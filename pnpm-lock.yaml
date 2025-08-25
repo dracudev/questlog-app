@@ -233,6 +233,8 @@ importers:
         specifier: ^5.3.2
         version: 5.9.2
 
+  packages/config: {}
+
   packages/shared-types:
     devDependencies:
       rimraf:
