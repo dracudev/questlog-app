@@ -1,0 +1,201 @@
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: questlog-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: questlog_dev
+      POSTGRES_USER: questlog
+      POSTGRES_PASSWORD: questlog_dev_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/backend/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - questlog-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U questlog -d questlog_dev']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: questlog-redis-dev
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - questlog-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # MinIO for file storage (S3-compatible)
+  minio:
+    image: minio/minio:latest
+    container_name: questlog-minio-dev
+    restart: unless-stopped
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: questlog
+      MINIO_ROOT_PASSWORD: questlog_minio_password
+    volumes:
+      - minio_data:/data
+    networks:
+      - questlog-network
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Backend API (NestJS)
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile.dev
+    container_name: questlog-backend-dev
+    restart: unless-stopped
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DATABASE_URL: postgresql://questlog:questlog_dev_password@postgres:5432/questlog_dev
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 24h
+      CORS_ORIGIN: http://localhost:4321
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: questlog
+      MINIO_SECRET_KEY: questlog_minio_password
+      MINIO_BUCKET_NAME: questlog-uploads
+      # Steam API (for future implementation)
+      STEAM_API_KEY: your-steam-api-key
+      # External Game APIs
+      RAWG_API_KEY: your-rawg-api-key
+      IGDB_CLIENT_ID: your-igdb-client-id
+      IGDB_CLIENT_SECRET: your-igdb-client-secret
+      # Email configuration (for future notifications)
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USER: your-email@gmail.com
+      SMTP_PASS: your-email-password
+      # Sentry for error tracking
+      SENTRY_DSN: your-sentry-dsn
+    volumes:
+      - ./apps/backend:/app
+      - /app/node_modules
+      - /app/dist
+    networks:
+      - questlog-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend (Astro)
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile.dev
+    container_name: questlog-frontend-dev
+    restart: unless-stopped
+    ports:
+      - '4321:4321'
+    environment:
+      NODE_ENV: development
+      PUBLIC_API_URL: http://localhost:3001
+      PUBLIC_SITE_URL: http://localhost:4321
+      # Analytics (for future indie games showcase)
+      PUBLIC_GOOGLE_ANALYTICS_ID: your-ga-id
+      PUBLIC_PLAUSIBLE_DOMAIN: localhost
+      # Feature flags
+      PUBLIC_ENABLE_STEAM_LOGIN: false
+      PUBLIC_ENABLE_INDIE_SHOWCASE: false
+      PUBLIC_ENABLE_ACHIEVEMENTS: false
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+      - /app/dist
+    networks:
+      - questlog-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4321']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx reverse proxy (for production-like setup)
+  nginx:
+    image: nginx:alpine
+    container_name: questlog-nginx-dev
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    volumes:
+      - ./docker/nginx/dev.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - questlog-network
+    depends_on:
+      - frontend
+      - backend
+
+  # MailHog for email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: questlog-mailhog-dev
+    restart: unless-stopped
+    ports:
+      - '1025:1025' # SMTP port
+      - '8025:8025' # Web UI port
+    networks:
+      - questlog-network
+
+  # Adminer for database management
+  adminer:
+    image: adminer:latest
+    container_name: questlog-adminer-dev
+    restart: unless-stopped
+    ports:
+      - '8080:8080'
+    networks:
+      - questlog-network
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+
+networks:
+  questlog-network:
+    driver: bridge

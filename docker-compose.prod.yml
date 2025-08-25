@@ -1,0 +1,185 @@
+
+services:
+  # PostgreSQL Database (Production)
+  postgres:
+    image: postgres:15-alpine
+    container_name: questlog-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+    networks:
+      - questlog-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Redis (Production)
+  redis:
+    image: redis:7-alpine
+    container_name: questlog-redis-prod
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - questlog-network
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'auth', '${REDIS_PASSWORD}', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API (Production)
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      args:
+        NODE_ENV: production
+    container_name: questlog-backend-prod
+    restart: always
+    ports:
+      - '3001:3001'
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      # File Storage
+      AWS_REGION: ${AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
+      # External APIs
+      STEAM_API_KEY: ${STEAM_API_KEY}
+      RAWG_API_KEY: ${RAWG_API_KEY}
+      IGDB_CLIENT_ID: ${IGDB_CLIENT_ID}
+      IGDB_CLIENT_SECRET: ${IGDB_CLIENT_SECRET}
+      # Email
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      # Monitoring
+      SENTRY_DSN: ${SENTRY_DSN}
+      # Rate limiting
+      RATE_LIMIT_TTL: 60
+      RATE_LIMIT_LIMIT: 100
+    networks:
+      - questlog-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
+      interval: 60s
+      timeout: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: questlog-nginx-prod
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./docker/nginx/prod.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/nginx/logs:/var/log/nginx
+    networks:
+      - questlog-network
+    depends_on:
+      - backend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  # Log aggregation
+  fluentd:
+    image: fluent/fluentd:latest
+    container_name: questlog-fluentd-prod
+    restart: always
+    volumes:
+      - ./docker/fluentd/fluent.conf:/fluentd/etc/fluent.conf
+      - /var/log:/var/log:ro
+    networks:
+      - questlog-network
+    depends_on:
+      - backend
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: questlog-prometheus-prod
+    restart: always
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - questlog-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+  # Database backup service
+  db-backup:
+    image: postgres:15-alpine
+    container_name: questlog-backup-prod
+    restart: unless-stopped
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh
+    networks:
+      - questlog-network
+    depends_on:
+      - postgres
+    command: >
+      sh -c "
+        chmod +x /backup.sh &&
+        echo '0 2 * * * /backup.sh' | crontab - &&
+        crond -f
+      "
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+networks:
+  questlog-network:
+    driver: bridge

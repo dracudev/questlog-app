@@ -1,0 +1,219 @@
+# ==============================================
+# Environment Variables
+# ==============================================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# ==============================================
+# Dependencies
+# ==============================================
+node_modules/
+.pnpm-store/
+.pnpm-debug.log*
+
+# ==============================================
+# Build Outputs
+# ==============================================
+dist/
+build/
+.next/
+.nuxt/
+.output/
+.vercel/
+.netlify/
+
+# Astro
+.astro/
+
+# ==============================================
+# Logs
+# ==============================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==============================================
+# Runtime Data
+# ==============================================
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ==============================================
+# Coverage Directory
+# ==============================================
+coverage/
+*.lcov
+.nyc_output/
+
+# ==============================================
+# IDEs and Editors
+# ==============================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ==============================================
+# OS Generated Files
+# ==============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.tmp
+
+# ==============================================
+# Database
+# ==============================================
+*.sqlite
+*.sqlite3
+*.db
+prisma/migrations/.migrate
+prisma/dev.db*
+
+# ==============================================
+# Docker
+# ==============================================
+.docker/
+docker-compose.override.yml
+
+# ==============================================
+# Certificates
+# ==============================================
+*.pem
+*.key
+*.crt
+*.cert
+ssl/
+certs/
+
+# ==============================================
+# Uploads & Static Files
+# ==============================================
+uploads/
+public/uploads/
+static/uploads/
+temp/
+.tmp/
+
+# ==============================================
+# Testing
+# ==============================================
+.jest/
+cypress/videos/
+cypress/screenshots/
+playwright-report/
+test-results/
+coverage/
+
+# ==============================================
+# Storybook
+# ==============================================
+storybook-static/
+
+# ==============================================
+# TypeScript
+# ==============================================
+*.tsbuildinfo
+
+# ==============================================
+# Package Manager Lockfiles
+# ==============================================
+# Keep pnpm-lock.yaml for consistency
+# Ignore other package managers
+package-lock.json
+yarn.lock
+
+# ==============================================
+# Backup Files
+# ==============================================
+backups/
+*.backup
+*.bak
+*.sql.gz
+
+# ==============================================
+# Temporary Files
+# ==============================================
+.cache/
+.parcel-cache/
+.swc/
+.turbo/
+.eslintcache
+
+# ==============================================
+# Sentry
+# ==============================================
+.sentry-cli
+.sentryclirc
+
+# ==============================================
+# Monitoring & Analytics
+# ==============================================
+sentry.properties
+
+# ==============================================
+# Local Development
+# ==============================================
+.local/
+dev-data/
+seed-data/
+test-data/
+
+# ==============================================
+# Documentation Generated Files
+# ==============================================
+docs/api/generated/
+docs/local/
+docs/.vitepress/dist/
+
+# ==============================================
+# Mobile Development (Future)
+# ==============================================
+*.apk
+*.ipa
+*.aab
+android/
+ios/
+platforms/
+
+# ==============================================
+# Game Files (Future Indie Showcase)
+# ==============================================
+games/uploads/
+demos/
+game-builds/
+*.unity3d
+*.wasm
+
+# ==============================================
+# Terraform (Future Infrastructure)
+# ==============================================
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# ==============================================
+# Kubernetes (Future)
+# ==============================================
+k8s/secrets/
+*.kubeconfig

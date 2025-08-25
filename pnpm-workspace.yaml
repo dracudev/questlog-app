@@ -1,0 +1,23 @@
+packages:
+  # Frontend applications
+  - 'apps/frontend'
+  
+  # Backend applications  
+  - 'apps/backend'
+  
+  # E2E testing
+  - 'apps/e2e'
+  
+  # Shared packages
+  - 'packages/shared-types'
+  - 'packages/ui-components'
+  - 'packages/utils'
+  - 'packages/config'
+  - 'packages/game-apis'
+  
+  # Future packages for indie games showcase
+  - 'packages/indie-sdk'
+  - 'packages/analytics'
+  
+  # Future packages for Steam integration
+  - 'packages/steam-integration'

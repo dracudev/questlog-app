@@ -1,0 +1,7 @@
+{
+  "name": "@questlog/config",
+  "version": "1.0.0",
+  "description": "Shared configuration for Questlog monorepo (eslint, prettier, typescript, tailwind)",
+  "main": "src/index.js",
+  "license": "MIT"
+}
