@@ -5,9 +5,9 @@ services:
     container_name: questlog-postgres-dev
     restart: unless-stopped
     environment:
-      POSTGRES_DB: questlog_dev
-      POSTGRES_USER: questlog
-      POSTGRES_PASSWORD: questlog
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
