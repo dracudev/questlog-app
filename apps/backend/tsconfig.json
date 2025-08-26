@@ -2,8 +2,9 @@
   "extends": "../../packages/config/src/typescript/tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["node"]
   },
-  "include": ["src"],
+  "include": ["src", "prisma/seeds"],
   "exclude": ["node_modules", "dist"]
 }

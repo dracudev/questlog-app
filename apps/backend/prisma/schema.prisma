@@ -1,0 +1,353 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Core User Management
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Authentication
+  email     String   @unique
+  username  String   @unique
+  password  String
+  role      UserRole @default(USER)
+  
+  // Profile Information
+  displayName String?
+  bio         String?  @db.Text
+  avatar      String?
+  location    String?
+  website     String?
+  
+  // Privacy and Preferences
+  isPrivate   Boolean @default(false)
+  language    String  @default("en")
+  timezone    String  @default("UTC")
+  
+  // Email preferences
+  emailNotifications Boolean @default(true)
+  
+  // Relations
+  reviews       Review[]
+  followers     Follow[] @relation("UserFollowers")
+  following     Follow[] @relation("UserFollowing")
+  likes         Like[]
+  gameLists     GameList[]
+  comments      Comment[]
+  
+  // Future expansion
+  achievements  UserAchievement[]
+  notifications Notification[]
+  sessions      UserSession[]
+  
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  MODERATOR
+}
+
+// Game Catalog System
+model Game {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Core Information
+  title       String
+  slug        String   @unique
+  description String?  @db.Text
+  summary     String?  @db.Text
+  
+  // Release Information
+  releaseDate DateTime?
+  status      GameStatus @default(RELEASED)
+  
+  // Media Assets
+  coverImage  String?
+  screenshots String[]
+  videos      String[]
+  
+  // External API Integration
+  rawgId      Int?     @unique
+  igdbId      Int?     @unique
+  steamId     Int?     @unique
+  metacriticId String?
+  
+  // Ratings and Metrics
+  averageRating Float?   @default(0)
+  reviewCount   Int      @default(0)
+  playCount     Int      @default(0)
+  
+  // Relations
+  developer     Developer?      @relation(fields: [developerId], references: [id])
+  developerId   String?
+  publisher     Publisher?      @relation(fields: [publisherId], references: [id])
+  publisherId   String?
+  genres        GameGenre[]
+  platforms     GamePlatform[]
+  reviews       Review[]
+  gameListEntries GameListEntry[]
+  
+  @@map("games")
+}
+
+enum GameStatus {
+  ANNOUNCED
+  IN_DEVELOPMENT
+  ALPHA
+  BETA
+  EARLY_ACCESS
+  RELEASED
+  CANCELLED
+}
+
+model Developer {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  website     String?
+  logo        String?
+  country     String?
+  foundedYear Int?
+  
+  games       Game[]
+  
+  @@map("developers")
+}
+
+model Publisher {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  website     String?
+  logo        String?
+  
+  games       Game[]
+  
+  @@map("publishers")
+}
+
+// Genre and Platform Systems
+model Genre {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
+  description String?
+  
+  games       GameGenre[]
+  
+  @@map("genres")
+}
+
+model Platform {
+  id           String         @id @default(cuid())
+  name         String         @unique
+  slug         String         @unique
+  abbreviation String?
+  
+  games        GamePlatform[]
+  
+  @@map("platforms")
+}
+
+model GameGenre {
+  gameId  String
+  genreId String
+  
+  game    Game   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+  
+  @@id([gameId, genreId])
+  @@map("game_genres")
+}
+
+model GamePlatform {
+  gameId     String
+  platformId String
+  
+  game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  platform   Platform @relation(fields: [platformId], references: [id], onDelete: Cascade)
+  
+  @@id([gameId, platformId])
+  @@map("game_platforms")
+}
+
+// Review System
+model Review {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Content
+  title     String?
+  content   String   @db.Text
+  rating    Float    // 0-10 scale
+  
+  // Status
+  isPublished Boolean @default(true)
+  isSpoiler   Boolean @default(false)
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  game        Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId      String
+  likes       Like[]
+  comments    Comment[]
+  
+  @@unique([userId, gameId])
+  @@map("reviews")
+}
+
+// Social System
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  
+  follower    User @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  @@id([followerId, followingId])
+  @@map("follows")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId  String
+  
+  @@unique([userId, reviewId])
+  @@map("likes")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  content   String   @db.Text
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reviewId  String
+  
+  @@map("comments")
+}
+
+// Game List System (Favorites, Played, Want to Play)
+model GameList {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  name        String
+  description String?   @db.Text
+  isPublic    Boolean   @default(true)
+  
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  entries     GameListEntry[]
+  
+  @@map("game_lists")
+}
+
+model GameListEntry {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  
+  notes      String?  @db.Text
+  order      Int      @default(0)
+  
+  gameList   GameList @relation(fields: [gameListId], references: [id], onDelete: Cascade)
+  gameListId String
+  game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId     String
+  
+  @@unique([gameListId, gameId])
+  @@map("game_list_entries")
+}
+
+// Future Features - Achievement System
+model Achievement {
+  id          String  @id @default(cuid())
+  name        String
+  description String
+  icon        String?
+  points      Int     @default(0)
+  
+  users       UserAchievement[]
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  unlockedAt    DateTime    @default(now())
+  
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  achievementId String
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// Future Features - Notification System
+model Notification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  title     String
+  message   String   @db.Text
+  type      NotificationType
+  isRead    Boolean  @default(false)
+  data      Json?
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  
+  @@map("notifications")
+}
+
+enum NotificationType {
+  FOLLOW
+  LIKE
+  COMMENT
+  REVIEW_REPLY
+  SYSTEM
+}
+
+// Session Management
+model UserSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  
+  @@map("user_sessions")
+}
