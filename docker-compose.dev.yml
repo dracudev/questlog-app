@@ -1,4 +1,3 @@
-
 services:
   # PostgreSQL Database
   postgres:
@@ -8,17 +7,17 @@ services:
     environment:
       POSTGRES_DB: questlog_dev
       POSTGRES_USER: questlog
-      POSTGRES_PASSWORD: questlog_dev_password
+      POSTGRES_PASSWORD: questlog
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./apps/backend/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - questlog-network
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U questlog -d questlog_dev']
+      test: ["CMD-SHELL", "pg_isready -U questlog -d questlog_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,13 +28,13 @@ services:
     container_name: questlog-redis-dev
     restart: unless-stopped
     ports:
-      - '6379:6379'
+      - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
       - questlog-network
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -46,8 +45,8 @@ services:
     container_name: questlog-minio-dev
     restart: unless-stopped
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - "9000:9000"
+      - "9001:9001"
     environment:
       MINIO_ROOT_USER: questlog
       MINIO_ROOT_PASSWORD: questlog_minio_password
@@ -57,7 +56,7 @@ services:
       - questlog-network
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -70,11 +69,11 @@ services:
     container_name: questlog-backend-dev
     restart: unless-stopped
     ports:
-      - '3001:3001'
+      - "3001:3001"
     environment:
       NODE_ENV: development
       PORT: 3001
-      DATABASE_URL: postgresql://questlog:questlog_dev_password@postgres:5432/questlog_dev
+      DATABASE_URL: postgresql://questlog:questlog@postgres:5432/questlog_dev
       REDIS_URL: redis://redis:6379
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       JWT_EXPIRES_IN: 24h
@@ -111,7 +110,7 @@ services:
       minio:
         condition: service_healthy
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -124,7 +123,7 @@ services:
     container_name: questlog-frontend-dev
     restart: unless-stopped
     ports:
-      - '4321:4321'
+      - "4321:4321"
     environment:
       NODE_ENV: development
       PUBLIC_API_URL: http://localhost:3001
@@ -145,7 +144,7 @@ services:
     depends_on:
       - backend
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4321']
+      test: ["CMD", "curl", "-f", "http://localhost:4321"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -156,7 +155,7 @@ services:
     container_name: questlog-nginx-dev
     restart: unless-stopped
     ports:
-      - '80:80'
+      - "80:80"
     volumes:
       - ./docker/nginx/dev.conf:/etc/nginx/nginx.conf:ro
     networks:
@@ -171,8 +170,8 @@ services:
     container_name: questlog-mailhog-dev
     restart: unless-stopped
     ports:
-      - '1025:1025' # SMTP port
-      - '8025:8025' # Web UI port
+      - "1025:1025" # SMTP port
+      - "8025:8025" # Web UI port
     networks:
       - questlog-network
 
@@ -182,7 +181,7 @@ services:
     container_name: questlog-adminer-dev
     restart: unless-stopped
     ports:
-      - '8080:8080'
+      - "8080:8080"
     networks:
       - questlog-network
     depends_on:
