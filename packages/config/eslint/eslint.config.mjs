@@ -1,5 +1,6 @@
 import eslintPluginTs from '@typescript-eslint/eslint-plugin';
 import eslintParserTs from '@typescript-eslint/parser';
+import prettierPlugin from 'eslint-plugin-prettier';
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
@@ -18,6 +19,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': eslintPluginTs,
+      prettier: prettierPlugin,
     },
     rules: {
       '@typescript-eslint/interface-name-prefix': 'off',
@@ -25,6 +27,7 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       quotes: ['error', 'single', { avoidEscape: true }],
+      'prettier/prettier': 'error',
     },
   },
 ];
