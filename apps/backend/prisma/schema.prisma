@@ -30,10 +30,13 @@ model User {
   isPrivate   Boolean @default(false)
   language    String  @default("en")
   timezone    String  @default("UTC")
-  
+
+  // Password reset
+  resetToken   String?
+
   // Email preferences
   emailNotifications Boolean @default(true)
-  
+
   // Relations
   reviews       Review[]
   followers     Follow[] @relation("UserFollowers")
