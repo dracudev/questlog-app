@@ -1,6 +1,6 @@
 {
   "name": "@questlog/backend",
-  "type": "module",
+  "type": "commonjs",
   "version": "0.0.1",
   "description": "Questlog Backend API",
   "author": "dracudev",
