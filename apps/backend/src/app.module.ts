@@ -10,6 +10,7 @@ import { FollowsModule } from './follows/follows.module';
 import { CommonModule } from './common/common.module'; */
 import { DatabaseModule } from './database/database.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { GamesModule } from './games/games.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
     // Feature modules
     AuthModule,
     UsersModule,
+    GamesModule,
     // GamesModule,
     // ReviewsModule,
     // FollowsModule,
