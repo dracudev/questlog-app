@@ -70,10 +70,21 @@ export class GamesService {
     }
   }
 
-  async findAll(
-  query: GamesQueryDto,
-  ): Promise<PaginatedGamesResponseDto> {
-  const { page = 1, limit = 12, search, genreIds, platformIds, developerId, publisherId, status, minRating, maxRating, sortBy = 'createdAt', sortOrder = 'desc' } = query;
+  async findAll(query: GamesQueryDto): Promise<PaginatedGamesResponseDto> {
+    const {
+      page = 1,
+      limit = 12,
+      search,
+      genreIds,
+      platformIds,
+      developerId,
+      publisherId,
+      status,
+      minRating,
+      maxRating,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+    } = query;
 
     const skip = (page - 1) * limit;
 
