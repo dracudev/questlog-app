@@ -193,7 +193,6 @@ docs/.vitepress/dist/
 *.aab
 android/
 ios/
-platforms/
 
 # ==============================================
 # Game Files (Future Indie Showcase)
