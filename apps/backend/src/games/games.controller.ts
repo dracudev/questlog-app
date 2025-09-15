@@ -24,8 +24,6 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { GameResponseDto } from './dto/game-response.dto';
 import { GameDetailDto } from './dto/game-detail.dto';
-import { GameFiltersDto } from './dto/game-filters.dto';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PaginatedGamesResponseDto } from './dto/paginated-game.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';

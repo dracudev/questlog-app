@@ -5,8 +5,6 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { GameResponseDto } from './dto/game-response.dto';
 import { GameDetailDto } from './dto/game-detail.dto';
-import { GameFiltersDto } from './dto/game-filters.dto';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
 import { PaginatedGamesResponseDto } from './dto/paginated-game.dto';
 import { GamesQueryDto } from './dto/games-query.dto';
 
@@ -65,6 +63,9 @@ export class GamesService {
         if (error.code === 'P2003') {
           throw new BadRequestException('Invalid developer, publisher, genre, or platform ID');
         }
+        if (error.code === 'P2025') {
+          throw new NotFoundException('Referenced entity not found');
+        }
       }
       throw error;
     }
@@ -88,17 +89,20 @@ export class GamesService {
 
     const skip = (page - 1) * limit;
 
+    // Sanitize search term
+    const sanitizedSearch = search?.trim().replace(/[<>\"']/g, '');
+
     // Build where clause
     const where: Prisma.GameWhereInput = {
       AND: [
-        search
+        sanitizedSearch
           ? {
               OR: [
-                { title: { contains: search, mode: 'insensitive' } },
-                { description: { contains: search, mode: 'insensitive' } },
+                { title: { contains: sanitizedSearch, mode: 'insensitive' } },
+                { description: { contains: sanitizedSearch, mode: 'insensitive' } },
                 {
                   developer: {
-                    name: { contains: search, mode: 'insensitive' },
+                    name: { contains: sanitizedSearch, mode: 'insensitive' },
                   },
                 },
               ],
@@ -409,12 +413,17 @@ export class GamesService {
   }
 
   private generateSlug(title: string): string {
+    if (!title || typeof title !== 'string') {
+      throw new BadRequestException('Title is required for slug generation');
+    }
+
     return title
       .toLowerCase()
+      .trim()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
-      .trim();
+      .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
   }
 
   private toGameResponseDto(game: any): GameResponseDto {
