@@ -9,7 +9,7 @@ import { ReviewsModule } from '@/reviews/reviews.module';
 import { FollowsModule } from '@/follows/follows.module';*/
 import { CommonModule } from '@/common/common.module';
 import { DatabaseModule } from '@/database/database.module';
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/guards';
 import { GamesModule } from '@/games/games.module';
 
 @Module({

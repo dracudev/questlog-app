@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GenreResponseDto } from './genre-response.dto';
-import { DeleteSuccessResponseDto } from '../../dto/delete-success-response.dto';
+import { DeleteSuccessResponseDto } from '../../dto';
 
 export class PaginatedGenresResponseDto {
   @ApiProperty({ type: [GenreResponseDto] })

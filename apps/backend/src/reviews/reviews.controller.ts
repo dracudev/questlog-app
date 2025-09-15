@@ -28,9 +28,8 @@ import {
   ReviewsQueryDto,
   DeleteSuccessResponseDto,
 } from './dto';
-import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
-import { GetUser } from '@/auth/decorators/get-user.decorator';
-import { Public } from '@/auth/decorators/public.decorator';
+import { JwtAuthGuard } from '@/auth/guards';
+import { GetUser, Public } from '@/auth/decorators';
 import { User } from '@prisma/client';
 
 @ApiTags('Reviews')

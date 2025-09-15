@@ -21,13 +21,9 @@ import {
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateProfileDto, UserResponseDto, UserProfileDto } from './dto';
-import { PaginationQueryDto } from '../common/dto/pagination-query.dto';
-import { PaginatedResponseDto } from '../common/dto/paginated-response.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { GetUser } from '../auth/decorators/get-user.decorator';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { Public } from '../auth/decorators/public.decorator';
+import { PaginationQueryDto, PaginatedResponseDto } from '../common/dto';
+import { JwtAuthGuard, RolesGuard } from '../auth/guards';
+import { GetUser, Roles, Public } from '../auth/decorators';
 import { UserRole } from '@prisma/client';
 
 @ApiTags('Users')
