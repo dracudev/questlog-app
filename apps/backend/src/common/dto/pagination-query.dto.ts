@@ -2,6 +2,7 @@ import { IsOptional, IsPositive, IsString, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { GAMES_CONSTANTS } from '../../games/constants/games.constants';
+import { PAGINATION_DEFAULTS } from '../constants';
 
 export class PaginationQueryDto {
   @ApiPropertyOptional({ example: 1, minimum: 1, default: 1 })
@@ -15,7 +16,7 @@ export class PaginationQueryDto {
   @Type(() => Number)
   @Min(1)
   @Max(GAMES_CONSTANTS.PAGINATION.MAX_LIMIT)
-  limit?: number = 10;
+  limit?: number = PAGINATION_DEFAULTS.LIMIT;
 
   @ApiPropertyOptional({ example: 'witcher', description: 'Search term' })
   @IsOptional()

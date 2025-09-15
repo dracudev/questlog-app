@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
+import { HTTP_ERROR_MESSAGES, PRISMA_ERROR_CODES } from '../constants';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -19,7 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
+    let message: string = HTTP_ERROR_MESSAGES.INTERNAL_SERVER_ERROR;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -33,7 +34,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message = this.handlePrismaError(exception);
     } else if (exception instanceof Prisma.PrismaClientValidationError) {
       status = HttpStatus.BAD_REQUEST;
-      message = 'Invalid data provided';
+      message = HTTP_ERROR_MESSAGES.INVALID_DATA;
     }
 
     const errorResponse = {
@@ -54,16 +55,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
   private handlePrismaError(exception: Prisma.PrismaClientKnownRequestError): string {
     switch (exception.code) {
-      case 'P2002':
-        return 'A record with this data already exists';
-      case 'P2025':
-        return 'Record not found';
-      case 'P2003':
-        return 'Invalid reference to related record';
-      case 'P2016':
-        return 'Query interpretation error';
+      case PRISMA_ERROR_CODES.UNIQUE_CONSTRAINT:
+        return HTTP_ERROR_MESSAGES.RECORD_EXISTS;
+      case PRISMA_ERROR_CODES.RECORD_NOT_FOUND:
+        return HTTP_ERROR_MESSAGES.RECORD_NOT_FOUND;
+      case PRISMA_ERROR_CODES.FOREIGN_KEY_CONSTRAINT:
+        return HTTP_ERROR_MESSAGES.INVALID_REFERENCE;
+      case PRISMA_ERROR_CODES.QUERY_INTERPRETATION:
+        return HTTP_ERROR_MESSAGES.QUERY_ERROR;
       default:
-        return 'Database operation failed';
+        return HTTP_ERROR_MESSAGES.DATABASE_ERROR;
     }
   }
 }

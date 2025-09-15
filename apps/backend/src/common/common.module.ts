@@ -1,8 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
-import { TransformInterceptor } from './interceptors/transform.interceptor';
-import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { TransformInterceptor, LoggingInterceptor } from './interceptors';
 
 @Global()
 @Module({
