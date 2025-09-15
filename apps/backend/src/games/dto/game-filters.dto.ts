@@ -2,6 +2,7 @@ import { IsOptional, IsArray, IsEnum, IsNumber, IsUUID, Min, Max } from 'class-v
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { GameStatus } from '@prisma/client';
+import { SORT_FIELDS, SORT_ORDERS } from '../constants/games.constants';
 
 export class GameFiltersDto {
   @ApiPropertyOptional({ example: ['cm2a3b4c5d6e7f8g9h0i'] })
@@ -48,15 +49,15 @@ export class GameFiltersDto {
   maxRating?: number;
 
   @ApiPropertyOptional({
-    enum: ['title', 'releaseDate', 'averageRating', 'reviewCount', 'createdAt'],
+    enum: SORT_FIELDS,
     default: 'createdAt',
   })
   @IsOptional()
-  @IsEnum(['title', 'releaseDate', 'averageRating', 'reviewCount', 'createdAt'])
+  @IsEnum(SORT_FIELDS)
   sortBy?: string;
 
-  @ApiPropertyOptional({ enum: ['asc', 'desc'], default: 'desc' })
+  @ApiPropertyOptional({ enum: SORT_ORDERS, default: 'desc' })
   @IsOptional()
-  @IsEnum(['asc', 'desc'])
+  @IsEnum(SORT_ORDERS)
   sortOrder?: 'asc' | 'desc';
 }

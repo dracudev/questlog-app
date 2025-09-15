@@ -10,11 +10,12 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { GameStatus } from '@prisma/client';
+import { GAMES_CONSTANTS } from '../constants/games.constants';
 
 export class CreateGameDto {
   @ApiProperty({ example: 'The Witcher 3: Wild Hunt' })
   @IsString()
-  @MaxLength(200)
+  @MaxLength(GAMES_CONSTANTS.VALIDATION.TITLE_MAX_LENGTH)
   title: string;
 
   @ApiPropertyOptional({ example: 'the-witcher-3-wild-hunt' })
@@ -30,7 +31,7 @@ export class CreateGameDto {
   @ApiPropertyOptional({ example: 'Award-winning RPG from CD Projekt RED' })
   @IsOptional()
   @IsString()
-  @MaxLength(500)
+  @MaxLength(GAMES_CONSTANTS.VALIDATION.SUMMARY_MAX_LENGTH)
   summary?: string;
 
   @ApiPropertyOptional({ example: '2015-05-19T00:00:00.000Z' })

@@ -7,6 +7,7 @@ import { GameResponseDto } from './dto/game-response.dto';
 import { GameDetailDto } from './dto/game-detail.dto';
 import { PaginatedGamesResponseDto } from './dto/paginated-game.dto';
 import { GamesQueryDto } from './dto/games-query.dto';
+import { GAMES_CONSTANTS } from './constants/games.constants';
 
 @Injectable()
 export class GamesService {
@@ -73,8 +74,8 @@ export class GamesService {
 
   async findAll(query: GamesQueryDto): Promise<PaginatedGamesResponseDto> {
     const {
-      page = 1,
-      limit = 12,
+      page = GAMES_CONSTANTS.PAGINATION.DEFAULT_PAGE,
+      limit = GAMES_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
       search,
       genreIds,
       platformIds,
@@ -355,7 +356,10 @@ export class GamesService {
     });
   }
 
-  async getSimilarGames(gameId: string, limit: number = 6): Promise<GameResponseDto[]> {
+  async getSimilarGames(
+    gameId: string,
+    limit: number = GAMES_CONSTANTS.SIMILAR_GAMES.DEFAULT_LIMIT,
+  ): Promise<GameResponseDto[]> {
     const game = await this.prisma.game.findUnique({
       where: { id: gameId },
       include: {
@@ -467,7 +471,9 @@ export class GamesService {
         game.reviews?.map((review: any) => ({
           id: review.id,
           title: review.title,
-          content: review.content.substring(0, 300) + (review.content.length > 300 ? '...' : ''),
+          content:
+            review.content.substring(0, GAMES_CONSTANTS.REVIEW_PREVIEW.MAX_LENGTH) +
+            (review.content.length > GAMES_CONSTANTS.REVIEW_PREVIEW.MAX_LENGTH ? '...' : ''),
           rating: review.rating,
           createdAt: review.createdAt,
           user: review.user,

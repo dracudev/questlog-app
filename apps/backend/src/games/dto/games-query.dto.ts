@@ -4,6 +4,7 @@ import { Type, Transform } from 'class-transformer';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import { GameFiltersDto } from './game-filters.dto';
 import { GameStatus } from '@prisma/client';
+import { SORT_FIELDS, SORT_ORDERS } from '../constants/games.constants';
 
 @ApiExtraModels(PaginationQueryDto, GameFiltersDto)
 export class GamesQueryDto extends PaginationQueryDto implements GameFiltersDto {
@@ -53,15 +54,15 @@ export class GamesQueryDto extends PaginationQueryDto implements GameFiltersDto 
   maxRating?: number;
 
   @ApiPropertyOptional({
-    enum: ['title', 'releaseDate', 'averageRating', 'reviewCount', 'createdAt'],
+    enum: SORT_FIELDS,
     default: 'createdAt',
   })
   @IsOptional()
-  @IsEnum(['title', 'releaseDate', 'averageRating', 'reviewCount', 'createdAt'])
+  @IsEnum(SORT_FIELDS)
   sortBy?: string;
 
-  @ApiPropertyOptional({ enum: ['asc', 'desc'], default: 'desc' })
+  @ApiPropertyOptional({ enum: SORT_ORDERS, default: 'desc' })
   @IsOptional()
-  @IsEnum(['asc', 'desc'])
+  @IsEnum(SORT_ORDERS)
   sortOrder?: 'asc' | 'desc';
 }
