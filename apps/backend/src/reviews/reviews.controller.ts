@@ -20,12 +20,14 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
-import { ReviewResponseDto } from './dto/review-response.dto';
-import { PaginatedReviewsResponseDto } from './dto/paginated-reviews.dto';
-import { ReviewsQueryDto } from './dto/reviews-query.dto';
-import { DeleteSuccessResponseDto } from './dto/delete-success-response.dto';
+import {
+  CreateReviewDto,
+  UpdateReviewDto,
+  ReviewResponseDto,
+  PaginatedReviewsResponseDto,
+  ReviewsQueryDto,
+  DeleteSuccessResponseDto,
+} from './dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { GetUser } from '@/auth/decorators/get-user.decorator';
 import { Public } from '@/auth/decorators/public.decorator';

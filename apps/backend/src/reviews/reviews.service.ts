@@ -7,11 +7,13 @@ import {
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '@/database/prisma.service';
 import { GamesService } from '@/games/games.service';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
-import { ReviewResponseDto } from './dto/review-response.dto';
-import { PaginatedReviewsResponseDto } from './dto/paginated-reviews.dto';
-import { ReviewsQueryDto } from './dto/reviews-query.dto';
+import {
+  CreateReviewDto,
+  UpdateReviewDto,
+  ReviewResponseDto,
+  PaginatedReviewsResponseDto,
+  ReviewsQueryDto,
+} from './dto';
 import { REVIEWS_CONSTANTS } from './constants/reviews.constants';
 
 @Injectable()
