@@ -2,16 +2,16 @@ import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req, Get } fro
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { AuthResponse } from './interfaces/auth-response.interface';
-import { GetUser } from './decorators/get-user.decorator';
+import { LocalAuthGuard, JwtAuthGuard, JwtRefreshGuard } from './guards';
+import {
+  RegisterDto,
+  LoginDto,
+  ChangePasswordDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dto';
+import { AuthResponse } from './interfaces';
+import { GetUser } from './decorators';
 
 @ApiTags('Authentication')
 @Controller('auth')

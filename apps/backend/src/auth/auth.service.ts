@@ -8,13 +8,20 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '@/users/users.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { AuthResponse } from './interfaces/auth-response.interface';
+import {
+  RegisterDto,
+  LoginDto,
+  ChangePasswordDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dto';
+import { JwtPayload, AuthResponse } from './interfaces';
+import {
+  BCRYPT_SALT_ROUNDS,
+  BCRYPT_RESET_TOKEN_ROUNDS,
+  JWT_TOKEN_TYPE,
+  AUTH_MESSAGES,
+} from './constants/auth.constants';
 
 @Injectable()
 export class AuthService {
@@ -31,15 +38,15 @@ export class AuthService {
     const existingUser = await this.usersService.findByEmailOrUsername(email, username);
     if (existingUser) {
       if (existingUser.email === email) {
-        throw new ConflictException('Email already registered');
+        throw new ConflictException(AUTH_MESSAGES.EMAIL_ALREADY_REGISTERED);
       }
       if (existingUser.username === username) {
-        throw new ConflictException('Username already taken');
+        throw new ConflictException(AUTH_MESSAGES.USERNAME_ALREADY_TAKEN);
       }
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
     // Create user
     const user = await this.usersService.create({
@@ -70,12 +77,12 @@ export class AuthService {
 
     const user = await this.usersService.findByEmail(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(AUTH_MESSAGES.INVALID_CREDENTIALS);
     }
 
     // Update last login
@@ -101,7 +108,7 @@ export class AuthService {
   async refreshToken(userId: string): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.usersService.findById(userId);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
     return this.generateTokens(user.id, user.email, user.role);
@@ -112,15 +119,15 @@ export class AuthService {
 
     const user = await this.usersService.findById(userId);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException(AUTH_MESSAGES.USER_NOT_FOUND);
     }
 
     const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
     if (!isCurrentPasswordValid) {
-      throw new BadRequestException('Current password is incorrect');
+      throw new BadRequestException(AUTH_MESSAGES.CURRENT_PASSWORD_INCORRECT);
     }
 
-    const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+    const hashedNewPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
     await this.usersService.updatePassword(userId, hashedNewPassword);
   }
 
@@ -135,7 +142,7 @@ export class AuthService {
 
     // Generate reset token (expires in 1 hour)
     const resetToken = this.jwtService.sign(
-      { userId: user.id, type: 'reset' },
+      { userId: user.id, type: JWT_TOKEN_TYPE.RESET },
       {
         secret: this.configService.get<string>('JWT_RESET_SECRET'),
         expiresIn: '1h',
@@ -143,7 +150,7 @@ export class AuthService {
     );
 
     // Store reset token hash in database
-    const resetTokenHash = await bcrypt.hash(resetToken, 10);
+    const resetTokenHash = await bcrypt.hash(resetToken, BCRYPT_RESET_TOKEN_ROUNDS);
     await this.usersService.updateResetToken(user.id, resetTokenHash);
 
     // TODO: Send email with reset link
@@ -158,27 +165,27 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_RESET_SECRET'),
       }) as { userId: string; type: string };
 
-      if (decoded.type !== 'reset') {
-        throw new BadRequestException('Invalid token type');
+      if (decoded.type !== JWT_TOKEN_TYPE.RESET) {
+        throw new BadRequestException(AUTH_MESSAGES.INVALID_TOKEN_TYPE);
       }
 
       const user = await this.usersService.findById(decoded.userId);
       if (!user || !user.resetToken) {
-        throw new BadRequestException('Invalid or expired reset token');
+        throw new BadRequestException(AUTH_MESSAGES.INVALID_OR_EXPIRED_TOKEN);
       }
 
       const isTokenValid = await bcrypt.compare(token, user.resetToken);
       if (!isTokenValid) {
-        throw new BadRequestException('Invalid or expired reset token');
+        throw new BadRequestException(AUTH_MESSAGES.INVALID_OR_EXPIRED_TOKEN);
       }
 
       // Update password and clear reset token
-      const hashedPassword = await bcrypt.hash(newPassword, 12);
+      const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
       await this.usersService.updatePassword(user.id, hashedPassword);
       await this.usersService.clearResetToken(user.id);
     } catch (error) {
       if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-        throw new BadRequestException('Invalid or expired reset token');
+        throw new BadRequestException(AUTH_MESSAGES.INVALID_OR_EXPIRED_TOKEN);
       }
       throw error;
     }
