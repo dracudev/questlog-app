@@ -96,8 +96,7 @@ questlog/
 │   │   │   ├── users/                    # User management
 │   │   │   ├── games/                    # Game catalog
 │   │   │   ├── reviews/                  # Review system
-│   │   │   ├── follows/                  # Social following
-│   │   │   ├── feed/                     # Social feed
+│   │   │   ├── social/                  # Social following, feed
 │   │   │   ├── indie/                    # Indie games showcase
 │   │   │   ├── steam/                    # Steam integration (future)
 │   │   │   ├── achievements/             # Achievement system (future)

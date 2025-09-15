@@ -5,8 +5,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthModule } from '@/auth/auth.module';
 import { UsersModule } from '@/users/users.module';
 import { ReviewsModule } from '@/reviews/reviews.module';
-/*
-import { FollowsModule } from '@/follows/follows.module';*/
+import { SocialModule } from '@/social/social.module';
 import { CommonModule } from '@/common/common.module';
 import { DatabaseModule } from '@/database/database.module';
 import { JwtAuthGuard } from '@/auth/guards';
@@ -37,7 +36,7 @@ import { GamesModule } from '@/games/games.module';
     UsersModule,
     GamesModule,
     ReviewsModule,
-    // FollowsModule,
+    SocialModule,
   ],
   providers: [
     // Global guards
