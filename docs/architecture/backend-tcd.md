@@ -255,6 +255,7 @@ GET    /api/games/:id/similar      # Get similar games based on genres/developer
 ### Game Metadata Management
 
 **Developers** (`/api/developers`)
+
 ```
 GET    /api/developers             # List developers with pagination/filters
 POST   /api/developers             # Create developer (admin/moderator only)
@@ -266,6 +267,7 @@ GET    /api/developers/:id/stats   # Get developer statistics
 ```
 
 **Genres** (`/api/genres`)
+
 ```
 GET    /api/genres                 # List game genres
 POST   /api/genres                 # Create genre (admin/moderator only)
@@ -275,6 +277,7 @@ DELETE /api/genres/:id             # Delete genre (admin only)
 ```
 
 **Platforms** (`/api/platforms`)
+
 ```
 GET    /api/platforms              # List gaming platforms
 POST   /api/platforms              # Create platform (admin/moderator only)
@@ -284,6 +287,7 @@ DELETE /api/platforms/:id          # Delete platform (admin only)
 ```
 
 **Publishers** (`/api/publishers`)
+
 ```
 GET    /api/publishers             # List game publishers
 POST   /api/publishers             # Create publisher (admin/moderator only)
@@ -609,24 +613,28 @@ The application is designed for deployment on platforms like Railway, Render, or
 ### Implemented Features (Current)
 
 ✅ **Authentication & Authorization**
+
 - Complete JWT-based auth with refresh tokens
 - Role-based access control (User, Admin, Moderator)
 - Password management (change, reset, forgot)
 - Secure route protection and guards
 
 ✅ **Game Catalog System**
+
 - Full CRUD operations for games
 - Comprehensive metadata management (developers, genres, platforms, publishers)
 - Advanced search and filtering capabilities
 - Game relationships and similar game suggestions
 
 ✅ **Review System**
+
 - Create, read, update, delete reviews
 - Review rating system (0-10 scale)
 - Review interactions (like/unlike)
 - Privacy controls (published/draft, spoiler flags)
 
 ✅ **Social Features**
+
 - User following/unfollowing
 - Activity feeds and social statistics
 - Mutual connections discovery
@@ -634,6 +642,7 @@ The application is designed for deployment on platforms like Railway, Render, or
 - User profile management
 
 ✅ **Technical Foundation**
+
 - Comprehensive API documentation (Swagger)
 - Advanced pagination and filtering
 - Global error handling and validation
@@ -643,23 +652,27 @@ The application is designed for deployment on platforms like Railway, Render, or
 ### Planned Features (Future)
 
 🔄 **Enhanced Social Features**
+
 - Comments on reviews
 - Review discussions and threads
 - User notifications system
 - Advanced activity feed filtering
 
 🔄 **Gamification**
+
 - User achievements and badges
 - Gaming statistics and analytics
 - Personal gaming journals/questlogs
 - Progress tracking for games
 
 🔄 **External Integrations**
+
 - Steam API integration for library sync
 - Other gaming platform integrations (Epic, PlayStation, Xbox)
 - Game metadata enrichment from external APIs
 
 🔄 **Advanced Features**
+
 - Game recommendations engine
 - User-created game lists and collections
 - Advanced search with AI/ML capabilities
