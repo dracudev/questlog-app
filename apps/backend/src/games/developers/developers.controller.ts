@@ -27,10 +27,12 @@ import {
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { DevelopersService } from './developers.service';
-import { CreateDeveloperDto } from './dto/create-developer.dto';
-import { UpdateDeveloperDto } from './dto/update-developer.dto';
-import { DeveloperResponseDto } from './dto/developer-response.dto';
-import { PaginatedDevelopersResponseDto } from './dto/paginated-developer.dto';
+import {
+  CreateDeveloperDto,
+  UpdateDeveloperDto,
+  DeveloperResponseDto,
+  PaginatedDevelopersResponseDto,
+} from './dto';
 
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';

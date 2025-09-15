@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Prisma, Game } from '@prisma/client';
 import { PrismaService } from '@/database/prisma.service';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
-import { GameResponseDto } from './dto/game-response.dto';
-import { GameDetailDto } from './dto/game-detail.dto';
-import { PaginatedGamesResponseDto } from './dto/paginated-game.dto';
-import { GamesQueryDto } from './dto/games-query.dto';
+import {
+  CreateGameDto,
+  UpdateGameDto,
+  GameResponseDto,
+  GameDetailDto,
+  PaginatedGamesResponseDto,
+  GamesQueryDto,
+} from './dto';
 import { GAMES_CONSTANTS } from './constants/games.constants';
 
 @Injectable()

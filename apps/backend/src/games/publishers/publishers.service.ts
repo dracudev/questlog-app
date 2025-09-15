@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '@/database/prisma.service';
-import { CreatePublisherDto } from './dto/create-publisher.dto';
-import { UpdatePublisherDto } from './dto/update-publisher.dto';
-import { PublisherResponseDto } from './dto/publisher-response.dto';
-import { PaginatedPublishersResponseDto } from './dto/paginated-publisher.dto';
+import {
+  CreatePublisherDto,
+  UpdatePublisherDto,
+  PublisherResponseDto,
+  PaginatedPublishersResponseDto,
+} from './dto';
 
 @Injectable()
 export class PublishersService {

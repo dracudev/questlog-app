@@ -27,10 +27,12 @@ import {
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { GenresService } from './genres.service';
-import { CreateGenreDto } from './dto/create-genre.dto';
-import { UpdateGenreDto } from './dto/update-genre.dto';
-import { GenreResponseDto } from './dto/genre-response.dto';
-import { PaginatedGenresResponseDto } from './dto/paginated-genre.dto';
+import {
+  CreateGenreDto,
+  UpdateGenreDto,
+  GenreResponseDto,
+  PaginatedGenresResponseDto,
+} from './dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';

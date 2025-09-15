@@ -27,10 +27,12 @@ import {
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { PlatformsService } from './platforms.service';
-import { CreatePlatformDto } from './dto/create-platform.dto';
-import { UpdatePlatformDto } from './dto/update-platform.dto';
-import { PlatformResponseDto } from './dto/platform-response.dto';
-import { PaginatedPlatformsResponseDto } from './dto/paginated-platform.dto';
+import {
+  CreatePlatformDto,
+  UpdatePlatformDto,
+  PlatformResponseDto,
+  PaginatedPlatformsResponseDto,
+} from './dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';

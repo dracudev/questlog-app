@@ -27,10 +27,12 @@ import {
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { PublishersService } from './publishers.service';
-import { CreatePublisherDto } from './dto/create-publisher.dto';
-import { UpdatePublisherDto } from './dto/update-publisher.dto';
-import { PublisherResponseDto } from './dto/publisher-response.dto';
-import { PaginatedPublishersResponseDto } from './dto/paginated-publisher.dto';
+import {
+  CreatePublisherDto,
+  UpdatePublisherDto,
+  PublisherResponseDto,
+  PaginatedPublishersResponseDto,
+} from './dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';

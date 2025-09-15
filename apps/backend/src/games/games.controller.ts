@@ -20,16 +20,18 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { GamesService } from './games.service';
-import { CreateGameDto } from './dto/create-game.dto';
-import { UpdateGameDto } from './dto/update-game.dto';
-import { GameResponseDto } from './dto/game-response.dto';
-import { GameDetailDto } from './dto/game-detail.dto';
-import { PaginatedGamesResponseDto } from './dto/paginated-game.dto';
+import {
+  CreateGameDto,
+  UpdateGameDto,
+  GameResponseDto,
+  GameDetailDto,
+  PaginatedGamesResponseDto,
+  GamesQueryDto,
+} from './dto';
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
 import { Public } from '@/auth/decorators/public.decorator';
-import { GamesQueryDto } from './dto/games-query.dto';
 
 @ApiTags('Games')
 @Controller('games')

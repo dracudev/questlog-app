@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '@/database/prisma.service';
-import { CreatePlatformDto } from './dto/create-platform.dto';
-import { UpdatePlatformDto } from './dto/update-platform.dto';
-import { PlatformResponseDto } from './dto/platform-response.dto';
-import { PaginatedPlatformsResponseDto } from './dto/paginated-platform.dto';
+import {
+  CreatePlatformDto,
+  UpdatePlatformDto,
+  PlatformResponseDto,
+  PaginatedPlatformsResponseDto,
+} from './dto';
 
 @Injectable()
 export class PlatformsService {
