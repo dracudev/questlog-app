@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { DeveloperResponseDto } from './developer-response.dto';
-import { DeleteSuccessResponseDto } from '../../dto/delete-success-response.dto';
+import { DeleteSuccessResponseDto } from '@/games/dto/delete-success-response.dto';
 
 export class PaginatedDevelopersResponseDto {
   @ApiProperty({ type: [DeveloperResponseDto] })

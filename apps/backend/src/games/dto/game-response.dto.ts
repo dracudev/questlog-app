@@ -1,8 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { DeveloperResponseDto } from '../developers/dto/developer-response.dto';
-import { PublisherResponseDto } from '../publishers/dto/publisher-response.dto';
-import { GenreResponseDto } from '../genres/dto/genre-response.dto';
-import { PlatformResponseDto } from '../platforms/dto/platform-response.dto';
+import { DeveloperResponseDto } from '@/games/developers/dto/developer-response.dto';
+import { PublisherResponseDto } from '@/games/publishers/dto/publisher-response.dto';
+import { GenreResponseDto } from '@/games/genres/dto/genre-response.dto';
+import { PlatformResponseDto } from '@/games/platforms/dto/platform-response.dto';
 
 export class GameBasicDto {
   @ApiProperty({ example: 'cm2a3b4c5d6e7f8g9h0i' })

@@ -5,8 +5,8 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
-import { AppModule } from './app.module';
-import { PrismaService } from './database/prisma.service';
+import { AppModule } from '@/app.module';
+import { PrismaService } from '@/database/prisma.service';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');

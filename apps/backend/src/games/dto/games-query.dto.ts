@@ -1,7 +1,7 @@
 import { ApiPropertyOptional, ApiExtraModels } from '@nestjs/swagger';
 import { IsOptional, IsArray, IsEnum, IsNumber, IsUUID, Min, Max, IsString } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { PaginationQueryDto } from '@/common/dto/pagination-query.dto';
 import { GameFiltersDto } from './game-filters.dto';
 import { GameStatus } from '@prisma/client';
 import { SORT_FIELDS, SORT_ORDERS } from '../constants/games.constants';
