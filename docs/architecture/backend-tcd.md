@@ -224,7 +224,9 @@ All endpoints use consistent JSON format:
 {
   "statusCode": 200,
   "message": "Success",
-  "data": { /* response data */ }
+  "data": {
+    /* response data */
+  }
 }
 ```
 
@@ -243,7 +245,9 @@ All endpoints use consistent JSON format:
 
 ```json
 {
-  "data": [/* items */],
+  "data": [
+    /* items */
+  ],
   "meta": {
     "page": 1,
     "limit": 12,
@@ -344,7 +348,7 @@ pnpm install
 ```
 
 2. **Environment Variables:**
-Create `/apps/backend/.env` with these required variables:
+   Create `/apps/backend/.env` with these required variables:
 
 ```bash
 # Database
