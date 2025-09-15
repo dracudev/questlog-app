@@ -1,13 +1,16 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { Prisma, User, UserRole } from '@prisma/client';
 import { PrismaService } from '@/database/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { UserResponseDto } from './dto/user-response.dto';
-import { UserProfileDto } from './dto/user-profile.dto';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  UpdateProfileDto,
+  UserResponseDto,
+  UserProfileDto,
+} from './dto';
 import { PaginationQueryDto } from '@/common/dto/pagination-query.dto';
 import { PaginatedResponseDto } from '@/common/dto/paginated-response.dto';
+import { USERS_CONSTANTS } from './constants/users.constants';
 
 @Injectable()
 export class UsersService {
@@ -32,7 +35,11 @@ export class UsersService {
   async findAll(
     paginationQuery: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<UserResponseDto>> {
-    const { page = 1, limit = 10, search } = paginationQuery;
+    const {
+      page = USERS_CONSTANTS.PAGINATION.DEFAULT_PAGE,
+      limit = USERS_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
+      search,
+    } = paginationQuery;
     const skip = (page - 1) * limit;
 
     const where: Prisma.UserWhereInput = search
@@ -131,7 +138,7 @@ export class UsersService {
           : false,
         reviews: {
           where: { isPublished: true },
-          take: 5,
+          take: USERS_CONSTANTS.PROFILE.RECENT_REVIEWS_LIMIT,
           orderBy: { createdAt: 'desc' },
           include: {
             game: {
@@ -152,7 +159,7 @@ export class UsersService {
         },
         gameLists: {
           where: { isPublic: true },
-          take: 3,
+          take: USERS_CONSTANTS.PROFILE.RECENT_GAME_LISTS_LIMIT,
           orderBy: { updatedAt: 'desc' },
           include: {
             _count: {
@@ -214,7 +221,11 @@ export class UsersService {
       recentReviews: user.reviews.map((review) => ({
         id: review.id,
         title: review.title,
-        content: review.content.substring(0, 200) + (review.content.length > 200 ? '...' : ''),
+        content:
+          review.content.substring(0, USERS_CONSTANTS.PROFILE.REVIEW_CONTENT_PREVIEW_LENGTH) +
+          (review.content.length > USERS_CONSTANTS.PROFILE.REVIEW_CONTENT_PREVIEW_LENGTH
+            ? '...'
+            : ''),
         rating: review.rating,
         createdAt: review.createdAt,
         game: review.game,
@@ -300,7 +311,9 @@ export class UsersService {
       data: {
         userId: id,
         token: resetToken,
-        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+        expiresAt: new Date(
+          Date.now() + USERS_CONSTANTS.SESSION.RESET_TOKEN_EXPIRY_HOURS * 60 * 60 * 1000,
+        ),
       },
     });
   }
@@ -342,7 +355,10 @@ export class UsersService {
     username: string,
     paginationQuery: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<UserResponseDto>> {
-    const { page = 1, limit = 10 } = paginationQuery;
+    const {
+      page = USERS_CONSTANTS.PAGINATION.DEFAULT_PAGE,
+      limit = USERS_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
+    } = paginationQuery;
     const skip = (page - 1) * limit;
 
     const user = await this.findByUsername(username);
@@ -399,7 +415,10 @@ export class UsersService {
     username: string,
     paginationQuery: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<UserResponseDto>> {
-    const { page = 1, limit = 10 } = paginationQuery;
+    const {
+      page = USERS_CONSTANTS.PAGINATION.DEFAULT_PAGE,
+      limit = USERS_CONSTANTS.PAGINATION.DEFAULT_LIMIT,
+    } = paginationQuery;
     const skip = (page - 1) * limit;
 
     const user = await this.findByUsername(username);
