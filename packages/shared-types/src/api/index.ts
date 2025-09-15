@@ -30,7 +30,7 @@ export interface PaginationQuery {
 
 export interface SortQuery {
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface SearchQuery {

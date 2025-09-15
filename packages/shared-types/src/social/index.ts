@@ -8,13 +8,13 @@ export interface SocialStats {
 
 // Activity Feed Types
 export type ActivityType =
-  | 'REVIEW_CREATED'
-  | 'REVIEW_LIKED'
-  | 'USER_FOLLOWED'
-  | 'GAME_ADDED'
-  | 'REVIEW_UPDATED';
+  | "REVIEW_CREATED"
+  | "REVIEW_LIKED"
+  | "USER_FOLLOWED"
+  | "GAME_ADDED"
+  | "REVIEW_UPDATED";
 
-export type ActivityTargetType = 'GAME' | 'USER' | 'REVIEW';
+export type ActivityTargetType = "GAME" | "USER" | "REVIEW";
 
 export interface ActivityUser {
   id: string;

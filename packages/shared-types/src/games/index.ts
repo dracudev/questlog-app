@@ -1,9 +1,9 @@
 // Game Status Types
 export type GameStatus =
-  | 'RELEASED'
-  | 'UNRELEASED'
-  | 'EARLY_ACCESS'
-  | 'CANCELLED';
+  | "RELEASED"
+  | "UNRELEASED"
+  | "EARLY_ACCESS"
+  | "CANCELLED";
 
 // Basic Game Entities
 export interface DeveloperResponse {
@@ -210,8 +210,8 @@ export interface GamesQuery {
   status?: GameStatus;
   minRating?: number;
   maxRating?: number;
-  sortBy?: 'title' | 'releaseDate' | 'rating' | 'reviewCount' | 'createdAt';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "title" | "releaseDate" | "rating" | "reviewCount" | "createdAt";
+  sortOrder?: "asc" | "desc";
 }
 
 export interface DevelopersQuery {

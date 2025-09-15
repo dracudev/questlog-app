@@ -57,7 +57,7 @@ export interface AsyncState<T> extends LoadingState {
 export interface BaseFilter {
   search?: string;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface DateFilter {
@@ -71,7 +71,7 @@ export interface RangeFilter {
 }
 
 // Notification Types
-export type NotificationType = 'success' | 'error' | 'warning' | 'info';
+export type NotificationType = "success" | "error" | "warning" | "info";
 
 export interface Notification {
   id: string;
@@ -86,13 +86,13 @@ export interface Notification {
 }
 
 // Theme Types
-export type Theme = 'light' | 'dark' | 'system';
+export type Theme = "light" | "dark" | "system";
 
 // Language Types
-export type Language = 'en' | 'es' | 'fr' | 'de' | 'ja' | 'ko' | 'zh';
+export type Language = "en" | "es" | "fr" | "de" | "ja" | "ko" | "zh";
 
 // Device Types
-export type Device = 'mobile' | 'tablet' | 'desktop';
+export type Device = "mobile" | "tablet" | "desktop";
 
 // Modal Types
 export interface Modal {
@@ -102,6 +102,6 @@ export interface Modal {
   options?: {
     closable?: boolean;
     backdrop?: boolean;
-    size?: 'sm' | 'md' | 'lg' | 'xl';
+    size?: "sm" | "md" | "lg" | "xl";
   };
 }

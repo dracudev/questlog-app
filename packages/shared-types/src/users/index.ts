@@ -1,4 +1,4 @@
-import type { UserRole } from '../auth';
+import type { UserRole } from "../auth";
 
 // User DTOs
 export interface UserStats {
@@ -70,4 +70,4 @@ export interface UsersQuery {
 }
 
 // Re-export from auth for convenience
-export type { UserRole } from '../auth';
+export type { UserRole } from "../auth";
