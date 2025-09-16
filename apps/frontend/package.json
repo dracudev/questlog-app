@@ -15,7 +15,7 @@
     "clean": "rimraf dist .astro"
   },
   "dependencies": {
-    "@astrojs/react": "^4.3.0",
+    "@astrojs/react": "^4.3.1",
     "@astrojs/vercel": "^8.2.6",
     "@nanostores/react": "^1.0.0",
     "@questlog/shared-types": "workspace:*",
@@ -29,8 +29,8 @@
     "tailwindcss": "4.1.12"
   },
   "devDependencies": {
-    "@types/react": "^19.1.11",
-    "@types/react-dom": "^19.1.8",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
     "rimraf": "^6.0.1",
     "typescript": "^5.9.2"
   }
