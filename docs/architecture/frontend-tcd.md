@@ -294,14 +294,18 @@ const game: GameResponse = await getGameBySlug(slug);
 
 ```typescript
 // In React components (.tsx files)
-import { useApi } from '../hooks/useApi';
-import { getReviews } from '../services/reviews';
-import type { ReviewsQuery, PaginatedResponse, ReviewResponse } from '@questlog/shared-types';
+import { useApi } from "../hooks/useApi";
+import { getReviews } from "../services/reviews";
+import type {
+  ReviewsQuery,
+  PaginatedResponse,
+  ReviewResponse,
+} from "@questlog/shared-types";
 
 const ReviewList = ({ gameId }: { gameId: string }) => {
   const query: ReviewsQuery = { gameId, page: 1, limit: 10 };
   const { data, loading, error } = useApi(() => getReviews(query));
-  
+
   // Component implementation...
 };
 ```
@@ -313,8 +317,8 @@ const ReviewList = ({ gameId }: { gameId: string }) => {
 **Authentication State** (`stores/auth.ts`):
 
 ```typescript
-import { atom } from 'nanostores';
-import type { AuthUser } from '@questlog/shared-types';
+import { atom } from "nanostores";
+import type { AuthUser } from "@questlog/shared-types";
 
 export const $currentUser = atom<AuthUser | null>(null);
 export const $isAuthenticated = atom<boolean>(false);
@@ -324,19 +328,19 @@ export const $authToken = atom<string | null>(null);
 **Theme & UI State** (`stores/theme.ts`):
 
 ```typescript
-import { atom } from 'nanostores';
+import { atom } from "nanostores";
 
-export const $theme = atom<'light' | 'dark'>('light');
+export const $theme = atom<"light" | "dark">("light");
 export const $sidebarOpen = atom<boolean>(false);
 ```
 
 **Search State** (`stores/search.ts`):
 
 ```typescript
-import { atom } from 'nanostores';
-import type { GamesQuery } from '@questlog/shared-types';
+import { atom } from "nanostores";
+import type { GamesQuery } from "@questlog/shared-types";
 
-export const $searchQuery = atom<string>('');
+export const $searchQuery = atom<string>("");
 export const $searchFilters = atom<Partial<GamesQuery>>({});
 export const $searchResults = atom<any[]>([]);
 ```
@@ -384,30 +388,31 @@ export const $searchResults = atom<any[]>([]);
 **Base API Configuration** (`services/api.ts`):
 
 ```typescript
-import type { ApiResponse, ApiError } from '@questlog/shared-types';
+import type { ApiResponse, ApiError } from "@questlog/shared-types";
 
 class ApiClient {
-  private baseURL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3001/api';
-  
+  private baseURL =
+    import.meta.env.PUBLIC_API_URL || "http://localhost:3001/api";
+
   async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const response = await fetch(`${this.baseURL}${endpoint}`, {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.getToken()}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.getToken()}`,
         ...options?.headers,
       },
       ...options,
     });
-    
+
     if (!response.ok) {
       const error: ApiError = await response.json();
       throw new Error(error.message);
     }
-    
+
     const apiResponse: ApiResponse<T> = await response.json();
     return apiResponse.data;
   }
-  
+
   private getToken(): string | null {
     // Token management implementation
   }
@@ -418,13 +423,15 @@ class ApiClient {
 
 ```typescript
 // services/games.ts
-import type { 
-  GameResponse, 
-  GamesQuery, 
-  PaginatedResponse 
-} from '@questlog/shared-types';
+import type {
+  GameResponse,
+  GamesQuery,
+  PaginatedResponse,
+} from "@questlog/shared-types";
 
-export const getGames = async (query?: GamesQuery): Promise<PaginatedResponse<GameResponse>> => {
+export const getGames = async (
+  query?: GamesQuery,
+): Promise<PaginatedResponse<GameResponse>> => {
   const searchParams = new URLSearchParams(query as any);
   return apiClient.request(`/games?${searchParams}`);
 };
@@ -439,13 +446,16 @@ export const getGameBySlug = async (slug: string): Promise<GameResponse> => {
 **useApi Hook** (`hooks/useApi.ts`):
 
 ```typescript
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-export const useApi = <T>(apiCall: () => Promise<T>, dependencies: any[] = []) => {
+export const useApi = <T>(
+  apiCall: () => Promise<T>,
+  dependencies: any[] = [],
+) => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -454,15 +464,15 @@ export const useApi = <T>(apiCall: () => Promise<T>, dependencies: any[] = []) =
         setData(result);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, dependencies);
-  
+
   return { data, loading, error, refetch: () => fetchData() };
 };
 ```
@@ -480,16 +490,16 @@ export class ErrorBoundary extends React.Component {
     super(props);
     this.state = { hasError: false, error: null };
   }
-  
+
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
   }
-  
+
   render() {
     if (this.state.hasError) {
       return <ErrorFallback error={this.state.error} />;
     }
-    
+
     return this.props.children;
   }
 }

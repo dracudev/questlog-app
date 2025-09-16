@@ -15,7 +15,7 @@ Questlog is a social network for gamers (like Letterboxd for games) built as a m
 ## Essential Development Commands
 
 ```bash
-# Development (localhost:3001 backend, localhost:4321 frontend)  
+# Development (localhost:3001 backend, localhost:4321 frontend)
 pnpm dev                    # Start both backend and frontend
 pnpm dev:backend           # Backend only with hot reload
 pnpm dev:frontend          # Frontend only with hot reload
