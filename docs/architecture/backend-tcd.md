@@ -77,7 +77,7 @@ The platform is designed to eventually become a showcase for indie games, integr
 
 The backend follows a **modular monolithic architecture** with clear separation of concerns:
 
-```
+```tree
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Controllers   │    │    Services     │    │   Data Layer    │
 │   (HTTP Layer)  │───▶│  (Business      │───▶│   (Prisma +     │
@@ -87,7 +87,7 @@ The backend follows a **modular monolithic architecture** with clear separation 
 
 ### Directory Structure
 
-```
+```tree
 src/
 ├── app.module.ts          # Root module with global configuration
 ├── main.ts               # Application bootstrap with Swagger setup
@@ -219,7 +219,7 @@ The API follows RESTful conventions with clear resource-based URLs:
 
 ### Authentication (`/api/auth`)
 
-```
+```tree
 POST   /api/auth/register          # User registration
 POST   /api/auth/login             # User login
 POST   /api/auth/refresh           # Token refresh using refresh token
@@ -231,7 +231,7 @@ GET    /api/auth/me                # Get current user profile
 
 ### User Management (`/api/users`)
 
-```
+```tree
 GET    /api/users                     # Get all users with pagination and search
 GET    /api/users/profile/:username   # Get user profile by username
 GET    /api/users/profile/:username/followers   # Get user followers
@@ -243,7 +243,7 @@ DELETE /api/users/:id                 # Delete user (admin only)
 
 ### Game Catalog (`/api/games`)
 
-```
+```tree
 GET    /api/games                  # List games with advanced filters/pagination
 POST   /api/games                  # Create game (admin/moderator only)
 GET    /api/games/:slug            # Get game by slug with detailed information
@@ -256,7 +256,7 @@ GET    /api/games/:id/similar      # Get similar games based on genres/developer
 
 **Developers** (`/api/developers`)
 
-```
+```tree
 GET    /api/developers             # List developers with pagination/filters
 POST   /api/developers             # Create developer (admin/moderator only)
 GET    /api/developers/:id         # Get developer by ID or slug
@@ -268,7 +268,7 @@ GET    /api/developers/:id/stats   # Get developer statistics
 
 **Genres** (`/api/genres`)
 
-```
+```tree
 GET    /api/genres                 # List game genres
 POST   /api/genres                 # Create genre (admin/moderator only)
 GET    /api/genres/:id             # Get genre details
@@ -278,7 +278,7 @@ DELETE /api/genres/:id             # Delete genre (admin only)
 
 **Platforms** (`/api/platforms`)
 
-```
+```tree
 GET    /api/platforms              # List gaming platforms
 POST   /api/platforms              # Create platform (admin/moderator only)
 GET    /api/platforms/:id          # Get platform details
@@ -288,7 +288,7 @@ DELETE /api/platforms/:id          # Delete platform (admin only)
 
 **Publishers** (`/api/publishers`)
 
-```
+```tree
 GET    /api/publishers             # List game publishers
 POST   /api/publishers             # Create publisher (admin/moderator only)
 GET    /api/publishers/:id         # Get publisher details
@@ -298,7 +298,7 @@ DELETE /api/publishers/:id         # Delete publisher (admin only)
 
 ### Reviews (`/api/reviews`)
 
-```
+```tree
 POST   /api/reviews                     # Create a new review (authenticated)
 GET    /api/reviews                     # Get all reviews with filters/pagination
 GET    /api/reviews/:id                 # Get review by ID
@@ -313,7 +313,7 @@ DELETE /api/reviews/:id/like            # Unlike a review (authenticated)
 
 ### Social Features (`/api/social`)
 
-```
+```tree
 POST   /api/social/follow/:userId       # Follow a user (authenticated)
 DELETE /api/social/follow/:userId       # Unfollow a user (authenticated)
 GET    /api/social/following/:userId    # Check if following a user
@@ -380,7 +380,7 @@ The system uses **JWT-based stateless authentication** with a dual-token approac
 
 ### Token Flow
 
-```
+```tree
 1. User logs in with email/password
 2. System validates credentials
 3. Server generates access + refresh tokens
