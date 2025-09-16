@@ -1,6 +1,11 @@
 {
   "extends": "../../packages/config/src/typescript/tsconfig.base.json",
   "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
     "outDir": "dist",
     "baseUrl": ".",
     "jsx": "react-jsx",
