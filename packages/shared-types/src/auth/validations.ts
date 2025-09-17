@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // ============================================================================
 // Validation Schemas
@@ -10,12 +10,12 @@ import { z } from 'zod';
 export const loginSchema = z.object({
   email: z
     .string()
-    .min(1, 'Email is required')
-    .email('Please enter a valid email address'),
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
   password: z
     .string()
-    .min(1, 'Password is required')
-    .min(6, 'Password must be at least 6 characters'),
+    .min(1, "Password is required")
+    .min(6, "Password must be at least 6 characters"),
 });
 
 /**
@@ -24,35 +24,35 @@ export const loginSchema = z.object({
 export const registerSchema = z.object({
   email: z
     .string()
-    .min(1, 'Email is required')
-    .email('Please enter a valid email address'),
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
   username: z
     .string()
-    .min(1, 'Username is required')
-    .min(3, 'Username must be at least 3 characters')
-    .max(30, 'Username must be no more than 30 characters')
+    .min(1, "Username is required")
+    .min(3, "Username must be at least 3 characters")
+    .max(30, "Username must be no more than 30 characters")
     .regex(
       /^[a-zA-Z0-9_-]+$/,
-      'Username can only contain letters, numbers, underscores, and hyphens'
+      "Username can only contain letters, numbers, underscores, and hyphens",
     )
     .refine(
-      (val) => !val.startsWith('_') && !val.startsWith('-'),
-      'Username cannot start with underscore or hyphen'
+      (val) => !val.startsWith("_") && !val.startsWith("-"),
+      "Username cannot start with underscore or hyphen",
     )
     .refine(
-      (val) => !val.endsWith('_') && !val.endsWith('-'),
-      'Username cannot end with underscore or hyphen'
+      (val) => !val.endsWith("_") && !val.endsWith("-"),
+      "Username cannot end with underscore or hyphen",
     ),
   password: z
     .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/\d/, 'Password must contain at least one number')
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/\d/, "Password must contain at least one number")
     .regex(
       /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
-      'Password must contain at least one special character'
+      "Password must contain at least one special character",
     ),
 });
 
@@ -60,17 +60,17 @@ export const registerSchema = z.object({
  * Change password form validation schema
  */
 export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1, 'Current password is required'),
+  currentPassword: z.string().min(1, "Current password is required"),
   newPassword: z
     .string()
-    .min(1, 'New password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/\d/, 'Password must contain at least one number')
+    .min(1, "New password is required")
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/\d/, "Password must contain at least one number")
     .regex(
       /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
-      'Password must contain at least one special character'
+      "Password must contain at least one special character",
     ),
 });
 
@@ -80,25 +80,25 @@ export const changePasswordSchema = z.object({
 export const forgotPasswordSchema = z.object({
   email: z
     .string()
-    .min(1, 'Email is required')
-    .email('Please enter a valid email address'),
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
 });
 
 /**
  * Reset password form validation schema
  */
 export const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Reset token is required'),
+  token: z.string().min(1, "Reset token is required"),
   newPassword: z
     .string()
-    .min(1, 'New password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/\d/, 'Password must contain at least one number')
+    .min(1, "New password is required")
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/\d/, "Password must contain at least one number")
     .regex(
       /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/,
-      'Password must contain at least one special character'
+      "Password must contain at least one special character",
     ),
 });
 
