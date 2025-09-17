@@ -238,6 +238,10 @@ importers:
   packages/config: {}
 
   packages/shared-types:
+    dependencies:
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
     devDependencies:
       rimraf:
         specifier: ^5.0.5

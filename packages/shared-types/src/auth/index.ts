@@ -1,28 +1,5 @@
-// Auth Request DTOs
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  email: string;
-  username: string;
-  password: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface ResetPasswordRequest {
-  token: string;
-  newPassword: string;
-}
+// Zod schemas and validation functions
+export * from './validations';
 
 // Auth Response Types
 export interface AuthUser {
@@ -50,7 +27,7 @@ export interface JwtPayload {
 }
 
 // Auth Constants
-export type UserRole = "USER" | "ADMIN" | "MODERATOR";
+export type UserRole = 'USER' | 'ADMIN' | 'MODERATOR';
 
 export interface TokenResponse {
   accessToken: string;
