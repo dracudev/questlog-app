@@ -23,6 +23,7 @@
     "@questlog/utils": "workspace:*",
     "@tailwindcss/vite": "^4.1.12",
     "astro": "^5.13.3",
+    "lucide-react": "^0.544.0",
     "nanostores": "^1.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
