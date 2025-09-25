@@ -76,34 +76,15 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
     <form onSubmit={handleSubmit} className={`space-y-6 ${className}`} noValidate>
       {/* Global auth error from hook */}
       {error && (
-        <div
-          className="rounded-md p-4 border"
-          style={{
-            backgroundColor: 'color-mix(in srgb, var(--state-error) 10%, transparent)',
-            borderColor: 'color-mix(in srgb, var(--state-error) 20%, transparent)',
-          }}
-        >
+        <div className="rounded-md p-4 border bg-state-error/10 border-state-error/20">
           <div className="flex">
             <div className="ml-3">
-              <h3 className="text-sm font-medium" style={{ color: 'var(--state-error)' }}>
-                Login Error
-              </h3>
-              <div
-                className="mt-2 text-sm"
-                style={{ color: 'color-mix(in srgb, var(--state-error) 80%, transparent)' }}
-              >
-                {error}
-              </div>
+              <h3 className="text-sm font-medium text-state-error">Login Error</h3>
+              <div className="mt-2 text-sm text-state-error/80">{error}</div>
               <button
                 type="button"
                 onClick={clearError}
-                className="mt-2 text-sm underline transition-colors"
-                style={{ color: 'var(--state-error)' }}
-                onMouseOver={(e) =>
-                  ((e.target as HTMLElement).style.color =
-                    'color-mix(in srgb, var(--state-error) 80%, transparent)')
-                }
-                onMouseOut={(e) => ((e.target as HTMLElement).style.color = 'var(--state-error)')}
+                className="mt-2 text-sm underline transition-colors text-state-error hover:text-state-error/80"
               >
                 Dismiss
               </button>
@@ -114,11 +95,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
 
       {/* Email field */}
       <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium"
-          style={{ color: 'var(--text-primary)' }}
-        >
+        <label htmlFor="email" className="block text-sm font-medium text-primary">
           Email address
         </label>
         <div className="mt-1">
@@ -130,21 +107,18 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
             required
             value={formData.email}
             onChange={handleInputChange}
-            className="appearance-none block w-full px-3 py-2 border rounded-md shadow-sm sm:text-sm transition-colors"
-            style={{
-              borderColor: formErrors.email ? 'var(--state-error)' : 'var(--bg-tertiary)',
-              backgroundColor: formErrors.email
-                ? 'color-mix(in srgb, var(--state-error) 5%, transparent)'
-                : 'var(--bg-primary)',
-              color: 'var(--text-primary)',
-            }}
+            className={`appearance-none block w-full px-3 py-2 border rounded-md shadow-sm sm:text-sm transition-colors text-primary ${
+              formErrors.email
+                ? 'border-state-error bg-state-error/5'
+                : 'border-tertiary bg-primary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20'
+            }`}
             placeholder="Enter your email"
             aria-invalid={formErrors.email ? 'true' : 'false'}
             aria-describedby={formErrors.email ? 'email-error' : undefined}
           />
         </div>
         {formErrors.email && (
-          <p id="email-error" className="mt-2 text-sm" style={{ color: 'var(--state-error)' }}>
+          <p id="email-error" className="mt-2 text-sm text-state-error">
             {formErrors.email}
           </p>
         )}
@@ -152,11 +126,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
 
       {/* Password field */}
       <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium"
-          style={{ color: 'var(--text-primary)' }}
-        >
+        <label htmlFor="password" className="block text-sm font-medium text-primary">
           Password
         </label>
         <div className="mt-1 relative">
@@ -168,14 +138,11 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
             required
             value={formData.password}
             onChange={handleInputChange}
-            className="appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm sm:text-sm transition-colors"
-            style={{
-              borderColor: formErrors.password ? 'var(--state-error)' : 'var(--bg-tertiary)',
-              backgroundColor: formErrors.password
-                ? 'color-mix(in srgb, var(--state-error) 5%, transparent)'
-                : 'var(--bg-primary)',
-              color: 'var(--text-primary)',
-            }}
+            className={`appearance-none block w-full px-3 py-2 pr-10 border rounded-md shadow-sm sm:text-sm transition-colors text-primary ${
+              formErrors.password
+                ? 'border-state-error bg-state-error/5'
+                : 'border-tertiary bg-primary focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20'
+            }`}
             placeholder="Enter your password"
             aria-invalid={formErrors.password ? 'true' : 'false'}
             aria-describedby={formErrors.password ? 'password-error' : undefined}
@@ -183,10 +150,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors"
-            style={{ color: 'var(--text-muted)' }}
-            onMouseOver={(e) => ((e.target as HTMLElement).style.color = 'var(--text-secondary)')}
-            onMouseOut={(e) => ((e.target as HTMLElement).style.color = 'var(--text-muted)')}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors text-muted hover:text-secondary"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? (
@@ -217,7 +181,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
           </button>
         </div>
         {formErrors.password && (
-          <p id="password-error" className="mt-2 text-sm" style={{ color: 'var(--state-error)' }}>
+          <p id="password-error" className="mt-2 text-sm text-state-error">
             {formErrors.password}
           </p>
         )}
@@ -230,18 +194,9 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
             id="remember-me"
             name="remember-me"
             type="checkbox"
-            className="h-4 w-4 rounded"
-            style={{
-              color: 'var(--brand-primary)',
-              borderColor: 'var(--bg-tertiary)',
-              backgroundColor: 'var(--bg-primary)',
-            }}
+            className="h-4 w-4 rounded text-brand-primary border-tertiary bg-primary focus:ring-2 focus:ring-brand-primary/20"
           />
-          <label
-            htmlFor="remember-me"
-            className="ml-2 block text-sm"
-            style={{ color: 'var(--text-secondary)' }}
-          >
+          <label htmlFor="remember-me" className="ml-2 block text-sm text-secondary">
             Remember me
           </label>
         </div>
@@ -249,10 +204,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
         <div className="text-sm">
           <a
             href="/auth/forgot-password"
-            className="font-medium transition-colors"
-            style={{ color: 'var(--brand-primary)' }}
-            onMouseOver={(e) => ((e.target as HTMLElement).style.color = 'var(--brand-accent)')}
-            onMouseOut={(e) => ((e.target as HTMLElement).style.color = 'var(--brand-primary)')}
+            className="font-medium transition-colors text-brand-primary hover:text-brand-accent"
           >
             Forgot your password?
           </a>
@@ -264,25 +216,12 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
         <button
           type="submit"
           disabled={isLoading}
-          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: 'var(--brand-primary)',
-            color: 'var(--text-primary)',
-          }}
-          onMouseOver={(e) =>
-            !isLoading &&
-            ((e.target as HTMLElement).style.backgroundColor =
-              'color-mix(in srgb, var(--brand-primary) 90%, transparent)')
-          }
-          onMouseOut={(e) =>
-            !isLoading && ((e.target as HTMLElement).style.backgroundColor = 'var(--brand-primary)')
-          }
+          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md transition-colors bg-brand-primary text-primary hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-brand-primary"
         >
           {isLoading ? (
             <>
               <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5"
-                style={{ color: 'var(--text-primary)' }}
+                className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"

@@ -32,13 +32,7 @@ export default function ThemeToggle() {
   // Don't render until mounted to prevent hydration mismatch
   if (!mounted) {
     return (
-      <button
-        className="w-9 h-9 rounded-md border"
-        style={{
-          backgroundColor: 'var(--bg-secondary)',
-          borderColor: 'var(--bg-tertiary)',
-        }}
-      >
+      <button className="w-9 h-9 rounded-md border bg-secondary border-tertiary">
         <span className="sr-only">Toggle theme</span>
       </button>
     );
@@ -49,29 +43,13 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="w-9 h-9 rounded-md border transition-colors flex items-center justify-center"
-      style={{
-        backgroundColor: 'var(--bg-secondary)',
-        borderColor: 'var(--bg-tertiary)',
-      }}
-      onMouseOver={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)')}
-      onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'var(--bg-secondary)')}
+      className="w-9 h-9 rounded-md border transition-colors flex items-center justify-center bg-secondary border-tertiary hover:bg-tertiary"
       aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
     >
       {isDarkTheme ? (
-        <Sun
-          size={16}
-          color="#cbd5e0"
-          strokeWidth={2}
-          style={{ display: 'inline-block', flexShrink: 0 }}
-        />
+        <Sun size={16} className="text-secondary flex-shrink-0" strokeWidth={2} />
       ) : (
-        <Moon
-          size={16}
-          color="#4b5563"
-          strokeWidth={2}
-          style={{ display: 'inline-block', flexShrink: 0 }}
-        />
+        <Moon size={16} className="text-secondary flex-shrink-0" strokeWidth={2} />
       )}
     </button>
   );
