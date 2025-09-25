@@ -18,26 +18,26 @@ All design tokens use industry-standard naming conventions and are organized by 
 
 ```css
 /* Brand */
---brand-primary: #7f5af0;    /* Primary CTA, links, focus states */
---brand-secondary: #94a1b2;  /* Secondary elements, muted text */
---brand-accent: #2cb67d;     /* Success, notifications, highlights */
+--brand-primary: #7f5af0; /* Primary CTA, links, focus states */
+--brand-secondary: #94a1b2; /* Secondary elements, muted text */
+--brand-accent: #2cb67d; /* Success, notifications, highlights */
 
 /* Text */
---text-primary: #fffffe;     /* Headings, high-emphasis text */
---text-secondary: #cbd5e0;   /* Body text, readable on dark */
---text-muted: #a3b1c2;       /* Placeholders, meta info */
---text-inverse: #1f2937;     /* Light background text (rare) */
+--text-primary: #fffffe; /* Headings, high-emphasis text */
+--text-secondary: #cbd5e0; /* Body text, readable on dark */
+--text-muted: #a3b1c2; /* Placeholders, meta info */
+--text-inverse: #1f2937; /* Light background text (rare) */
 
 /* Backgrounds */
---bg-primary: #16161a;       /* Main app background */
---bg-secondary: #242629;     /* Cards, panels, elevated content */
---bg-tertiary: #3b3e45;      /* Borders, dividers, input borders */
+--bg-primary: #16161a; /* Main app background */
+--bg-secondary: #242629; /* Cards, panels, elevated content */
+--bg-tertiary: #3b3e45; /* Borders, dividers, input borders */
 
 /* States */
---state-error: #ef4444;      /* Error messages, destructive actions */
---state-warning: #f59e0b;    /* Warnings, caution */
---state-success: #2cb67d;    /* Success messages, positive feedback */
---state-info: #7f5af0;       /* Info messages, neutral feedback */
+--state-error: #ef4444; /* Error messages, destructive actions */
+--state-warning: #f59e0b; /* Warnings, caution */
+--state-success: #2cb67d; /* Success messages, positive feedback */
+--state-info: #7f5af0; /* Info messages, neutral feedback */
 ```
 
 ### Typography
@@ -45,14 +45,14 @@ All design tokens use industry-standard naming conventions and are organized by 
 Single font family with responsive scaling:
 
 ```css
---font-family-base: 'Inter', system-ui, sans-serif;
+--font-family-base: "Inter", system-ui, sans-serif;
 
 /* Fixed Sizes */
---font-size-xs: 0.75rem;     /* 12px - Fine print */
---font-size-sm: 0.875rem;    /* 14px - Small text, captions */
---font-size-base: 1rem;      /* 16px - Body text */
---font-size-lg: 1.125rem;    /* 18px - Large body text */
---font-size-xl: 1.25rem;     /* 20px - Small headings */
+--font-size-xs: 0.75rem; /* 12px - Fine print */
+--font-size-sm: 0.875rem; /* 14px - Small text, captions */
+--font-size-base: 1rem; /* 16px - Body text */
+--font-size-lg: 1.125rem; /* 18px - Large body text */
+--font-size-xl: 1.25rem; /* 20px - Small headings */
 
 /* Responsive Headings */
 --font-size-h1: clamp(2.25rem, 5vw + 1rem, 3.75rem);
@@ -65,14 +65,14 @@ Single font family with responsive scaling:
 8px-based spacing scale for consistent layouts:
 
 ```css
---space-1: 0.25rem;  /* 4px */
---space-2: 0.5rem;   /* 8px */
---space-3: 0.75rem;  /* 12px */
---space-4: 1rem;     /* 16px */
---space-6: 1.5rem;   /* 24px */
---space-8: 2rem;     /* 32px */
---space-12: 3rem;    /* 48px */
---space-16: 4rem;    /* 64px */
+--space-1: 0.25rem; /* 4px */
+--space-2: 0.5rem; /* 8px */
+--space-3: 0.75rem; /* 12px */
+--space-4: 1rem; /* 16px */
+--space-6: 1.5rem; /* 24px */
+--space-8: 2rem; /* 32px */
+--space-12: 3rem; /* 48px */
+--space-16: 4rem; /* 64px */
 ```
 
 ### Shadows & Effects
@@ -84,9 +84,9 @@ Subtle depth for dark theme interfaces:
 --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.25);
 --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.35);
 
---radius-sm: 0.25rem;   /* Small components */
---radius-md: 0.375rem;  /* Buttons, inputs */
---radius-lg: 0.5rem;    /* Cards, panels */
+--radius-sm: 0.25rem; /* Small components */
+--radius-md: 0.375rem; /* Buttons, inputs */
+--radius-lg: 0.5rem; /* Cards, panels */
 
 --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
 --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -98,12 +98,20 @@ Subtle depth for dark theme interfaces:
 
 ```css
 /* Primary button - default styling applied automatically */
-button { /* Uses --brand-primary background */ }
+button {
+  /* Uses --brand-primary background */
+}
 
 /* Variants available as utility classes */
-.btn-secondary { /* Outlined secondary style */ }
-.btn-outline { /* Subtle outlined style */ }
-.btn-danger { /* Destructive actions */ }
+.btn-secondary {
+  /* Outlined secondary style */
+}
+.btn-outline {
+  /* Subtle outlined style */
+}
+.btn-danger {
+  /* Destructive actions */
+}
 ```
 
 ### Form Controls
