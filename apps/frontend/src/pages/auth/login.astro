@@ -1,0 +1,96 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LoginForm from '@/components/auth/LoginForm';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+
+// Static page metadata
+const pageTitle = "Login";
+const pageDescription = "Sign in to your Questlog account to discover games, write reviews, and connect with fellow gamers.";
+
+---
+
+<BaseLayout 
+  title={pageTitle}
+  description={pageDescription}
+  noIndex={true}
+>
+  <main id="main-content" class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style="background-color: var(--bg-primary);">
+    <div class="absolute top-4 right-4">
+      <ThemeToggle client:load />
+    </div>
+    
+    <div class="max-w-md w-full space-y-8">
+      <div class="text-center">
+        <a href="/" class="inline-block">
+          <h1 class="text-4xl font-bold" style="color: var(--text-primary);">
+            Questlog
+          </h1>
+          <p class="mt-2 text-sm" style="color: var(--text-muted);">
+            The social network for gamers
+          </p>
+        </a>
+      </div>
+      
+      <div class="py-8 px-6 shadow-lg rounded-lg border" style="background-color: var(--bg-secondary); border-color: var(--bg-tertiary);">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-center" style="color: var(--text-primary);">
+            Sign in to your account
+          </h2>
+          <p class="mt-2 text-sm text-center" style="color: var(--text-muted);">
+            Don't have an account?{' '}
+            <a 
+              href="/auth/register" 
+              class="font-medium transition-colors"
+              style="color: var(--brand-primary);"
+              onmouseover="this.style.color='var(--brand-accent)'"
+              onmouseout="this.style.color='var(--brand-primary)'"
+            >
+              Sign up here
+            </a>
+          </p>
+        </div>
+        
+        <!-- React Island -->
+        <LoginForm client:load />
+        
+        <!-- Fallback content for no-JS users -->
+        <noscript>
+          <div class="mt-4 p-4 rounded-md border" style="background-color: color-mix(in srgb, var(--state-warning) 10%, transparent); border-color: color-mix(in srgb, var(--state-warning) 20%, transparent);">
+            <p class="text-sm" style="color: var(--state-warning);">
+              JavaScript is required for the interactive login form. Please enable JavaScript or contact support for assistance.
+            </p>
+          </div>
+        </noscript>
+      </div>
+      
+      <!-- Footer links -->
+      <div class="text-center space-y-2">
+        <div class="flex justify-center space-x-4 text-sm">
+          <a 
+            href="/auth/forgot-password" 
+            class="transition-colors"
+            style="color: var(--text-muted);"
+            onmouseover="this.style.color='var(--text-primary)'"
+            onmouseout="this.style.color='var(--text-muted)'"
+          >
+            Forgot your password?
+          </a>
+        </div>
+        
+        <div class="flex justify-center space-x-4 text-xs" style="color: var(--text-muted);">
+          <a href="/privacy" class="transition-colors" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">
+            Privacy Policy
+          </a>
+          <span>•</span>
+          <a href="/terms" class="transition-colors" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">
+            Terms of Service
+          </a>
+          <span>•</span>
+          <a href="/support" class="transition-colors" onmouseover="this.style.color='var(--text-secondary)'" onmouseout="this.style.color='var(--text-muted)'">
+            Support
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
