@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import LoginForm from '@/components/auth/LoginForm';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import NoScriptFallback from '@/components/ui/NoScriptFallback';
 
 // Static page metadata
 const pageTitle = "Login";
@@ -51,13 +52,7 @@ const pageDescription = "Sign in to your Questlog account to discover games, wri
         <LoginForm client:load />
         
         <!-- Fallback content for no-JS users -->
-        <noscript>
-          <div class="mt-4 p-4 rounded-md border bg-state-warning/10 border-state-warning/20">
-            <p class="text-sm text-state-warning">
-              JavaScript is required for the interactive login form. Please enable JavaScript or contact support for assistance.
-            </p>
-          </div>
-        </noscript>
+        <NoScriptFallback client:load feature="login form" />
       </div>
       
       <!-- Footer links -->

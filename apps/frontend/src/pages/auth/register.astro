@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import RegisterForm from '@/components/auth/RegisterForm';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import NoScriptFallback from '@/components/ui/NoScriptFallback';
 
 // Static page metadata
 const pageTitle = "Sign Up";
@@ -51,13 +52,7 @@ const pageDescription = "Join Questlog to discover games, write reviews, and con
         <RegisterForm client:load />
         
         <!-- Fallback content for no-JS users -->
-        <noscript>
-          <div class="mt-4 p-4 rounded-md border bg-state-warning/10 border-state-warning/20">
-            <p class="text-sm text-state-warning">
-              JavaScript is required for the interactive registration form. Please enable JavaScript or contact support for assistance.
-            </p>
-          </div>
-        </noscript>
+        <NoScriptFallback client:load feature="registration form" />
       </div>
       
       <!-- Footer links -->
