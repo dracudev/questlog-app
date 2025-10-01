@@ -1,0 +1,90 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import RegisterForm from '@/components/auth/RegisterForm';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+
+// Static page metadata
+const pageTitle = "Sign Up";
+const pageDescription = "Join Questlog to discover games, write reviews, and connect with fellow gamers.";
+
+---
+
+<BaseLayout 
+  title={pageTitle}
+  description={pageDescription}
+  noIndex={true}
+>
+  <main id="main-content" class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-primary">
+    <div class="absolute top-4 right-4">
+      <ThemeToggle client:load />
+    </div>
+    
+    <div class="max-w-md w-full space-y-8">
+      <div class="text-center">
+        <a href="/" class="inline-block">
+          <h1 class="text-4xl font-bold text-primary">
+            Questlog
+          </h1>
+          <p class="mt-2 text-sm text-muted">
+            The social network for gamers
+          </p>
+        </a>
+      </div>
+      
+      <div class="py-8 px-6 shadow-lg rounded-lg border bg-secondary border-tertiary">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-center text-primary">
+            Sign Up
+          </h2>
+          <p class="mt-2 text-sm text-center text-muted">
+            Already have an account?{' '}
+            <a 
+              href="/auth/login" 
+              class="font-medium text-brand-primary hover:text-brand-accent transition-colors"
+            >
+              Sign in here
+            </a>
+          </p>
+        </div>
+        
+        <!-- React Island -->
+        <RegisterForm client:load />
+        
+        <!-- Fallback content for no-JS users -->
+        <noscript>
+          <div class="mt-4 p-4 rounded-md border bg-state-warning/10 border-state-warning/20">
+            <p class="text-sm text-state-warning">
+              JavaScript is required for the interactive registration form. Please enable JavaScript or contact support for assistance.
+            </p>
+          </div>
+        </noscript>
+      </div>
+      
+      <!-- Footer links -->
+      <div class="text-center space-y-2">
+        <div class="flex justify-center space-x-4 text-sm">
+          <a 
+            href="/auth/login" 
+            class="text-muted hover:text-primary transition-colors"
+          >
+            Back to Sign In
+          </a>
+        </div>
+        
+        <div class="flex justify-center space-x-4 text-xs text-muted">
+          <a href="/privacy" class="hover:text-secondary transition-colors">
+            Privacy Policy
+          </a>
+          <span>•</span>
+          <a href="/terms" class="hover:text-secondary transition-colors">
+            Terms of Service
+          </a>
+          <span>•</span>
+          <a href="/support" class="hover:text-secondary transition-colors">
+            Support
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
