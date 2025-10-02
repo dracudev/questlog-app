@@ -1,0 +1,60 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Navbar from '@/components/ui/Navbar';
+import Footer from '@/components/ui/Footer';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  noIndex?: boolean;
+  canonicalURL?: string;
+  showNavbar?: boolean;
+  showFooter?: boolean;
+  containerClass?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  noIndex = false,
+  canonicalURL,
+  showNavbar = true,
+  showFooter = true,
+  containerClass = '',
+  ...baseLayoutProps
+} = Astro.props;
+
+// Get current path for active navigation
+const currentPath = Astro.url.pathname;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={image}
+  noIndex={noIndex}
+  canonicalURL={canonicalURL}
+  {...baseLayoutProps}
+>
+  <div class="min-h-screen flex flex-col">
+    <!-- Navigation -->
+    {showNavbar && (
+      <Navbar 
+        client:load 
+        currentPath={currentPath}
+      />
+    )}
+
+    <!-- Main Content -->
+    <main class={`flex-1 ${containerClass}`}>
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    {showFooter && (
+      <Footer client:load />
+    )}
+  </div>
+</BaseLayout>
