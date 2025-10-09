@@ -4,7 +4,6 @@ import type {
   ReviewsQuery,
   CreateReviewRequest,
   UpdateReviewRequest,
-  LikeReviewResponse,
 } from '@questlog/shared-types';
 import { apiClient } from './api';
 
