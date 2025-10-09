@@ -1,9 +1,12 @@
+// Imports from other modules
+import type { ReviewUser, ReviewStats } from '../reviews';
+
 // Game Status Types
 export type GameStatus =
-  | "RELEASED"
-  | "UNRELEASED"
-  | "EARLY_ACCESS"
-  | "CANCELLED";
+  | 'RELEASED'
+  | 'UNRELEASED'
+  | 'EARLY_ACCESS'
+  | 'CANCELLED';
 
 // Basic Game Entities
 export interface DeveloperResponse {
@@ -85,8 +88,38 @@ export interface GameResponse {
   metacriticId?: string;
 }
 
+// Game Summary for card views (simplified)
+export interface GameSummary {
+  id: string;
+  title: string;
+  slug: string;
+  coverImage?: string;
+  releaseDate?: Date;
+  status: GameStatus;
+  averageRating?: number;
+  reviewCount: number;
+  developer?: Pick<DeveloperResponse, 'id' | 'name' | 'slug'>;
+  genres: Pick<GenreResponse, 'id' | 'name' | 'slug'>[];
+  platforms: Pick<PlatformResponse, 'id' | 'name' | 'slug' | 'abbreviation'>[];
+}
+
+// Review types for game detail view (imported from reviews module)
+export interface GameReview {
+  id: string;
+  title?: string;
+  content: string;
+  rating: number;
+  createdAt: Date;
+  user: ReviewUser;
+  stats: ReviewStats;
+}
+
 export interface GameDetail extends GameResponse {
-  // Add any additional fields specific to detailed game view
+  rawgId?: number;
+  igdbId?: number;
+  steamId?: number;
+  metacriticId?: string;
+  recentReviews: GameReview[];
 }
 
 // Create/Update Game DTOs
@@ -198,6 +231,17 @@ export interface UpdatePlatformRequest {
   abbreviation?: string;
 }
 
+// Paginated Games Response
+export interface PaginatedGamesResponse {
+  data: GameResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
 // Query Types
 export interface GamesQuery {
   page?: number;
@@ -210,8 +254,13 @@ export interface GamesQuery {
   status?: GameStatus;
   minRating?: number;
   maxRating?: number;
-  sortBy?: "title" | "releaseDate" | "rating" | "reviewCount" | "createdAt";
-  sortOrder?: "asc" | "desc";
+  sortBy?:
+    | 'title'
+    | 'releaseDate'
+    | 'averageRating'
+    | 'reviewCount'
+    | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface DevelopersQuery {
