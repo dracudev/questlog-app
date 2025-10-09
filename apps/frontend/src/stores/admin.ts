@@ -1,596 +1,541 @@
-import { atom, computed, map } from 'nanostores';
+import { atom, computed } from 'nanostores';
+import { $isAdmin, $isModerator, $userRole } from './auth.ts';
 import type {
-  AdminUserResponse,
-  PendingReviewResponse,
-  ReportResponse,
-  SystemStatsResponse,
-  PaginatedUsersResponse,
-  PaginatedReviewsResponse,
-  PaginatedReportsResponse,
-  UserManagementQuery,
-  ContentModerationQuery,
-  ReportsQuery,
-} from '../services/admin';
+  UserResponse,
+  UserProfile,
+  GameResponse,
+  DeveloperResponse,
+  PublisherResponse,
+  GenreResponse,
+  PlatformResponse,
+  PaginatedResponse,
+  UserRole,
+  AdminDashboardStats,
+} from '@questlog/shared-types';
 
 // ============================================================================
-// State Atoms
+// Admin Permission Checks
 // ============================================================================
 
+/**
+ * Check if current user can access admin panel
+ */
+export const $canAccessAdmin = computed(
+  [$isAdmin, $isModerator],
+  (isAdmin, isModerator) => isAdmin || isModerator,
+);
+
+/**
+ * Check if current user has admin-only permissions
+ */
+export const $hasAdminPermissions = computed($isAdmin, (isAdmin) => isAdmin);
+
+/**
+ * Check if current user has moderator permissions (including admin)
+ */
+export const $hasModeratorPermissions = computed(
+  [$isAdmin, $isModerator],
+  (isAdmin, isModerator) => isAdmin || isModerator,
+);
+
+/**
+ * Get permission level for UI rendering
+ */
+export const $adminPermissionLevel = computed($userRole, (role) => {
+  if (role === 'ADMIN') return 'admin';
+  if (role === 'MODERATOR') return 'moderator';
+  return 'none';
+});
+
+// ============================================================================
+// Admin State Atoms
+// ============================================================================
+
+/**
+ * General admin loading state
+ */
+export const $adminLoading = atom<boolean>(false);
+
+/**
+ * General admin error state
+ */
+export const $adminError = atom<string | null>(null);
+
+/**
+ * Admin operation success messages
+ */
+export const $adminSuccess = atom<string | null>(null);
+
+// ============================================================================
 // User Management State
-export const adminUsersState = atom<PaginatedUsersResponse | null>(null);
-export const selectedUserState = atom<AdminUserResponse | null>(null);
-export const userManagementQuery = atom<UserManagementQuery>({ page: 1, limit: 20 });
-export const usersLoading = atom<boolean>(false);
-export const usersError = atom<string | null>(null);
-
-// Content Moderation State
-export const pendingReviewsState = atom<PaginatedReviewsResponse | null>(null);
-export const selectedReviewState = atom<PendingReviewResponse | null>(null);
-export const contentModerationQuery = atom<ContentModerationQuery>({ page: 1, limit: 20 });
-export const reviewsLoading = atom<boolean>(false);
-export const reviewsError = atom<string | null>(null);
-
-// Reports Management State
-export const reportsState = atom<PaginatedReportsResponse | null>(null);
-export const selectedReportState = atom<ReportResponse | null>(null);
-export const reportsQuery = atom<ReportsQuery>({ page: 1, limit: 20 });
-export const reportsLoading = atom<boolean>(false);
-export const reportsError = atom<string | null>(null);
-
-// System Statistics State
-export const systemStatsState = atom<SystemStatsResponse | null>(null);
-export const statsLoading = atom<boolean>(false);
-export const statsError = atom<string | null>(null);
-
-// UI State
-export const selectedTab = atom<'users' | 'reviews' | 'reports' | 'stats'>('users');
-export const bulkSelectedUsers = atom<string[]>([]);
-export const bulkSelectedReviews = atom<string[]>([]);
-export const showBanDialog = atom<boolean>(false);
-export const showPromoteDialog = atom<boolean>(false);
-
-// Form State
-export const banUserForm = atom<{ userId: string; reason: string } | null>(null);
-export const promoteUserForm = atom<{ userId: string; role: 'MODERATOR' | 'ADMIN' } | null>(null);
-export const rejectReviewForm = atom<{ reviewId: string; reason: string } | null>(null);
-export const resolveReportForm = atom<{
-  reportId: string;
-  resolution: string;
-  action: 'RESOLVED' | 'DISMISSED';
-} | null>(null);
-
-// Cache Management
-const adminUsersCache = map<Record<string, AdminUserResponse>>({});
-const pendingReviewsCache = map<Record<string, PendingReviewResponse>>({});
-const reportsCache = map<Record<string, ReportResponse>>({});
-
-// ============================================================================
-// Computed Values
 // ============================================================================
 
-// Users Statistics
-export const usersStats = computed(adminUsersState, (usersData) => {
-  if (!usersData?.data) return null;
+/**
+ * Admin users list with pagination
+ */
+export const $adminUsers = atom<PaginatedResponse<UserResponse> | null>(null);
 
-  const activeUsers = usersData.data.filter((user) => user.isActive && !user.isBanned).length;
-  const bannedUsers = usersData.data.filter((user) => user.isBanned).length;
-  const moderators = usersData.data.filter((user) => user.role === 'MODERATOR').length;
-  const admins = usersData.data.filter((user) => user.role === 'ADMIN').length;
+/**
+ * Detailed user profiles for admin management
+ */
+export const $adminUserProfiles = atom<Record<string, UserProfile>>({});
 
-  return {
-    total: usersData.total,
-    active: activeUsers,
-    banned: bannedUsers,
-    moderators,
-    admins,
-    currentPage: usersData.page,
-    totalPages: usersData.totalPages,
-  };
+/**
+ * User management loading state
+ */
+export const $userManagementLoading = atom<boolean>(false);
+
+/**
+ * User management error state
+ */
+export const $userManagementError = atom<string | null>(null);
+
+/**
+ * User management query state
+ */
+export const $userManagementQuery = atom<{
+  search?: string;
+  page: number;
+  limit: number;
+  role?: UserRole;
+}>({
+  page: 1,
+  limit: 20,
 });
 
-// Reviews Statistics
-export const reviewsStats = computed(pendingReviewsState, (reviewsData) => {
-  if (!reviewsData?.data) return null;
-
-  const highPriorityReviews = reviewsData.data.filter((review) => review.reportCount > 5).length;
-  const reportedReviews = reviewsData.data.filter((review) => review.reportCount > 0).length;
-
-  return {
-    total: reviewsData.total,
-    highPriority: highPriorityReviews,
-    reported: reportedReviews,
-    currentPage: reviewsData.page,
-    totalPages: reviewsData.totalPages,
-  };
-});
-
-// Reports Statistics
-export const reportsStats = computed(reportsState, (reportsData) => {
-  if (!reportsData?.data) return null;
-
-  const pendingReports = reportsData.data.filter((report) => report.status === 'PENDING').length;
-  const resolvedReports = reportsData.data.filter((report) => report.status === 'RESOLVED').length;
-  const reviewReports = reportsData.data.filter((report) => report.type === 'REVIEW').length;
-  const userReports = reportsData.data.filter((report) => report.type === 'USER').length;
-
-  return {
-    total: reportsData.total,
-    pending: pendingReports,
-    resolved: resolvedReports,
-    reviewReports,
-    userReports,
-    currentPage: reportsData.page,
-    totalPages: reportsData.totalPages,
-  };
-});
-
-// Dashboard Summary
-export const dashboardSummary = computed(
-  [systemStatsState, usersStats, reviewsStats, reportsStats],
-  (systemStats, usersStatsData, reviewsStatsData, reportsStatsData) => {
-    if (!systemStats) return null;
-
-    return {
-      users: {
-        total: systemStats.users.total,
-        active: systemStats.users.active,
-        banned: systemStats.users.banned,
-        newThisMonth: systemStats.users.newThisMonth,
-      },
-      content: {
-        games: systemStats.content.games,
-        reviews: systemStats.content.reviews,
-        pendingReviews: systemStats.content.pendingReviews,
-        comments: systemStats.content.comments,
-      },
-      activity: {
-        dailyActiveUsers: systemStats.activity.dailyActiveUsers,
-        weeklyActiveUsers: systemStats.activity.weeklyActiveUsers,
-        monthlyActiveUsers: systemStats.activity.monthlyActiveUsers,
-        avgSessionDuration: systemStats.activity.avgSessionDuration,
-      },
-      reports: {
-        pending: systemStats.reports.pending,
-        resolved: systemStats.reports.resolved,
-        dismissed: systemStats.reports.dismissed,
-      },
-      currentStats: {
-        users: usersStatsData,
-        reviews: reviewsStatsData,
-        reports: reportsStatsData,
-      },
-    };
-  },
-);
-
-// Bulk Selection Counts
-export const bulkSelectionCounts = computed(
-  [bulkSelectedUsers, bulkSelectedReviews],
-  (selectedUsers, selectedReviews) => ({
-    users: selectedUsers.length,
-    reviews: selectedReviews.length,
-  }),
-);
-
 // ============================================================================
-// Action Functions
+// Content Management State (Games, Developers, etc.)
 // ============================================================================
 
-// User Management Actions
-export function setUsersData(data: PaginatedUsersResponse): void {
-  adminUsersState.set(data);
+/**
+ * Admin games list with pagination
+ */
+export const $adminGames = atom<PaginatedResponse<GameResponse> | null>(null);
 
-  // Cache individual users
-  data.data.forEach((user) => {
-    adminUsersCache.setKey(user.id, user);
-  });
-}
+/**
+ * Admin content management loading states
+ */
+export const $contentManagementLoading = atom<{
+  games: boolean;
+  developers: boolean;
+  publishers: boolean;
+  genres: boolean;
+  platforms: boolean;
+}>({
+  games: false,
+  developers: false,
+  publishers: false,
+  genres: false,
+  platforms: false,
+});
 
-export function updateUserInList(userId: string, updatedUser: AdminUserResponse): void {
-  const currentData = adminUsersState.get();
-  if (currentData) {
-    const updatedData = {
-      ...currentData,
-      data: currentData.data.map((user) => (user.id === userId ? updatedUser : user)),
-    };
-    adminUsersState.set(updatedData);
-  }
+/**
+ * Admin content management error states
+ */
+export const $contentManagementErrors = atom<{
+  games: string | null;
+  developers: string | null;
+  publishers: string | null;
+  genres: string | null;
+  platforms: string | null;
+}>({
+  games: null,
+  developers: null,
+  publishers: null,
+  genres: null,
+  platforms: null,
+});
 
-  // Update cache
-  adminUsersCache.setKey(userId, updatedUser);
-}
+/**
+ * Admin developers list
+ */
+export const $adminDevelopers = atom<PaginatedResponse<DeveloperResponse> | null>(null);
 
-export function removeUserFromList(userId: string): void {
-  const currentData = adminUsersState.get();
-  if (currentData) {
-    const updatedData = {
-      ...currentData,
-      data: currentData.data.filter((user) => user.id !== userId),
-      total: currentData.total - 1,
-    };
-    adminUsersState.set(updatedData);
-  }
+/**
+ * Admin publishers list
+ */
+export const $adminPublishers = atom<PaginatedResponse<PublisherResponse> | null>(null);
 
-  // Remove from cache
-  adminUsersCache.setKey(userId, undefined);
-}
+/**
+ * Admin genres list
+ */
+export const $adminGenres = atom<PaginatedResponse<GenreResponse> | null>(null);
 
-export function setSelectedUser(user: AdminUserResponse | null): void {
-  selectedUserState.set(user);
-}
+/**
+ * Admin platforms list
+ */
+export const $adminPlatforms = atom<PaginatedResponse<PlatformResponse> | null>(null);
 
-export function updateUserManagementQuery(updates: Partial<UserManagementQuery>): void {
-  const currentQuery = userManagementQuery.get();
-  userManagementQuery.set({ ...currentQuery, ...updates });
-}
+// ============================================================================
+// Admin Dashboard Stats
+// ============================================================================
 
-export function setUsersLoading(loading: boolean): void {
-  usersLoading.set(loading);
-}
+/**
+ * Admin dashboard statistics
+ */
+export const $adminStats = atom<AdminDashboardStats | null>(null);
 
-export function setUsersError(error: string | null): void {
-  usersError.set(error);
-}
-
-// Content Moderation Actions
-export function setPendingReviewsData(data: PaginatedReviewsResponse): void {
-  pendingReviewsState.set(data);
-
-  // Cache individual reviews
-  data.data.forEach((review) => {
-    pendingReviewsCache.setKey(review.id, review);
-  });
-}
-
-export function removeReviewFromList(reviewId: string): void {
-  const currentData = pendingReviewsState.get();
-  if (currentData) {
-    const updatedData = {
-      ...currentData,
-      data: currentData.data.filter((review) => review.id !== reviewId),
-      total: currentData.total - 1,
-    };
-    pendingReviewsState.set(updatedData);
-  }
-
-  // Remove from cache
-  pendingReviewsCache.setKey(reviewId, undefined);
-}
-
-export function setSelectedReview(review: PendingReviewResponse | null): void {
-  selectedReviewState.set(review);
-}
-
-export function updateContentModerationQuery(updates: Partial<ContentModerationQuery>): void {
-  const currentQuery = contentModerationQuery.get();
-  contentModerationQuery.set({ ...currentQuery, ...updates });
-}
-
-export function setReviewsLoading(loading: boolean): void {
-  reviewsLoading.set(loading);
-}
-
-export function setReviewsError(error: string | null): void {
-  reviewsError.set(error);
-}
-
-// Reports Management Actions
-export function setReportsData(data: PaginatedReportsResponse): void {
-  reportsState.set(data);
-
-  // Cache individual reports
-  data.data.forEach((report) => {
-    reportsCache.setKey(report.id, report);
-  });
-}
-
-export function updateReportInList(reportId: string, updatedReport: ReportResponse): void {
-  const currentData = reportsState.get();
-  if (currentData) {
-    const updatedData = {
-      ...currentData,
-      data: currentData.data.map((report) => (report.id === reportId ? updatedReport : report)),
-    };
-    reportsState.set(updatedData);
-  }
-
-  // Update cache
-  reportsCache.setKey(reportId, updatedReport);
-}
-
-export function setSelectedReport(report: ReportResponse | null): void {
-  selectedReportState.set(report);
-}
-
-export function updateReportsQuery(updates: Partial<ReportsQuery>): void {
-  const currentQuery = reportsQuery.get();
-  reportsQuery.set({ ...currentQuery, ...updates });
-}
-
-export function setReportsLoading(loading: boolean): void {
-  reportsLoading.set(loading);
-}
-
-export function setReportsError(error: string | null): void {
-  reportsError.set(error);
-}
-
-// System Statistics Actions
-export function setSystemStats(stats: SystemStatsResponse): void {
-  systemStatsState.set(stats);
-}
-
-export function setStatsLoading(loading: boolean): void {
-  statsLoading.set(loading);
-}
-
-export function setStatsError(error: string | null): void {
-  statsError.set(error);
-}
-
-// UI Actions
-export function setSelectedTab(tab: 'users' | 'reviews' | 'reports' | 'stats'): void {
-  selectedTab.set(tab);
-  // Clear selections when switching tabs
-  clearBulkSelections();
-}
-
-export function toggleUserSelection(userId: string): void {
-  const current = bulkSelectedUsers.get();
-  const isSelected = current.includes(userId);
-
-  if (isSelected) {
-    bulkSelectedUsers.set(current.filter((id) => id !== userId));
-  } else {
-    bulkSelectedUsers.set([...current, userId]);
-  }
-}
-
-export function toggleReviewSelection(reviewId: string): void {
-  const current = bulkSelectedReviews.get();
-  const isSelected = current.includes(reviewId);
-
-  if (isSelected) {
-    bulkSelectedReviews.set(current.filter((id) => id !== reviewId));
-  } else {
-    bulkSelectedReviews.set([...current, reviewId]);
-  }
-}
-
-export function selectAllUsers(): void {
-  const currentData = adminUsersState.get();
-  if (currentData) {
-    const allUserIds = currentData.data.map((user) => user.id);
-    bulkSelectedUsers.set(allUserIds);
-  }
-}
-
-export function selectAllReviews(): void {
-  const currentData = pendingReviewsState.get();
-  if (currentData) {
-    const allReviewIds = currentData.data.map((review) => review.id);
-    bulkSelectedReviews.set(allReviewIds);
-  }
-}
-
-export function clearBulkSelections(): void {
-  bulkSelectedUsers.set([]);
-  bulkSelectedReviews.set([]);
-}
-
-// Form Actions
-export function setBanUserForm(form: { userId: string; reason: string } | null): void {
-  banUserForm.set(form);
-  showBanDialog.set(form !== null);
-}
-
-export function setPromoteUserForm(
-  form: {
+/**
+ * Admin activity log
+ */
+export const $adminActivityLog = atom<
+  Array<{
+    id: string;
+    action: string;
+    resource: string;
+    resourceId: string;
     userId: string;
-    role: 'MODERATOR' | 'ADMIN';
-  } | null,
-): void {
-  promoteUserForm.set(form);
-  showPromoteDialog.set(form !== null);
-}
-
-export function setRejectReviewForm(form: { reviewId: string; reason: string } | null): void {
-  rejectReviewForm.set(form);
-}
-
-export function setResolveReportForm(
-  form: {
-    reportId: string;
-    resolution: string;
-    action: 'RESOLVED' | 'DISMISSED';
-  } | null,
-): void {
-  resolveReportForm.set(form);
-}
+    username: string;
+    timestamp: Date;
+    details?: Record<string, any>;
+  }>
+>([]);
 
 // ============================================================================
-// Cache Helper Functions
+// Admin State Actions - General
 // ============================================================================
 
-export function getCachedUser(userId: string): AdminUserResponse | undefined {
-  return adminUsersCache.get()[userId];
-}
-
-export function getCachedReview(reviewId: string): PendingReviewResponse | undefined {
-  return pendingReviewsCache.get()[reviewId];
-}
-
-export function getCachedReport(reportId: string): ReportResponse | undefined {
-  return reportsCache.get()[reportId];
-}
-
-export function clearUsersCache(): void {
-  adminUsersCache.set({});
-}
-
-export function clearReviewsCache(): void {
-  pendingReviewsCache.set({});
-}
-
-export function clearReportsCache(): void {
-  reportsCache.set({});
-}
-
-export function clearAllCaches(): void {
-  clearUsersCache();
-  clearReviewsCache();
-  clearReportsCache();
-}
-
-// ============================================================================
-// Filter Helper Functions
-// ============================================================================
-
-export function filterUsersByRole(
-  users: AdminUserResponse[],
-  role: 'USER' | 'MODERATOR' | 'ADMIN',
-): AdminUserResponse[] {
-  return users.filter((user) => user.role === role);
-}
-
-export function filterUsersByStatus(
-  users: AdminUserResponse[],
-  status: 'ACTIVE' | 'BANNED',
-): AdminUserResponse[] {
-  if (status === 'ACTIVE') {
-    return users.filter((user) => user.isActive && !user.isBanned);
+/**
+ * Set general admin loading state
+ */
+export function setAdminLoading(loading: boolean): void {
+  $adminLoading.set(loading);
+  if (loading) {
+    $adminError.set(null);
   }
-  return users.filter((user) => user.isBanned);
 }
 
-export function filterReviewsByReportCount(
-  reviews: PendingReviewResponse[],
-  minReports: number,
-): PendingReviewResponse[] {
-  return reviews.filter((review) => review.reportCount >= minReports);
+/**
+ * Set general admin error
+ */
+export function setAdminError(error: string | null): void {
+  $adminError.set(error);
+  $adminLoading.set(false);
 }
 
-export function filterReportsByType(
-  reports: ReportResponse[],
-  type: 'REVIEW' | 'USER' | 'COMMENT',
-): ReportResponse[] {
-  return reports.filter((report) => report.type === type);
+/**
+ * Set admin success message
+ */
+export function setAdminSuccess(message: string | null): void {
+  $adminSuccess.set(message);
+  if (message) {
+    // Auto-clear success message after 5 seconds
+    setTimeout(() => {
+      if ($adminSuccess.get() === message) {
+        $adminSuccess.set(null);
+      }
+    }, 5000);
+  }
 }
 
-export function filterReportsByStatus(
-  reports: ReportResponse[],
-  status: 'PENDING' | 'RESOLVED' | 'DISMISSED',
-): ReportResponse[] {
-  return reports.filter((report) => report.status === status);
-}
-
-// ============================================================================
-// Statistics Helper Functions
-// ============================================================================
-
-export function calculateUserGrowthRate(
-  currentTotal: number,
-  newThisMonth: number,
-): { percentage: number; trend: 'up' | 'down' | 'stable' } {
-  const previousTotal = currentTotal - newThisMonth;
-  if (previousTotal === 0) return { percentage: 100, trend: 'up' };
-
-  const percentage = (newThisMonth / previousTotal) * 100;
-  return {
-    percentage: Math.round(percentage * 100) / 100,
-    trend: percentage > 5 ? 'up' : percentage < -5 ? 'down' : 'stable',
-  };
-}
-
-export function getActivityTrend(
-  daily: number,
-  weekly: number,
-  monthly: number,
-): { metric: string; value: number; trend: 'up' | 'down' | 'stable' } {
-  const dailyRate = daily / 1;
-  const weeklyRate = weekly / 7;
-  const monthlyRate = monthly / 30;
-
-  // Compare current daily activity to historical patterns
-  const weeklyComparison = (dailyRate - weeklyRate) / weeklyRate;
-  const monthlyComparison = (dailyRate - monthlyRate) / monthlyRate;
-
-  // Use the more conservative comparison
-  const comparison = Math.min(weeklyComparison, monthlyComparison);
-
-  return {
-    metric: 'Daily Activity Trend',
-    value: Math.round(comparison * 100 * 100) / 100,
-    trend: comparison > 0.1 ? 'up' : comparison < -0.1 ? 'down' : 'stable',
-  };
+/**
+ * Clear all admin messages
+ */
+export function clearAdminMessages(): void {
+  $adminError.set(null);
+  $adminSuccess.set(null);
 }
 
 // ============================================================================
-// Reset Functions
+// Admin State Actions - User Management
 // ============================================================================
 
-export function resetAdminState(): void {
-  // Reset all atoms to initial state
-  adminUsersState.set(null);
-  selectedUserState.set(null);
-  userManagementQuery.set({ page: 1, limit: 20 });
-  usersLoading.set(false);
-  usersError.set(null);
-
-  pendingReviewsState.set(null);
-  selectedReviewState.set(null);
-  contentModerationQuery.set({ page: 1, limit: 20 });
-  reviewsLoading.set(false);
-  reviewsError.set(null);
-
-  reportsState.set(null);
-  selectedReportState.set(null);
-  reportsQuery.set({ page: 1, limit: 20 });
-  reportsLoading.set(false);
-  reportsError.set(null);
-
-  systemStatsState.set(null);
-  statsLoading.set(false);
-  statsError.set(null);
-
-  selectedTab.set('users');
-  clearBulkSelections();
-  showBanDialog.set(false);
-  showPromoteDialog.set(false);
-
-  banUserForm.set(null);
-  promoteUserForm.set(null);
-  rejectReviewForm.set(null);
-  resolveReportForm.set(null);
-
-  clearAllCaches();
+/**
+ * Set admin users list
+ */
+export function setAdminUsers(users: PaginatedResponse<UserResponse> | null): void {
+  $adminUsers.set(users);
+  $userManagementError.set(null);
 }
 
-export function resetUserManagement(): void {
-  adminUsersState.set(null);
-  selectedUserState.set(null);
-  userManagementQuery.set({ page: 1, limit: 20 });
-  usersLoading.set(false);
-  usersError.set(null);
-  bulkSelectedUsers.set([]);
-  clearUsersCache();
+/**
+ * Set admin user profile
+ */
+export function setAdminUserProfile(userId: string, profile: UserProfile): void {
+  const current = $adminUserProfiles.get();
+  $adminUserProfiles.set({
+    ...current,
+    [userId]: profile,
+  });
 }
 
-export function resetContentModeration(): void {
-  pendingReviewsState.set(null);
-  selectedReviewState.set(null);
-  contentModerationQuery.set({ page: 1, limit: 20 });
-  reviewsLoading.set(false);
-  reviewsError.set(null);
-  bulkSelectedReviews.set([]);
-  clearReviewsCache();
+/**
+ * Update user in admin list
+ */
+export function updateAdminUser(userId: string, updates: Partial<UserResponse>): void {
+  const currentUsers = $adminUsers.get();
+  if (!currentUsers) return;
+
+  const updatedItems = currentUsers.items.map((user) =>
+    user.id === userId ? { ...user, ...updates } : user,
+  );
+
+  setAdminUsers({
+    ...currentUsers,
+    items: updatedItems,
+  });
+
+  // Also update in profiles cache if exists
+  const currentProfiles = $adminUserProfiles.get();
+  if (currentProfiles[userId]) {
+    setAdminUserProfile(userId, {
+      ...currentProfiles[userId],
+      ...updates,
+    });
+  }
 }
 
-export function resetReportsManagement(): void {
-  reportsState.set(null);
-  selectedReportState.set(null);
-  reportsQuery.set({ page: 1, limit: 20 });
-  reportsLoading.set(false);
-  reportsError.set(null);
-  clearReportsCache();
+/**
+ * Remove user from admin list
+ */
+export function removeAdminUser(userId: string): void {
+  const currentUsers = $adminUsers.get();
+  if (!currentUsers) return;
+
+  const filteredItems = currentUsers.items.filter((user) => user.id !== userId);
+
+  setAdminUsers({
+    ...currentUsers,
+    items: filteredItems,
+    meta: {
+      ...currentUsers.meta,
+      total: currentUsers.meta.total - 1,
+    },
+  });
+
+  // Remove from profiles cache
+  const currentProfiles = $adminUserProfiles.get();
+  const { [userId]: removed, ...remainingProfiles } = currentProfiles;
+  $adminUserProfiles.set(remainingProfiles);
+}
+
+/**
+ * Set user management loading state
+ */
+export function setUserManagementLoading(loading: boolean): void {
+  $userManagementLoading.set(loading);
+  if (loading) {
+    $userManagementError.set(null);
+  }
+}
+
+/**
+ * Set user management error
+ */
+export function setUserManagementError(error: string | null): void {
+  $userManagementError.set(error);
+  $userManagementLoading.set(false);
+}
+
+/**
+ * Set user management query
+ */
+export function setUserManagementQuery(query: {
+  search?: string;
+  page: number;
+  limit: number;
+  role?: UserRole;
+}): void {
+  $userManagementQuery.set(query);
+}
+
+// ============================================================================
+// Admin State Actions - Content Management
+// ============================================================================
+
+/**
+ * Set content management loading state for specific domain
+ */
+export function setContentManagementLoading(
+  domain: keyof typeof $contentManagementLoading.value,
+  loading: boolean,
+): void {
+  const current = $contentManagementLoading.get();
+  $contentManagementLoading.set({
+    ...current,
+    [domain]: loading,
+  });
+
+  if (loading) {
+    const currentErrors = $contentManagementErrors.get();
+    $contentManagementErrors.set({
+      ...currentErrors,
+      [domain]: null,
+    });
+  }
+}
+
+/**
+ * Set content management error for specific domain
+ */
+export function setContentManagementError(
+  domain: keyof typeof $contentManagementErrors.value,
+  error: string | null,
+): void {
+  const currentErrors = $contentManagementErrors.get();
+  $contentManagementErrors.set({
+    ...currentErrors,
+    [domain]: error,
+  });
+
+  const currentLoading = $contentManagementLoading.get();
+  $contentManagementLoading.set({
+    ...currentLoading,
+    [domain]: false,
+  });
+}
+
+/**
+ * Set admin games list
+ */
+export function setAdminGames(games: PaginatedResponse<GameResponse> | null): void {
+  $adminGames.set(games);
+  setContentManagementError('games', null);
+}
+
+/**
+ * Set admin developers list
+ */
+export function setAdminDevelopers(developers: PaginatedResponse<DeveloperResponse> | null): void {
+  $adminDevelopers.set(developers);
+  setContentManagementError('developers', null);
+}
+
+/**
+ * Set admin publishers list
+ */
+export function setAdminPublishers(publishers: PaginatedResponse<PublisherResponse> | null): void {
+  $adminPublishers.set(publishers);
+  setContentManagementError('publishers', null);
+}
+
+/**
+ * Set admin genres list
+ */
+export function setAdminGenres(genres: PaginatedResponse<GenreResponse> | null): void {
+  $adminGenres.set(genres);
+  setContentManagementError('genres', null);
+}
+
+/**
+ * Set admin platforms list
+ */
+export function setAdminPlatforms(platforms: PaginatedResponse<PlatformResponse> | null): void {
+  $adminPlatforms.set(platforms);
+  setContentManagementError('platforms', null);
+}
+
+// ============================================================================
+// Admin State Actions - Dashboard
+// ============================================================================
+
+/**
+ * Set admin dashboard stats
+ */
+export function setAdminStats(stats: AdminDashboardStats | null): void {
+  $adminStats.set(stats);
+}
+
+/**
+ * Set admin activity log
+ */
+export function setAdminActivityLog(log: typeof $adminActivityLog.value): void {
+  $adminActivityLog.set(log);
+}
+
+/**
+ * Add activity log entry
+ */
+export function addAdminActivityLogEntry(entry: (typeof $adminActivityLog.value)[0]): void {
+  const currentLog = $adminActivityLog.get();
+  $adminActivityLog.set([entry, ...currentLog.slice(0, 49)]); // Keep last 50 entries
+}
+
+// ============================================================================
+// Admin State Helpers
+// ============================================================================
+
+/**
+ * Check if user can perform admin action based on role requirement
+ */
+export function canPerformAdminAction(requiredRole: 'ADMIN' | 'MODERATOR'): boolean {
+  const currentRole = $userRole.get();
+  if (!currentRole) return false;
+
+  if (requiredRole === 'ADMIN') {
+    return currentRole === 'ADMIN';
+  }
+
+  if (requiredRole === 'MODERATOR') {
+    return currentRole === 'ADMIN' || currentRole === 'MODERATOR';
+  }
+
+  return false;
+}
+
+/**
+ * Get admin user by ID from cache
+ */
+export function getAdminUser(userId: string): UserResponse | null {
+  const adminUsers = $adminUsers.get();
+  if (!adminUsers) return null;
+  return adminUsers.items.find((user) => user.id === userId) || null;
+}
+
+/**
+ * Get admin user profile by ID from cache
+ */
+export function getAdminUserProfile(userId: string): UserProfile | null {
+  return $adminUserProfiles.get()[userId] || null;
+}
+
+/**
+ * Check if any content management operation is loading
+ */
+export const $isAnyContentLoading = computed($contentManagementLoading, (loading) => {
+  return Object.values(loading).some(Boolean);
+});
+
+/**
+ * Get all content management errors
+ */
+export const $contentManagementErrorsArray = computed($contentManagementErrors, (errors) => {
+  return Object.entries(errors)
+    .filter(([, error]) => error !== null)
+    .map(([domain, error]) => ({ domain, error }));
+});
+
+/**
+ * Clear all admin state
+ */
+export function clearAllAdminState(): void {
+  $adminLoading.set(false);
+  $adminError.set(null);
+  $adminSuccess.set(null);
+  $adminUsers.set(null);
+  $adminUserProfiles.set({});
+  $userManagementLoading.set(false);
+  $userManagementError.set(null);
+  $userManagementQuery.set({ page: 1, limit: 20 });
+  $adminGames.set(null);
+  $adminDevelopers.set(null);
+  $adminPublishers.set(null);
+  $adminGenres.set(null);
+  $adminPlatforms.set(null);
+  $contentManagementLoading.set({
+    games: false,
+    developers: false,
+    publishers: false,
+    genres: false,
+    platforms: false,
+  });
+  $contentManagementErrors.set({
+    games: null,
+    developers: null,
+    publishers: null,
+    genres: null,
+    platforms: null,
+  });
+  $adminStats.set(null);
+  $adminActivityLog.set([]);
 }

@@ -1,1466 +1,650 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import type {
-  AdminUserResponse,
-  PendingReviewResponse,
-  ReportResponse,
-  SystemStatsResponse,
-  PaginatedUsersResponse,
-  PaginatedReviewsResponse,
-  PaginatedReportsResponse,
-  UserManagementQuery,
-  ContentModerationQuery,
-  ReportsQuery,
-} from '@/services/admin';
+  UserResponse,
+  UserProfile,
+  UserRole,
+  UpdateUserRequest,
+  UsersQuery,
+  GameResponse,
+  CreateGameRequest,
+  UpdateGameRequest,
+  GamesQuery,
+  DeveloperResponse,
+  CreateDeveloperRequest,
+  UpdateDeveloperRequest,
+  DevelopersQuery,
+  PublisherResponse,
+  CreatePublisherRequest,
+  UpdatePublisherRequest,
+  PublishersQuery,
+  GenreResponse,
+  CreateGenreRequest,
+  UpdateGenreRequest,
+  GenresQuery,
+  PlatformResponse,
+  CreatePlatformRequest,
+  UpdatePlatformRequest,
+  PlatformsQuery,
+  PaginatedResponse,
+  AdminDashboardStats,
+} from '@questlog/shared-types';
 
-import { adminService } from '@/services/admin';
-import { $currentUser } from '@/stores/auth';
+import { AdminService } from '@/services/admin';
 import {
-  // User Management State
-  adminUsersState,
-  selectedUserState,
-  userManagementQuery,
-  usersLoading,
-  usersError,
-  // Content Moderation State
-  pendingReviewsState,
-  selectedReviewState,
-  contentModerationQuery,
-  reviewsLoading,
-  reviewsError,
-  // Reports Management State
-  reportsState,
-  selectedReportState,
-  reportsQuery,
-  reportsLoading,
-  reportsError,
-  // System Statistics State
-  systemStatsState,
-  statsLoading,
-  statsError,
-  // UI State
-  selectedTab,
-  bulkSelectedUsers,
-  bulkSelectedReviews,
-  bulkSelectionCounts,
-  // Form State
-  banUserForm,
-  promoteUserForm,
-  rejectReviewForm,
-  resolveReportForm,
-  // Computed Values
-  usersStats,
-  reviewsStats,
-  reportsStats,
-  dashboardSummary,
-  // Action Functions
-  setUsersData,
-  updateUserInList,
-  setSelectedUser,
-  updateUserManagementQuery,
-  setUsersLoading,
-  setUsersError,
-  setPendingReviewsData,
-  removeReviewFromList,
-  setSelectedReview,
-  updateContentModerationQuery,
-  setReviewsLoading,
-  setReviewsError,
-  setReportsData,
-  updateReportInList,
-  setSelectedReport,
-  updateReportsQuery,
-  setReportsLoading,
-  setReportsError,
-  setSystemStats,
-  setStatsLoading,
-  setStatsError,
-  setSelectedTab,
-  toggleUserSelection,
-  toggleReviewSelection,
-  selectAllUsers,
-  selectAllReviews,
-  clearBulkSelections,
-  setBanUserForm,
-  setPromoteUserForm,
-  setRejectReviewForm,
-  setResolveReportForm,
-  resetAdminState,
-  resetUserManagement,
-  resetContentModeration,
-  resetReportsManagement,
+  // Permission state
+  $canAccessAdmin,
+  $hasAdminPermissions,
+  $hasModeratorPermissions,
+  $adminPermissionLevel,
+
+  // General admin state
+  $adminLoading,
+  $adminError,
+  $adminSuccess,
+
+  // User management state
+  $adminUsers,
+  $adminUserProfiles,
+  $userManagementLoading,
+  $userManagementError,
+  $userManagementQuery,
+
+  // Content management state
+  $adminGames,
+  $adminDevelopers,
+  $adminPublishers,
+  $adminGenres,
+  $adminPlatforms,
+  $contentManagementLoading,
+  $contentManagementErrors,
+
+  // Dashboard state
+  $adminStats,
+  $adminActivityLog,
+
+  // Actions
+  clearAdminMessages,
+  setUserManagementQuery,
+  clearAllAdminState,
 } from '@/stores/admin';
 
 // ============================================================================
 // Types
 // ============================================================================
 
-interface UseAdminUsersReturn {
-  // State
-  users: PaginatedUsersResponse | null;
-  selectedUser: AdminUserResponse | null;
-  query: UserManagementQuery;
+interface UseAdminReturn {
+  // Permission state
+  canAccessAdmin: boolean;
+  hasAdminPermissions: boolean;
+  hasModeratorPermissions: boolean;
+  permissionLevel: 'admin' | 'moderator' | 'none';
+
+  // General state
   isLoading: boolean;
   error: string | null;
-  stats: {
-    total: number;
-    active: number;
-    banned: number;
-    moderators: number;
-    admins: number;
-    currentPage: number;
-    totalPages: number;
-  } | null;
-  bulkSelected: string[];
+  success: string | null;
 
-  // Actions
-  fetchUsers: (query?: UserManagementQuery) => Promise<PaginatedUsersResponse>;
-  fetchUserById: (userId: string) => Promise<AdminUserResponse>;
-  searchUsers: (
-    searchTerm: string,
-    options?: Omit<UserManagementQuery, 'search'>,
-  ) => Promise<PaginatedUsersResponse>;
-  getUsersByRole: (
-    role: 'USER' | 'MODERATOR' | 'ADMIN',
-    options?: Omit<UserManagementQuery, 'role'>,
-  ) => Promise<PaginatedUsersResponse>;
-  getBannedUsers: (options?: UserManagementQuery) => Promise<PaginatedUsersResponse>;
-  banUser: (userId: string, reason: string) => Promise<void>;
-  unbanUser: (userId: string) => Promise<void>;
-  promoteUser: (userId: string, role: 'MODERATOR' | 'ADMIN') => Promise<AdminUserResponse>;
-  demoteUser: (userId: string) => Promise<AdminUserResponse>;
-  bulkBanUsers: (userIds: string[], reason: string) => Promise<void>;
-  clearError: () => void;
-  clearData: () => void;
+  // User management state
+  users: PaginatedResponse<UserResponse> | null;
+  userProfiles: Record<string, UserProfile>;
+  userManagementLoading: boolean;
+  userManagementError: string | null;
+  userQuery: { search?: string; page: number; limit: number; role?: UserRole };
 
-  // Selection Actions
-  selectUser: (user: AdminUserResponse | null) => void;
-  toggleSelection: (userId: string) => void;
-  selectAll: () => void;
-  clearSelections: () => void;
-
-  // Query Actions
-  updateQuery: (updates: Partial<UserManagementQuery>) => void;
-
-  // Utils
-  refetch: () => Promise<void>;
-}
-
-interface UseAdminReviewsReturn {
-  // State
-  reviews: PaginatedReviewsResponse | null;
-  selectedReview: PendingReviewResponse | null;
-  query: ContentModerationQuery;
-  isLoading: boolean;
-  error: string | null;
-  stats: {
-    total: number;
-    highPriority: number;
-    reported: number;
-    currentPage: number;
-    totalPages: number;
-  } | null;
-  bulkSelected: string[];
-
-  // Actions
-  fetchPendingReviews: (query?: ContentModerationQuery) => Promise<PaginatedReviewsResponse>;
-  approveReview: (reviewId: string) => Promise<void>;
-  rejectReview: (reviewId: string, reason: string) => Promise<void>;
-  bulkApproveReviews: (reviewIds: string[]) => Promise<void>;
-  bulkRejectReviews: (reviewIds: string[], reason: string) => Promise<void>;
-  clearError: () => void;
-  clearData: () => void;
-
-  // Selection Actions
-  selectReview: (review: PendingReviewResponse | null) => void;
-  toggleSelection: (reviewId: string) => void;
-  selectAll: () => void;
-  clearSelections: () => void;
-
-  // Query Actions
-  updateQuery: (updates: Partial<ContentModerationQuery>) => void;
-
-  // Utils
-  refetch: () => Promise<void>;
-}
-
-interface UseAdminReportsReturn {
-  // State
-  reports: PaginatedReportsResponse | null;
-  selectedReport: ReportResponse | null;
-  query: ReportsQuery;
-  isLoading: boolean;
-  error: string | null;
-  stats: {
-    total: number;
-    pending: number;
-    resolved: number;
-    reviewReports: number;
-    userReports: number;
-    currentPage: number;
-    totalPages: number;
-  } | null;
-
-  // Actions
-  fetchReports: (query?: ReportsQuery) => Promise<PaginatedReportsResponse>;
-  fetchReportById: (reportId: string) => Promise<ReportResponse>;
-  getPendingReports: (options?: ReportsQuery) => Promise<PaginatedReportsResponse>;
-  resolveReport: (
-    reportId: string,
-    resolution: string,
-    action?: 'DISMISSED' | 'RESOLVED',
-  ) => Promise<void>;
-  clearError: () => void;
-  clearData: () => void;
-
-  // Selection Actions
-  selectReport: (report: ReportResponse | null) => void;
-
-  // Query Actions
-  updateQuery: (updates: Partial<ReportsQuery>) => void;
-
-  // Utils
-  refetch: () => Promise<void>;
-}
-
-interface UseAdminStatsReturn {
-  // State
-  stats: SystemStatsResponse | null;
-  isLoading: boolean;
-  error: string | null;
-  dashboard: {
-    users: {
-      total: number;
-      active: number;
-      banned: number;
-      newThisMonth: number;
-    };
-    content: {
-      games: number;
-      reviews: number;
-      pendingReviews: number;
-      comments: number;
-    };
-    activity: {
-      dailyActiveUsers: number;
-      weeklyActiveUsers: number;
-      monthlyActiveUsers: number;
-      avgSessionDuration: number;
-    };
-    reports: {
-      pending: number;
-      resolved: number;
-      dismissed: number;
-    };
-    currentStats: {
-      users: any;
-      reviews: any;
-      reports: any;
-    };
-  } | null;
-
-  // Actions
-  fetchSystemStats: () => Promise<SystemStatsResponse>;
-  fetchUserStats: () => Promise<SystemStatsResponse['users']>;
-  fetchContentStats: () => Promise<SystemStatsResponse['content']>;
-  fetchActivityStats: () => Promise<SystemStatsResponse['activity']>;
-  clearError: () => void;
-
-  // Utils
-  refetch: () => Promise<void>;
-}
-
-interface UseAdminUIReturn {
-  // State
-  selectedTab: 'users' | 'reviews' | 'reports' | 'stats';
-  bulkCounts: {
-    users: number;
-    reviews: number;
+  // Content management state
+  games: PaginatedResponse<GameResponse> | null;
+  developers: PaginatedResponse<DeveloperResponse> | null;
+  publishers: PaginatedResponse<PublisherResponse> | null;
+  genres: PaginatedResponse<GenreResponse> | null;
+  platforms: PaginatedResponse<PlatformResponse> | null;
+  contentLoading: {
+    games: boolean;
+    developers: boolean;
+    publishers: boolean;
+    genres: boolean;
+    platforms: boolean;
   };
-  banForm: { userId: string; reason: string } | null;
-  promoteForm: { userId: string; role: 'MODERATOR' | 'ADMIN' } | null;
-  rejectForm: { reviewId: string; reason: string } | null;
-  resolveForm: {
-    reportId: string;
-    resolution: string;
-    action: 'RESOLVED' | 'DISMISSED';
-  } | null;
+  contentErrors: {
+    games: string | null;
+    developers: string | null;
+    publishers: string | null;
+    genres: string | null;
+    platforms: string | null;
+  };
 
-  // Actions
-  setTab: (tab: 'users' | 'reviews' | 'reports' | 'stats') => void;
-  clearAllSelections: () => void;
+  // Dashboard state
+  dashboardStats: AdminDashboardStats | null;
+  activityLog: Array<{
+    id: string;
+    action: string;
+    resource: string;
+    resourceId: string;
+    userId: string;
+    username: string;
+    timestamp: Date;
+    details?: Record<string, any>;
+  }>;
 
-  // Form Actions
-  openBanDialog: (userId: string, reason?: string) => void;
-  closeBanDialog: () => void;
-  openPromoteDialog: (userId: string, role?: 'MODERATOR' | 'ADMIN') => void;
-  closePromoteDialog: () => void;
-  openRejectDialog: (reviewId: string, reason?: string) => void;
-  closeRejectDialog: () => void;
-  openResolveDialog: (
-    reportId: string,
-    resolution?: string,
-    action?: 'RESOLVED' | 'DISMISSED',
-  ) => void;
-  closeResolveDialog: () => void;
+  // User management actions
+  getUsers: (query?: UsersQuery) => Promise<PaginatedResponse<UserResponse>>;
+  getUserProfile: (userId: string) => Promise<UserProfile>;
+  updateUserRole: (userId: string, role: UserRole) => Promise<UserResponse>;
+  updateUser: (userId: string, updates: UpdateUserRequest) => Promise<UserResponse>;
+  deleteUser: (userId: string) => Promise<void>;
+  bulkDeleteUsers: (userIds: string[]) => Promise<void>;
+
+  // Game management actions
+  getGames: (query?: GamesQuery) => Promise<PaginatedResponse<GameResponse>>;
+  createGame: (gameData: CreateGameRequest) => Promise<GameResponse>;
+  updateGame: (gameId: string, updates: UpdateGameRequest) => Promise<GameResponse>;
+  deleteGame: (gameId: string) => Promise<void>;
+
+  // Developer management actions
+  getDevelopers: (query?: DevelopersQuery) => Promise<PaginatedResponse<DeveloperResponse>>;
+  createDeveloper: (developerData: CreateDeveloperRequest) => Promise<DeveloperResponse>;
+  updateDeveloper: (
+    developerId: string,
+    updates: UpdateDeveloperRequest,
+  ) => Promise<DeveloperResponse>;
+  deleteDeveloper: (developerId: string) => Promise<void>;
+
+  // Publisher management actions
+  getPublishers: (query?: PublishersQuery) => Promise<PaginatedResponse<PublisherResponse>>;
+  createPublisher: (publisherData: CreatePublisherRequest) => Promise<PublisherResponse>;
+  updatePublisher: (
+    publisherId: string,
+    updates: UpdatePublisherRequest,
+  ) => Promise<PublisherResponse>;
+  deletePublisher: (publisherId: string) => Promise<void>;
+
+  // Genre management actions
+  getGenres: (query?: GenresQuery) => Promise<PaginatedResponse<GenreResponse>>;
+  createGenre: (genreData: CreateGenreRequest) => Promise<GenreResponse>;
+  updateGenre: (genreId: string, updates: UpdateGenreRequest) => Promise<GenreResponse>;
+  deleteGenre: (genreId: string) => Promise<void>;
+
+  // Platform management actions
+  getPlatforms: (query?: PlatformsQuery) => Promise<PaginatedResponse<PlatformResponse>>;
+  createPlatform: (platformData: CreatePlatformRequest) => Promise<PlatformResponse>;
+  updatePlatform: (platformId: string, updates: UpdatePlatformRequest) => Promise<PlatformResponse>;
+  deletePlatform: (platformId: string) => Promise<void>;
+
+  // Dashboard actions
+  getDashboardStats: () => Promise<AdminDashboardStats>;
+  exportData: (type: 'users' | 'games' | 'reviews') => Promise<Blob>;
+
+  // Utility actions
+  setUserQuery: (query: { search?: string; page: number; limit: number; role?: UserRole }) => void;
+  clearMessages: () => void;
+  clearAllState: () => void;
 }
 
 // ============================================================================
-// User Management Hook
+// Hook Implementation
 // ============================================================================
 
 /**
- * Hook for managing admin user operations
+ * Admin hook that provides admin state and actions
+ * Automatically enforces permissions and provides role-based functionality
  *
  * @example
  * ```tsx
- * function AdminUsersPanel() {
+ * function AdminUserManagement() {
  *   const {
+ *     canAccessAdmin,
+ *     hasAdminPermissions,
  *     users,
- *     isLoading,
- *     error,
- *     fetchUsers,
- *     banUser,
- *     promoteUser,
- *     clearError
- *   } = useAdminUsers();
+ *     userManagementLoading,
+ *     getUsers,
+ *     updateUserRole,
+ *     deleteUser
+ *   } = useAdmin();
  *
  *   useEffect(() => {
- *     fetchUsers({ page: 1, limit: 20, role: 'USER' });
- *   }, []);
+ *     if (canAccessAdmin) {
+ *       getUsers({ page: 1, limit: 20 });
+ *     }
+ *   }, [canAccessAdmin, getUsers]);
  *
- *   const handleBanUser = async (userId: string, reason: string) => {
- *     try {
- *       await banUser(userId, reason);
- *       // User will be updated in the list automatically
- *     } catch (err) {
- *       // Error is already handled in the hook
+ *   const handleRoleUpdate = async (userId: string, role: UserRole) => {
+ *     if (hasAdminPermissions) {
+ *       await updateUserRole(userId, role);
  *     }
  *   };
  *
- *   if (error) return <ErrorMessage message={error} onClose={clearError} />;
- *   if (isLoading) return <Loading />;
+ *   if (!canAccessAdmin) {
+ *     return <AccessDenied />;
+ *   }
  *
  *   return (
  *     <div>
- *       {users?.data.map(user => (
- *         <UserCard
- *           key={user.id}
- *           user={user}
- *           onBan={(reason) => handleBanUser(user.id, reason)}
- *         />
- *       ))}
+ *       {userManagementLoading ? <Loading /> : <UsersList users={users} />}
  *     </div>
  *   );
  * }
  * ```
  */
-export function useAdminUsers(): UseAdminUsersReturn {
-  // Subscribe to global admin stores
-  const users = useStore(adminUsersState);
-  const selectedUser = useStore(selectedUserState);
-  const query = useStore(userManagementQuery);
-  const isLoading = useStore(usersLoading);
-  const error = useStore(usersError);
-  const stats = useStore(usersStats);
-  const bulkSelected = useStore(bulkSelectedUsers);
+export function useAdmin(): UseAdminReturn {
+  // Subscribe to admin stores
+  const canAccessAdmin = useStore($canAccessAdmin);
+  const hasAdminPermissions = useStore($hasAdminPermissions);
+  const hasModeratorPermissions = useStore($hasModeratorPermissions);
+  const permissionLevel = useStore($adminPermissionLevel);
+
+  const isLoading = useStore($adminLoading);
+  const error = useStore($adminError);
+  const success = useStore($adminSuccess);
+
+  const users = useStore($adminUsers);
+  const userProfiles = useStore($adminUserProfiles);
+  const userManagementLoading = useStore($userManagementLoading);
+  const userManagementError = useStore($userManagementError);
+  const userQuery = useStore($userManagementQuery);
+
+  const games = useStore($adminGames);
+  const developers = useStore($adminDevelopers);
+  const publishers = useStore($adminPublishers);
+  const genres = useStore($adminGenres);
+  const platforms = useStore($adminPlatforms);
+  const contentLoading = useStore($contentManagementLoading);
+  const contentErrors = useStore($contentManagementErrors);
+
+  const dashboardStats = useStore($adminStats);
+  const activityLog = useStore($adminActivityLog);
 
   // ============================================================================
-  // API Actions
+  // User Management Actions
   // ============================================================================
 
-  const fetchUsers = useCallback(
-    async (queryParams: UserManagementQuery = {}): Promise<PaginatedUsersResponse> => {
-      setUsersLoading(true);
-      setUsersError(null);
-
-      try {
-        const response = await adminService.getUsers(queryParams);
-        setUsersData(response);
-        updateUserManagementQuery(queryParams);
-        return response;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch users';
-        setUsersError(errorMessage);
-        throw error;
-      } finally {
-        setUsersLoading(false);
-      }
+  const getUsers = useCallback(
+    async (query: UsersQuery = {}): Promise<PaginatedResponse<UserResponse>> => {
+      return await AdminService.getUsers(query);
     },
     [],
   );
 
-  const fetchUserById = useCallback(async (userId: string): Promise<AdminUserResponse> => {
-    setUsersLoading(true);
-    setUsersError(null);
-
-    try {
-      const response = await adminService.getUserById(userId);
-      setSelectedUser(response);
-      return response;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch user';
-      setUsersError(errorMessage);
-      throw error;
-    } finally {
-      setUsersLoading(false);
-    }
+  const getUserProfile = useCallback(async (userId: string): Promise<UserProfile> => {
+    return await AdminService.getUserProfile(userId);
   }, []);
 
-  const searchUsers = useCallback(
-    async (
-      searchTerm: string,
-      options: Omit<UserManagementQuery, 'search'> = {},
-    ): Promise<PaginatedUsersResponse> => {
-      setUsersLoading(true);
-      setUsersError(null);
-
-      try {
-        const response = await adminService.searchUsers(searchTerm, options);
-        setUsersData(response);
-        updateUserManagementQuery({ ...options, search: searchTerm });
-        return response;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to search users';
-        setUsersError(errorMessage);
-        throw error;
-      } finally {
-        setUsersLoading(false);
+  const updateUserRole = useCallback(
+    async (userId: string, role: UserRole): Promise<UserResponse> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to update user roles');
       }
+      return await AdminService.updateUserRole(userId, role);
     },
-    [],
+    [hasAdminPermissions],
   );
 
-  const getUsersByRole = useCallback(
-    async (
-      role: 'USER' | 'MODERATOR' | 'ADMIN',
-      options: Omit<UserManagementQuery, 'role'> = {},
-    ): Promise<PaginatedUsersResponse> => {
-      return fetchUsers({ ...options, role });
-    },
-    [fetchUsers],
-  );
-
-  const getBannedUsers = useCallback(
-    async (options: UserManagementQuery = {}): Promise<PaginatedUsersResponse> => {
-      return fetchUsers({ ...options, status: 'BANNED' });
-    },
-    [fetchUsers],
-  );
-
-  const banUser = useCallback(
-    async (userId: string, reason: string): Promise<void> => {
-      try {
-        await adminService.banUser(userId, reason);
-
-        // Optimistically update the user in the list
-        const currentUser = users?.data.find((u) => u.id === userId);
-        if (currentUser) {
-          const updatedUser: AdminUserResponse = {
-            ...currentUser,
-            isBanned: true,
-            banReason: reason,
-            bannedAt: new Date(),
-            isActive: false,
-          };
-          updateUserInList(userId, updatedUser);
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to ban user';
-        setUsersError(errorMessage);
-        throw error;
+  const updateUser = useCallback(
+    async (userId: string, updates: UpdateUserRequest): Promise<UserResponse> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to update users');
       }
+      return await AdminService.updateUser(userId, updates);
     },
-    [users],
+    [hasAdminPermissions],
   );
 
-  const unbanUser = useCallback(
+  const deleteUser = useCallback(
     async (userId: string): Promise<void> => {
-      try {
-        await adminService.unbanUser(userId);
-
-        // Optimistically update the user in the list
-        const currentUser = users?.data.find((u) => u.id === userId);
-        if (currentUser) {
-          const updatedUser: AdminUserResponse = {
-            ...currentUser,
-            isBanned: false,
-            banReason: undefined,
-            bannedAt: undefined,
-            isActive: true,
-          };
-          updateUserInList(userId, updatedUser);
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to unban user';
-        setUsersError(errorMessage);
-        throw error;
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to delete users');
       }
+      await AdminService.deleteUser(userId);
     },
-    [users],
+    [hasAdminPermissions],
   );
 
-  const promoteUser = useCallback(
-    async (userId: string, role: 'MODERATOR' | 'ADMIN'): Promise<AdminUserResponse> => {
-      try {
-        const response = await adminService.promoteUser(userId, role);
-        updateUserInList(userId, response);
-        return response;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to promote user';
-        setUsersError(errorMessage);
-        throw error;
+  const bulkDeleteUsers = useCallback(
+    async (userIds: string[]): Promise<void> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required for bulk operations');
       }
+      await AdminService.bulkDeleteUsers(userIds);
+    },
+    [hasAdminPermissions],
+  );
+
+  // ============================================================================
+  // Game Management Actions
+  // ============================================================================
+
+  const getGames = useCallback(
+    async (query: GamesQuery = {}): Promise<PaginatedResponse<GameResponse>> => {
+      return await AdminService.getGames(query);
     },
     [],
   );
 
-  const demoteUser = useCallback(async (userId: string): Promise<AdminUserResponse> => {
-    try {
-      const response = await adminService.demoteUser(userId);
-      updateUserInList(userId, response);
-      return response;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to demote user';
-      setUsersError(errorMessage);
-      throw error;
-    }
-  }, []);
-
-  const bulkBanUsers = useCallback(
-    async (userIds: string[], reason: string): Promise<void> => {
-      try {
-        await adminService.bulkBanUsers(userIds, reason);
-
-        // Optimistically update all users in the list
-        userIds.forEach((userId) => {
-          const currentUser = users?.data.find((u) => u.id === userId);
-          if (currentUser) {
-            const updatedUser: AdminUserResponse = {
-              ...currentUser,
-              isBanned: true,
-              banReason: reason,
-              bannedAt: new Date(),
-              isActive: false,
-            };
-            updateUserInList(userId, updatedUser);
-          }
-        });
-
-        // Clear selections after successful bulk operation
-        clearBulkSelections();
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to bulk ban users';
-        setUsersError(errorMessage);
-        throw error;
+  const createGame = useCallback(
+    async (gameData: CreateGameRequest): Promise<GameResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to create games');
       }
+      return await AdminService.createGame(gameData);
     },
-    [users],
+    [hasModeratorPermissions],
+  );
+
+  const updateGame = useCallback(
+    async (gameId: string, updates: UpdateGameRequest): Promise<GameResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to update games');
+      }
+      return await AdminService.updateGame(gameId, updates);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const deleteGame = useCallback(
+    async (gameId: string): Promise<void> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to delete games');
+      }
+      await AdminService.deleteGame(gameId);
+    },
+    [hasAdminPermissions],
+  );
+
+  // ============================================================================
+  // Developer Management Actions
+  // ============================================================================
+
+  const getDevelopers = useCallback(
+    async (query: DevelopersQuery = {}): Promise<PaginatedResponse<DeveloperResponse>> => {
+      return await AdminService.getDevelopers(query);
+    },
+    [],
+  );
+
+  const createDeveloper = useCallback(
+    async (developerData: CreateDeveloperRequest): Promise<DeveloperResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to create developers');
+      }
+      return await AdminService.createDeveloper(developerData);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const updateDeveloper = useCallback(
+    async (developerId: string, updates: UpdateDeveloperRequest): Promise<DeveloperResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to update developers');
+      }
+      return await AdminService.updateDeveloper(developerId, updates);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const deleteDeveloper = useCallback(
+    async (developerId: string): Promise<void> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to delete developers');
+      }
+      await AdminService.deleteDeveloper(developerId);
+    },
+    [hasAdminPermissions],
+  );
+
+  // ============================================================================
+  // Publisher Management Actions
+  // ============================================================================
+
+  const getPublishers = useCallback(
+    async (query: PublishersQuery = {}): Promise<PaginatedResponse<PublisherResponse>> => {
+      return await AdminService.getPublishers(query);
+    },
+    [],
+  );
+
+  const createPublisher = useCallback(
+    async (publisherData: CreatePublisherRequest): Promise<PublisherResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to create publishers');
+      }
+      return await AdminService.createPublisher(publisherData);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const updatePublisher = useCallback(
+    async (publisherId: string, updates: UpdatePublisherRequest): Promise<PublisherResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to update publishers');
+      }
+      return await AdminService.updatePublisher(publisherId, updates);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const deletePublisher = useCallback(
+    async (publisherId: string): Promise<void> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to delete publishers');
+      }
+      await AdminService.deletePublisher(publisherId);
+    },
+    [hasAdminPermissions],
+  );
+
+  // ============================================================================
+  // Genre Management Actions
+  // ============================================================================
+
+  const getGenres = useCallback(
+    async (query: GenresQuery = {}): Promise<PaginatedResponse<GenreResponse>> => {
+      return await AdminService.getGenres(query);
+    },
+    [],
+  );
+
+  const createGenre = useCallback(
+    async (genreData: CreateGenreRequest): Promise<GenreResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to create genres');
+      }
+      return await AdminService.createGenre(genreData);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const updateGenre = useCallback(
+    async (genreId: string, updates: UpdateGenreRequest): Promise<GenreResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to update genres');
+      }
+      return await AdminService.updateGenre(genreId, updates);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const deleteGenre = useCallback(
+    async (genreId: string): Promise<void> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to delete genres');
+      }
+      await AdminService.deleteGenre(genreId);
+    },
+    [hasAdminPermissions],
+  );
+
+  // ============================================================================
+  // Platform Management Actions
+  // ============================================================================
+
+  const getPlatforms = useCallback(
+    async (query: PlatformsQuery = {}): Promise<PaginatedResponse<PlatformResponse>> => {
+      return await AdminService.getPlatforms(query);
+    },
+    [],
+  );
+
+  const createPlatform = useCallback(
+    async (platformData: CreatePlatformRequest): Promise<PlatformResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to create platforms');
+      }
+      return await AdminService.createPlatform(platformData);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const updatePlatform = useCallback(
+    async (platformId: string, updates: UpdatePlatformRequest): Promise<PlatformResponse> => {
+      if (!hasModeratorPermissions) {
+        throw new Error('Moderator permissions required to update platforms');
+      }
+      return await AdminService.updatePlatform(platformId, updates);
+    },
+    [hasModeratorPermissions],
+  );
+
+  const deletePlatform = useCallback(
+    async (platformId: string): Promise<void> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to delete platforms');
+      }
+      await AdminService.deletePlatform(platformId);
+    },
+    [hasAdminPermissions],
+  );
+
+  // ============================================================================
+  // Dashboard Actions
+  // ============================================================================
+
+  const getDashboardStats = useCallback(async (): Promise<AdminDashboardStats> => {
+    if (!canAccessAdmin) {
+      throw new Error('Admin access required to view dashboard stats');
+    }
+    return await AdminService.getDashboardStats();
+  }, [canAccessAdmin]);
+
+  const exportData = useCallback(
+    async (type: 'users' | 'games' | 'reviews'): Promise<Blob> => {
+      if (!hasAdminPermissions) {
+        throw new Error('Admin permissions required to export data');
+      }
+      return await AdminService.exportData(type);
+    },
+    [hasAdminPermissions],
   );
 
   // ============================================================================
   // Utility Actions
   // ============================================================================
 
-  const clearError = useCallback(() => {
-    setUsersError(null);
-  }, []);
-
-  const clearData = useCallback(() => {
-    resetUserManagement();
-  }, []);
-
-  const selectUser = useCallback((user: AdminUserResponse | null) => {
-    setSelectedUser(user);
-  }, []);
-
-  const toggleSelection = useCallback((userId: string) => {
-    toggleUserSelection(userId);
-  }, []);
-
-  const selectAll = useCallback(() => {
-    selectAllUsers();
-  }, []);
-
-  const clearSelections = useCallback(() => {
-    clearBulkSelections();
-  }, []);
-
-  const updateQuery = useCallback((updates: Partial<UserManagementQuery>) => {
-    updateUserManagementQuery(updates);
-  }, []);
-
-  const refetch = useCallback(async (): Promise<void> => {
-    await fetchUsers(query);
-  }, [fetchUsers, query]);
-
-  return {
-    // State
-    users,
-    selectedUser,
-    query,
-    isLoading,
-    error,
-    stats,
-    bulkSelected,
-
-    // Actions
-    fetchUsers,
-    fetchUserById,
-    searchUsers,
-    getUsersByRole,
-    getBannedUsers,
-    banUser,
-    unbanUser,
-    promoteUser,
-    demoteUser,
-    bulkBanUsers,
-    clearError,
-    clearData,
-
-    // Selection Actions
-    selectUser,
-    toggleSelection,
-    selectAll,
-    clearSelections,
-
-    // Query Actions
-    updateQuery,
-
-    // Utils
-    refetch,
-  };
-}
-
-// ============================================================================
-// Content Moderation Hook
-// ============================================================================
-
-/**
- * Hook for managing admin review moderation operations
- *
- * @example
- * ```tsx
- * function AdminReviewsPanel() {
- *   const {
- *     reviews,
- *     isLoading,
- *     error,
- *     fetchPendingReviews,
- *     approveReview,
- *     rejectReview,
- *     clearError
- *   } = useAdminReviews();
- *
- *   useEffect(() => {
- *     fetchPendingReviews({ page: 1, limit: 20 });
- *   }, []);
- *
- *   const handleApproveReview = async (reviewId: string) => {
- *     try {
- *       await approveReview(reviewId);
- *       // Review will be removed from pending list automatically
- *     } catch (err) {
- *       // Error is already handled in the hook
- *     }
- *   };
- *
- *   if (error) return <ErrorMessage message={error} onClose={clearError} />;
- *   if (isLoading) return <Loading />;
- *
- *   return (
- *     <div>
- *       {reviews?.data.map(review => (
- *         <ReviewModerationCard
- *           key={review.id}
- *           review={review}
- *           onApprove={() => handleApproveReview(review.id)}
- *           onReject={(reason) => rejectReview(review.id, reason)}
- *         />
- *       ))}
- *     </div>
- *   );
- * }
- * ```
- */
-export function useAdminReviews(): UseAdminReviewsReturn {
-  // Subscribe to global admin stores
-  const reviews = useStore(pendingReviewsState);
-  const selectedReview = useStore(selectedReviewState);
-  const query = useStore(contentModerationQuery);
-  const isLoading = useStore(reviewsLoading);
-  const error = useStore(reviewsError);
-  const stats = useStore(reviewsStats);
-  const bulkSelected = useStore(bulkSelectedReviews);
-
-  // ============================================================================
-  // API Actions
-  // ============================================================================
-
-  const fetchPendingReviews = useCallback(
-    async (queryParams: ContentModerationQuery = {}): Promise<PaginatedReviewsResponse> => {
-      setReviewsLoading(true);
-      setReviewsError(null);
-
-      try {
-        const response = await adminService.getPendingReviews(queryParams);
-        setPendingReviewsData(response);
-        updateContentModerationQuery(queryParams);
-        return response;
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Failed to fetch pending reviews';
-        setReviewsError(errorMessage);
-        throw error;
-      } finally {
-        setReviewsLoading(false);
-      }
+  const setUserQuery = useCallback(
+    (query: { search?: string; page: number; limit: number; role?: UserRole }) => {
+      setUserManagementQuery(query);
     },
     [],
   );
 
-  const approveReview = useCallback(async (reviewId: string): Promise<void> => {
-    try {
-      await adminService.approveReview(reviewId);
-      // Remove the review from the pending list
-      removeReviewFromList(reviewId);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to approve review';
-      setReviewsError(errorMessage);
-      throw error;
-    }
+  const clearMessages = useCallback(() => {
+    clearAdminMessages();
   }, []);
 
-  const rejectReview = useCallback(async (reviewId: string, reason: string): Promise<void> => {
-    try {
-      await adminService.rejectReview(reviewId, reason);
-      // Remove the review from the pending list
-      removeReviewFromList(reviewId);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to reject review';
-      setReviewsError(errorMessage);
-      throw error;
-    }
-  }, []);
-
-  const bulkApproveReviews = useCallback(async (reviewIds: string[]): Promise<void> => {
-    try {
-      await adminService.bulkApproveReviews(reviewIds);
-
-      // Remove all approved reviews from the pending list
-      reviewIds.forEach((reviewId) => {
-        removeReviewFromList(reviewId);
-      });
-
-      // Clear selections after successful bulk operation
-      clearBulkSelections();
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to bulk approve reviews';
-      setReviewsError(errorMessage);
-      throw error;
-    }
-  }, []);
-
-  const bulkRejectReviews = useCallback(
-    async (reviewIds: string[], reason: string): Promise<void> => {
-      try {
-        await adminService.bulkRejectReviews(reviewIds, reason);
-
-        // Remove all rejected reviews from the pending list
-        reviewIds.forEach((reviewId) => {
-          removeReviewFromList(reviewId);
-        });
-
-        // Clear selections after successful bulk operation
-        clearBulkSelections();
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Failed to bulk reject reviews';
-        setReviewsError(errorMessage);
-        throw error;
-      }
-    },
-    [],
-  );
-
-  // ============================================================================
-  // Utility Actions
-  // ============================================================================
-
-  const clearError = useCallback(() => {
-    setReviewsError(null);
-  }, []);
-
-  const clearData = useCallback(() => {
-    resetContentModeration();
-  }, []);
-
-  const selectReview = useCallback((review: PendingReviewResponse | null) => {
-    setSelectedReview(review);
-  }, []);
-
-  const toggleSelection = useCallback((reviewId: string) => {
-    toggleReviewSelection(reviewId);
-  }, []);
-
-  const selectAll = useCallback(() => {
-    selectAllReviews();
-  }, []);
-
-  const clearSelections = useCallback(() => {
-    clearBulkSelections();
-  }, []);
-
-  const updateQuery = useCallback((updates: Partial<ContentModerationQuery>) => {
-    updateContentModerationQuery(updates);
-  }, []);
-
-  const refetch = useCallback(async (): Promise<void> => {
-    await fetchPendingReviews(query);
-  }, [fetchPendingReviews, query]);
-
-  return {
-    // State
-    reviews,
-    selectedReview,
-    query,
-    isLoading,
-    error,
-    stats,
-    bulkSelected,
-
-    // Actions
-    fetchPendingReviews,
-    approveReview,
-    rejectReview,
-    bulkApproveReviews,
-    bulkRejectReviews,
-    clearError,
-    clearData,
-
-    // Selection Actions
-    selectReview,
-    toggleSelection,
-    selectAll,
-    clearSelections,
-
-    // Query Actions
-    updateQuery,
-
-    // Utils
-    refetch,
-  };
-}
-
-// ============================================================================
-// Reports Management Hook
-// ============================================================================
-
-/**
- * Hook for managing admin report operations
- *
- * @example
- * ```tsx
- * function AdminReportsPanel() {
- *   const {
- *     reports,
- *     isLoading,
- *     error,
- *     fetchReports,
- *     resolveReport,
- *     clearError
- *   } = useAdminReports();
- *
- *   useEffect(() => {
- *     fetchReports({ page: 1, limit: 20, status: 'PENDING' });
- *   }, []);
- *
- *   const handleResolveReport = async (reportId: string, resolution: string) => {
- *     try {
- *       await resolveReport(reportId, resolution, 'RESOLVED');
- *     } catch (err) {
- *       // Error is already handled in the hook
- *     }
- *   };
- *
- *   if (error) return <ErrorMessage message={error} onClose={clearError} />;
- *   if (isLoading) return <Loading />;
- *
- *   return (
- *     <div>
- *       {reports?.data.map(report => (
- *         <ReportCard
- *           key={report.id}
- *           report={report}
- *           onResolve={(resolution) => handleResolveReport(report.id, resolution)}
- *         />
- *       ))}
- *     </div>
- *   );
- * }
- * ```
- */
-export function useAdminReports(): UseAdminReportsReturn {
-  // Subscribe to global admin stores
-  const reports = useStore(reportsState);
-  const selectedReport = useStore(selectedReportState);
-  const query = useStore(reportsQuery);
-  const isLoading = useStore(reportsLoading);
-  const error = useStore(reportsError);
-  const stats = useStore(reportsStats);
-
-  // ============================================================================
-  // API Actions
-  // ============================================================================
-
-  const fetchReports = useCallback(
-    async (queryParams: ReportsQuery = {}): Promise<PaginatedReportsResponse> => {
-      setReportsLoading(true);
-      setReportsError(null);
-
-      try {
-        const response = await adminService.getReports(queryParams);
-        setReportsData(response);
-        updateReportsQuery(queryParams);
-        return response;
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to fetch reports';
-        setReportsError(errorMessage);
-        throw error;
-      } finally {
-        setReportsLoading(false);
-      }
-    },
-    [],
-  );
-
-  const fetchReportById = useCallback(async (reportId: string): Promise<ReportResponse> => {
-    setReportsLoading(true);
-    setReportsError(null);
-
-    try {
-      const response = await adminService.getReportById(reportId);
-      setSelectedReport(response);
-      return response;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch report';
-      setReportsError(errorMessage);
-      throw error;
-    } finally {
-      setReportsLoading(false);
-    }
-  }, []);
-
-  const getPendingReports = useCallback(
-    async (options: ReportsQuery = {}): Promise<PaginatedReportsResponse> => {
-      return fetchReports({ ...options, status: 'PENDING' });
-    },
-    [fetchReports],
-  );
-
-  const resolveReport = useCallback(
-    async (
-      reportId: string,
-      resolution: string,
-      action: 'DISMISSED' | 'RESOLVED' = 'RESOLVED',
-    ): Promise<void> => {
-      try {
-        await adminService.resolveReport(reportId, resolution, action);
-
-        // Optimistically update the report in the list
-        const currentReport = reports?.data.find((r) => r.id === reportId);
-        if (currentReport) {
-          const updatedReport: ReportResponse = {
-            ...currentReport,
-            status: action,
-            resolution,
-            resolvedAt: new Date(),
-          };
-          updateReportInList(reportId, updatedReport);
-        }
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to resolve report';
-        setReportsError(errorMessage);
-        throw error;
-      }
-    },
-    [reports],
-  );
-
-  // ============================================================================
-  // Utility Actions
-  // ============================================================================
-
-  const clearError = useCallback(() => {
-    setReportsError(null);
-  }, []);
-
-  const clearData = useCallback(() => {
-    resetReportsManagement();
-  }, []);
-
-  const selectReport = useCallback((report: ReportResponse | null) => {
-    setSelectedReport(report);
-  }, []);
-
-  const updateQuery = useCallback((updates: Partial<ReportsQuery>) => {
-    updateReportsQuery(updates);
-  }, []);
-
-  const refetch = useCallback(async (): Promise<void> => {
-    await fetchReports(query);
-  }, [fetchReports, query]);
-
-  return {
-    // State
-    reports,
-    selectedReport,
-    query,
-    isLoading,
-    error,
-    stats,
-
-    // Actions
-    fetchReports,
-    fetchReportById,
-    getPendingReports,
-    resolveReport,
-    clearError,
-    clearData,
-
-    // Selection Actions
-    selectReport,
-
-    // Query Actions
-    updateQuery,
-
-    // Utils
-    refetch,
-  };
-}
-
-// ============================================================================
-// System Statistics Hook
-// ============================================================================
-
-/**
- * Hook for managing admin system statistics
- *
- * @example
- * ```tsx
- * function AdminDashboard() {
- *   const {
- *     stats,
- *     dashboard,
- *     isLoading,
- *     error,
- *     fetchSystemStats,
- *     clearError
- *   } = useAdminStats();
- *
- *   useEffect(() => {
- *     fetchSystemStats();
- *   }, []);
- *
- *   if (error) return <ErrorMessage message={error} onClose={clearError} />;
- *   if (isLoading) return <Loading />;
- *
- *   return (
- *     <div>
- *       <StatCard title="Total Users" value={stats?.users.total} />
- *       <StatCard title="Active Users" value={stats?.users.active} />
- *       <StatCard title="Total Reviews" value={stats?.content.reviews} />
- *       <StatCard title="Pending Reports" value={stats?.reports.pending} />
- *     </div>
- *   );
- * }
- * ```
- */
-export function useAdminStats(): UseAdminStatsReturn {
-  // Subscribe to global admin stores
-  const stats = useStore(systemStatsState);
-  const isLoading = useStore(statsLoading);
-  const error = useStore(statsError);
-  const dashboard = useStore(dashboardSummary);
-
-  // ============================================================================
-  // API Actions
-  // ============================================================================
-
-  const fetchSystemStats = useCallback(async (): Promise<SystemStatsResponse> => {
-    setStatsLoading(true);
-    setStatsError(null);
-
-    try {
-      const response = await adminService.getSystemStats();
-      setSystemStats(response);
-      return response;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch system statistics';
-      setStatsError(errorMessage);
-      throw error;
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
-
-  const fetchUserStats = useCallback(async (): Promise<SystemStatsResponse['users']> => {
-    setStatsLoading(true);
-    setStatsError(null);
-
-    try {
-      const response = await adminService.getUserStats();
-      return response;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch user statistics';
-      setStatsError(errorMessage);
-      throw error;
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
-
-  const fetchContentStats = useCallback(async (): Promise<SystemStatsResponse['content']> => {
-    setStatsLoading(true);
-    setStatsError(null);
-
-    try {
-      const response = await adminService.getContentStats();
-      return response;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch content statistics';
-      setStatsError(errorMessage);
-      throw error;
-    } finally {
-      setStatsLoading(false);
-    }
-  }, []);
-
-  const fetchActivityStats = useCallback(async (): Promise<SystemStatsResponse['activity']> => {
-    setStatsLoading(true);
-    setStatsError(null);
-
-    try {
-      const response = await adminService.getActivityStats();
-      return response;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch activity statistics';
-      setStatsError(errorMessage);
-      throw error;
-    } finally {
-      setStatsLoading(false);
-    }
+  const clearAllState = useCallback(() => {
+    clearAllAdminState();
   }, []);
 
   // ============================================================================
-  // Utility Actions
+  // Effects
   // ============================================================================
 
-  const clearError = useCallback(() => {
-    setStatsError(null);
-  }, []);
-
-  const refetch = useCallback(async (): Promise<void> => {
-    await fetchSystemStats();
-  }, [fetchSystemStats]);
-
-  return {
-    // State
-    stats,
-    isLoading,
-    error,
-    dashboard,
-
-    // Actions
-    fetchSystemStats,
-    fetchUserStats,
-    fetchContentStats,
-    fetchActivityStats,
-    clearError,
-
-    // Utils
-    refetch,
-  };
-}
-
-// ============================================================================
-// Admin UI Hook
-// ============================================================================
-
-/**
- * Hook for managing admin UI state and interactions
- *
- * @example
- * ```tsx
- * function AdminPanel() {
- *   const {
- *     selectedTab,
- *     bulkCounts,
- *     setTab,
- *     openBanDialog,
- *     closeBanDialog
- *   } = useAdminUI();
- *
- *   return (
- *     <div>
- *       <AdminTabs selectedTab={selectedTab} onTabChange={setTab} />
- *       {bulkCounts.users > 0 && (
- *         <BulkActions count={bulkCounts.users} />
- *       )}
- *       <BanUserDialog
- *         open={banForm !== null}
- *         onClose={closeBanDialog}
- *         onConfirm={(reason) => banUser(banForm.userId, reason)}
- *       />
- *     </div>
- *   );
- * }
- * ```
- */
-export function useAdminUI(): UseAdminUIReturn {
-  // Subscribe to global admin UI stores
-  const currentTab = useStore(selectedTab);
-  const bulkCounts = useStore(bulkSelectionCounts);
-  const banForm = useStore(banUserForm);
-  const promoteForm = useStore(promoteUserForm);
-  const rejectForm = useStore(rejectReviewForm);
-  const resolveForm = useStore(resolveReportForm);
-
-  // ============================================================================
-  // UI Actions
-  // ============================================================================
-
-  const setTab = useCallback((tab: 'users' | 'reviews' | 'reports' | 'stats') => {
-    setSelectedTab(tab);
-  }, []);
-
-  const clearAllSelections = useCallback(() => {
-    clearBulkSelections();
-  }, []);
-
-  // ============================================================================
-  // Form Actions
-  // ============================================================================
-
-  const openBanDialog = useCallback((userId: string, reason: string = '') => {
-    setBanUserForm({ userId, reason });
-  }, []);
-
-  const closeBanDialog = useCallback(() => {
-    setBanUserForm(null);
-  }, []);
-
-  const openPromoteDialog = useCallback(
-    (userId: string, role: 'MODERATOR' | 'ADMIN' = 'MODERATOR') => {
-      setPromoteUserForm({ userId, role });
-    },
-    [],
-  );
-
-  const closePromoteDialog = useCallback(() => {
-    setPromoteUserForm(null);
-  }, []);
-
-  const openRejectDialog = useCallback((reviewId: string, reason: string = '') => {
-    setRejectReviewForm({ reviewId, reason });
-  }, []);
-
-  const closeRejectDialog = useCallback(() => {
-    setRejectReviewForm(null);
-  }, []);
-
-  const openResolveDialog = useCallback(
-    (reportId: string, resolution: string = '', action: 'RESOLVED' | 'DISMISSED' = 'RESOLVED') => {
-      setResolveReportForm({ reportId, resolution, action });
-    },
-    [],
-  );
-
-  const closeResolveDialog = useCallback(() => {
-    setResolveReportForm(null);
-  }, []);
-
-  return {
-    // State
-    selectedTab: currentTab,
-    bulkCounts,
-    banForm,
-    promoteForm,
-    rejectForm,
-    resolveForm,
-
-    // Actions
-    setTab,
-    clearAllSelections,
-
-    // Form Actions
-    openBanDialog,
-    closeBanDialog,
-    openPromoteDialog,
-    closePromoteDialog,
-    openRejectDialog,
-    closeRejectDialog,
-    openResolveDialog,
-    closeResolveDialog,
-  };
-}
-
-// ============================================================================
-// Combined Admin Hook
-// ============================================================================
-
-/**
- * Combined hook that provides access to all admin functionality
- *
- * @example
- * ```typescript
- * function AdminDashboard() {
- *   const admin = useAdminModule();
- *
- *   // Access all admin features
- *   const { users, reviews, reports, stats, ui } = admin;
- *
- *   useEffect(() => {
- *     // Initialize dashboard data
- *     admin.initializeDashboard();
- *   }, []);
- *
- *   return (
- *     <div>
- *       <AdminTabs selectedTab={ui.selectedTab} onTabChange={ui.setTab} />
- *       {ui.selectedTab === 'users' && <UsersPanel {...users} />}
- *       {ui.selectedTab === 'reviews' && <ReviewsPanel {...reviews} />}
- *       {ui.selectedTab === 'reports' && <ReportsPanel {...reports} />}
- *       {ui.selectedTab === 'stats' && <StatsPanel {...stats} />}
- *     </div>
- *   );
- * }
- * ```
- */
-export function useAdminModule() {
-  const users = useAdminUsers();
-  const reviews = useAdminReviews();
-  const reports = useAdminReports();
-  const stats = useAdminStats();
-  const ui = useAdminUI();
-
-  // ============================================================================
-  // Initialization Functions
-  // ============================================================================
-
-  const initializeDashboard = useCallback(async () => {
-    try {
-      // Load initial stats for dashboard
-      await stats.fetchSystemStats();
-    } catch (error) {
-      console.error('Failed to initialize admin dashboard:', error);
-    }
-  }, [stats]);
-
-  const initializeUsersTab = useCallback(async () => {
-    if (!users.users) {
-      try {
-        await users.fetchUsers({ page: 1, limit: 20 });
-      } catch (error) {
-        console.error('Failed to initialize users tab:', error);
-      }
-    }
-  }, [users]);
-
-  const initializeReviewsTab = useCallback(async () => {
-    if (!reviews.reviews) {
-      try {
-        await reviews.fetchPendingReviews({ page: 1, limit: 20 });
-      } catch (error) {
-        console.error('Failed to initialize reviews tab:', error);
-      }
-    }
-  }, [reviews]);
-
-  const initializeReportsTab = useCallback(async () => {
-    if (!reports.reports) {
-      try {
-        await reports.fetchReports({ page: 1, limit: 20, status: 'PENDING' });
-      } catch (error) {
-        console.error('Failed to initialize reports tab:', error);
-      }
-    }
-  }, [reports]);
-
-  // ============================================================================
-  // Combined Actions
-  // ============================================================================
-
-  const clearAllData = useCallback(() => {
-    users.clearData();
-    reviews.clearData();
-    reports.clearData();
-    ui.clearAllSelections();
-  }, [users, reviews, reports, ui]);
-
-  const refreshAllData = useCallback(async () => {
-    const promises = [];
-
-    if (users.users) promises.push(users.refetch());
-    if (reviews.reviews) promises.push(reviews.refetch());
-    if (reports.reports) promises.push(reports.refetch());
-    if (stats.stats) promises.push(stats.refetch());
-
-    try {
-      await Promise.all(promises);
-    } catch (error) {
-      console.error('Failed to refresh admin data:', error);
-    }
-  }, [users, reviews, reports, stats]);
-
-  // ============================================================================
-  // Auto-initialization Effect
-  // ============================================================================
-
+  // Auto-redirect if user loses admin access
   useEffect(() => {
-    initializeDashboard();
-  }, [initializeDashboard]);
-
-  // Initialize tab data when switching tabs
-  useEffect(() => {
-    switch (ui.selectedTab) {
-      case 'users':
-        initializeUsersTab();
-        break;
-      case 'reviews':
-        initializeReviewsTab();
-        break;
-      case 'reports':
-        initializeReportsTab();
-        break;
-      case 'stats':
-        // Stats are already loaded in dashboard initialization
-        break;
+    if (!canAccessAdmin && typeof window !== 'undefined') {
+      // Only redirect if we were previously on an admin page
+      if (window.location.pathname.startsWith('/admin')) {
+        window.location.href = '/dashboard';
+      }
     }
-  }, [ui.selectedTab, initializeUsersTab, initializeReviewsTab, initializeReportsTab]);
+  }, [canAccessAdmin]);
 
   return {
+    // Permission state
+    canAccessAdmin,
+    hasAdminPermissions,
+    hasModeratorPermissions,
+    permissionLevel,
+
+    // General state
+    isLoading,
+    error,
+    success,
+
+    // User management state
     users,
-    reviews,
-    reports,
-    stats,
-    ui,
+    userProfiles,
+    userManagementLoading,
+    userManagementError,
+    userQuery,
 
-    // Combined actions
-    initializeDashboard,
-    initializeUsersTab,
-    initializeReviewsTab,
-    initializeReportsTab,
-    clearAllData,
-    refreshAllData,
+    // Content management state
+    games,
+    developers,
+    publishers,
+    genres,
+    platforms,
+    contentLoading,
+    contentErrors,
 
-    // Global reset
-    resetAll: resetAdminState,
+    // Dashboard state
+    dashboardStats,
+    activityLog,
+
+    // User management actions
+    getUsers,
+    getUserProfile,
+    updateUserRole,
+    updateUser,
+    deleteUser,
+    bulkDeleteUsers,
+
+    // Game management actions
+    getGames,
+    createGame,
+    updateGame,
+    deleteGame,
+
+    // Developer management actions
+    getDevelopers,
+    createDeveloper,
+    updateDeveloper,
+    deleteDeveloper,
+
+    // Publisher management actions
+    getPublishers,
+    createPublisher,
+    updatePublisher,
+    deletePublisher,
+
+    // Genre management actions
+    getGenres,
+    createGenre,
+    updateGenre,
+    deleteGenre,
+
+    // Platform management actions
+    getPlatforms,
+    createPlatform,
+    updatePlatform,
+    deletePlatform,
+
+    // Dashboard actions
+    getDashboardStats,
+    exportData,
+
+    // Utility actions
+    setUserQuery,
+    clearMessages,
+    clearAllState,
   };
 }
 
@@ -1469,65 +653,161 @@ export function useAdminModule() {
 // ============================================================================
 
 /**
- * Hook for admin dashboard overview with key metrics
- */
-export function useAdminDashboard() {
-  const { stats } = useAdminModule();
-  const dashboard = useStore(dashboardSummary);
-
-  useEffect(() => {
-    if (!stats.stats) {
-      stats.fetchSystemStats();
-    }
-  }, [stats]);
-
-  return {
-    dashboard,
-    isLoading: stats.isLoading,
-    error: stats.error,
-    refetch: stats.refetch,
-    clearError: stats.clearError,
-  };
-}
-
-/**
- * Hook for requiring admin privileges - redirects if not admin
- */
-export function useRequireAdmin() {
-  const auth = useStore($currentUser);
-
-  useEffect(() => {
-    if (auth && auth.role !== 'ADMIN' && auth.role !== 'MODERATOR') {
-      // Redirect to unauthorized page
-      if (typeof window !== 'undefined') {
-        window.location.href = '/unauthorized';
-      }
-    }
-  }, [auth]);
-
-  return {
-    isAdmin: auth?.role === 'ADMIN',
-    isModerator: auth?.role === 'MODERATOR',
-    hasAccess: auth?.role === 'ADMIN' || auth?.role === 'MODERATOR',
-  };
-}
-
-/**
  * Hook for admin-only routes - redirects if not admin
  */
-export function useAdminOnly() {
-  const auth = useStore($currentUser);
+export function useRequireAdmin(): UseAdminReturn {
+  const admin = useAdmin();
 
   useEffect(() => {
-    if (auth && auth.role !== 'ADMIN') {
-      // Redirect to unauthorized page
+    if (!admin.isLoading && !admin.hasAdminPermissions) {
+      // Redirect to dashboard or unauthorized page
       if (typeof window !== 'undefined') {
-        window.location.href = '/unauthorized';
+        window.location.href = '/dashboard';
       }
     }
-  }, [auth]);
+  }, [admin.hasAdminPermissions, admin.isLoading]);
+
+  return admin;
+}
+
+/**
+ * Hook for moderator+ routes - redirects if not moderator or admin
+ */
+export function useRequireModerator(): UseAdminReturn {
+  const admin = useAdmin();
+
+  useEffect(() => {
+    if (!admin.isLoading && !admin.hasModeratorPermissions) {
+      // Redirect to dashboard or unauthorized page
+      if (typeof window !== 'undefined') {
+        window.location.href = '/dashboard';
+      }
+    }
+  }, [admin.hasModeratorPermissions, admin.isLoading]);
+
+  return admin;
+}
+
+/**
+ * Hook specifically for user management - provides only user-related state and actions
+ */
+export function useAdminUserManagement() {
+  const {
+    canAccessAdmin,
+    hasAdminPermissions,
+    users,
+    userProfiles,
+    userManagementLoading,
+    userManagementError,
+    userQuery,
+    getUsers,
+    getUserProfile,
+    updateUserRole,
+    updateUser,
+    deleteUser,
+    bulkDeleteUsers,
+    setUserQuery,
+  } = useAdmin();
 
   return {
-    isAdmin: auth?.role === 'ADMIN',
+    // State
+    canAccessAdmin,
+    hasAdminPermissions,
+    users,
+    userProfiles,
+    isLoading: userManagementLoading,
+    error: userManagementError,
+    query: userQuery,
+
+    // Actions
+    getUsers,
+    getUserProfile,
+    updateUserRole,
+    updateUser,
+    deleteUser,
+    bulkDeleteUsers,
+    setQuery: setUserQuery,
+  };
+}
+
+/**
+ * Hook specifically for content management - provides only content-related state and actions
+ */
+export function useAdminContentManagement() {
+  const {
+    canAccessAdmin,
+    hasAdminPermissions,
+    hasModeratorPermissions,
+    games,
+    developers,
+    publishers,
+    genres,
+    platforms,
+    contentLoading,
+    contentErrors,
+    getGames,
+    createGame,
+    updateGame,
+    deleteGame,
+    getDevelopers,
+    createDeveloper,
+    updateDeveloper,
+    deleteDeveloper,
+    getPublishers,
+    createPublisher,
+    updatePublisher,
+    deletePublisher,
+    getGenres,
+    createGenre,
+    updateGenre,
+    deleteGenre,
+    getPlatforms,
+    createPlatform,
+    updatePlatform,
+    deletePlatform,
+  } = useAdmin();
+
+  return {
+    // State
+    canAccessAdmin,
+    hasAdminPermissions,
+    hasModeratorPermissions,
+    games,
+    developers,
+    publishers,
+    genres,
+    platforms,
+    loading: contentLoading,
+    errors: contentErrors,
+
+    // Game actions
+    getGames,
+    createGame,
+    updateGame,
+    deleteGame,
+
+    // Developer actions
+    getDevelopers,
+    createDeveloper,
+    updateDeveloper,
+    deleteDeveloper,
+
+    // Publisher actions
+    getPublishers,
+    createPublisher,
+    updatePublisher,
+    deletePublisher,
+
+    // Genre actions
+    getGenres,
+    createGenre,
+    updateGenre,
+    deleteGenre,
+
+    // Platform actions
+    getPlatforms,
+    createPlatform,
+    updatePlatform,
+    deletePlatform,
   };
 }

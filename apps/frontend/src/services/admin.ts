@@ -1,640 +1,952 @@
-import type { UserResponse, ReviewResponse } from '@questlog/shared-types';
-import { apiClient } from './api';
+import { apiClient } from './api.ts';
+import type {
+  UserResponse,
+  UserProfile,
+  UserRole,
+  UpdateUserRequest,
+  UsersQuery,
+  GameResponse,
+  CreateGameRequest,
+  UpdateGameRequest,
+  GamesQuery,
+  DeveloperResponse,
+  CreateDeveloperRequest,
+  UpdateDeveloperRequest,
+  DevelopersQuery,
+  PublisherResponse,
+  CreatePublisherRequest,
+  UpdatePublisherRequest,
+  PublishersQuery,
+  GenreResponse,
+  CreateGenreRequest,
+  UpdateGenreRequest,
+  GenresQuery,
+  PlatformResponse,
+  CreatePlatformRequest,
+  UpdatePlatformRequest,
+  PlatformsQuery,
+  PaginatedResponse,
+  AdminDashboardStats,
+} from '@questlog/shared-types';
 
-// ============================================================================
-// Configuration
-// ============================================================================
-
-const ADMIN_ENDPOINTS = {
-  // User Management
-  USERS: 'admin/users',
-  USER_BY_ID: (id: string) => `admin/users/${id}`,
-  USER_BAN: (id: string) => `admin/users/${id}/ban`,
-  USER_UNBAN: (id: string) => `admin/users/${id}/unban`,
-  USER_PROMOTE: (id: string) => `admin/users/${id}/promote`,
-  USER_DEMOTE: (id: string) => `admin/users/${id}/demote`,
-
-  // Content Moderation
-  REVIEWS_PENDING: 'admin/reviews/pending',
-  REVIEW_APPROVE: (id: string) => `admin/reviews/${id}/approve`,
-  REVIEW_REJECT: (id: string) => `admin/reviews/${id}/reject`,
-
-  // Reports Management
-  REPORTS: 'admin/reports',
-  REPORT_BY_ID: (id: string) => `admin/reports/${id}`,
-  REPORT_RESOLVE: (id: string) => `admin/reports/${id}/resolve`,
-
-  // System Stats
-  STATS: 'admin/stats',
-  STATS_USERS: 'admin/stats/users',
-  STATS_CONTENT: 'admin/stats/content',
-  STATS_ACTIVITY: 'admin/stats/activity',
-} as const;
-
-// ============================================================================
-// Admin Response Interfaces
-// ============================================================================
-
-interface AdminUserResponse extends UserResponse {
-  role: 'USER' | 'MODERATOR' | 'ADMIN';
-  isActive: boolean;
-  isBanned: boolean;
-  banReason?: string;
-  bannedAt?: Date;
-  bannedBy?: string;
-  lastLoginAt?: Date;
-  reviewsCount: number;
-  reportsCount: number;
-}
-
-interface PendingReviewResponse extends ReviewResponse {
-  user: {
-    id: string;
-    username: string;
-    displayName: string;
-    avatar?: string;
-  };
-  game: {
-    id: string;
-    title: string;
-    slug: string;
-    coverImage?: string;
-  };
-  reportCount: number;
-  submittedAt: Date;
-}
-
-interface ReportResponse {
-  id: string;
-  type: 'REVIEW' | 'USER' | 'COMMENT';
-  reason: string;
-  description?: string;
-  status: 'PENDING' | 'RESOLVED' | 'DISMISSED';
-  targetId: string;
-  targetType: string;
-  reportedBy: {
-    id: string;
-    username: string;
-    displayName: string;
-  };
-  reportedUser?: {
-    id: string;
-    username: string;
-    displayName: string;
-  };
-  createdAt: Date;
-  resolvedAt?: Date;
-  resolvedBy?: string;
-  resolution?: string;
-}
-
-interface SystemStatsResponse {
-  users: {
-    total: number;
-    active: number;
-    banned: number;
-    newThisMonth: number;
-  };
-  content: {
-    games: number;
-    reviews: number;
-    pendingReviews: number;
-    comments: number;
-  };
-  activity: {
-    dailyActiveUsers: number;
-    weeklyActiveUsers: number;
-    monthlyActiveUsers: number;
-    avgSessionDuration: number;
-  };
-  reports: {
-    pending: number;
-    resolved: number;
-    dismissed: number;
-  };
-}
-
-interface PaginatedUsersResponse {
-  data: AdminUserResponse[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-interface PaginatedReviewsResponse {
-  data: PendingReviewResponse[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-interface PaginatedReportsResponse {
-  data: ReportResponse[];
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
-
-interface AdminQuery {
-  page?: number;
-  limit?: number;
-  search?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
-
-interface UserManagementQuery extends AdminQuery {
-  role?: 'USER' | 'MODERATOR' | 'ADMIN';
-  status?: 'ACTIVE' | 'BANNED' | 'INACTIVE';
-  dateFrom?: string;
-  dateTo?: string;
-}
-
-interface ContentModerationQuery extends AdminQuery {
-  status?: 'PENDING' | 'APPROVED' | 'REJECTED';
-  gameId?: string;
-  userId?: string;
-}
-
-interface ReportsQuery extends AdminQuery {
-  type?: 'REVIEW' | 'USER' | 'COMMENT';
-  status?: 'PENDING' | 'RESOLVED' | 'DISMISSED';
-}
+import {
+  setAdminLoading,
+  setAdminError,
+  setAdminSuccess,
+  setAdminUsers,
+  setUserManagementLoading,
+  setUserManagementError,
+  updateAdminUser,
+  removeAdminUser,
+  setAdminGames,
+  setAdminDevelopers,
+  setAdminPublishers,
+  setAdminGenres,
+  setAdminPlatforms,
+  setContentManagementLoading,
+  setContentManagementError,
+  setAdminStats,
+  addAdminActivityLogEntry,
+} from '@/stores/admin.ts';
 
 // ============================================================================
 // Admin Service Class
 // ============================================================================
 
-class AdminService {
+/**
+ * Service for admin-specific API operations that require ADMIN or MODERATOR roles
+ * Mirrors the backend's role-based access control patterns
+ */
+export class AdminService {
   // ============================================================================
-  // User Management
-  // ============================================================================
-
-  /**
-   * Get all users with admin filtering and pagination
-   *
-   * @param query - Query parameters for filtering users
-   * @returns Promise resolving to paginated users response
-   *
-   * @example
-   * ```typescript
-   * const users = await adminService.getUsers({
-   *   page: 1,
-   *   limit: 20,
-   *   role: 'USER',
-   *   status: 'ACTIVE'
-   * });
-   * ```
-   */
-  async getUsers(query: UserManagementQuery = {}): Promise<PaginatedUsersResponse> {
-    const searchParams = new URLSearchParams();
-
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, value.toString());
-      }
-    });
-
-    const endpoint = searchParams.toString()
-      ? `${ADMIN_ENDPOINTS.USERS}?${searchParams.toString()}`
-      : ADMIN_ENDPOINTS.USERS;
-
-    return apiClient.get<PaginatedUsersResponse>(endpoint);
-  }
-
-  /**
-   * Get user details by ID (admin view)
-   *
-   * @param id - User ID
-   * @returns Promise resolving to user details
-   */
-  async getUserById(id: string): Promise<AdminUserResponse> {
-    if (!id) {
-      throw new Error('User ID is required');
-    }
-
-    return apiClient.get<AdminUserResponse>(ADMIN_ENDPOINTS.USER_BY_ID(id));
-  }
-
-  /**
-   * Ban a user
-   *
-   * @param id - User ID
-   * @param reason - Reason for ban
-   * @returns Promise resolving when user is banned
-   */
-  async banUser(id: string, reason: string): Promise<void> {
-    if (!id) {
-      throw new Error('User ID is required');
-    }
-    if (!reason?.trim()) {
-      throw new Error('Ban reason is required');
-    }
-
-    return apiClient.post<void>(ADMIN_ENDPOINTS.USER_BAN(id), { reason });
-  }
-
-  /**
-   * Unban a user
-   *
-   * @param id - User ID
-   * @returns Promise resolving when user is unbanned
-   */
-  async unbanUser(id: string): Promise<void> {
-    if (!id) {
-      throw new Error('User ID is required');
-    }
-
-    return apiClient.post<void>(ADMIN_ENDPOINTS.USER_UNBAN(id));
-  }
-
-  /**
-   * Promote user to moderator/admin
-   *
-   * @param id - User ID
-   * @param role - New role
-   * @returns Promise resolving when user is promoted
-   */
-  async promoteUser(id: string, role: 'MODERATOR' | 'ADMIN'): Promise<AdminUserResponse> {
-    if (!id) {
-      throw new Error('User ID is required');
-    }
-    if (!role) {
-      throw new Error('Role is required');
-    }
-
-    return apiClient.post<AdminUserResponse>(ADMIN_ENDPOINTS.USER_PROMOTE(id), { role });
-  }
-
-  /**
-   * Demote user from moderator/admin
-   *
-   * @param id - User ID
-   * @returns Promise resolving when user is demoted
-   */
-  async demoteUser(id: string): Promise<AdminUserResponse> {
-    if (!id) {
-      throw new Error('User ID is required');
-    }
-
-    return apiClient.post<AdminUserResponse>(ADMIN_ENDPOINTS.USER_DEMOTE(id));
-  }
-
-  // ============================================================================
-  // Content Moderation
+  // User Management (ADMIN only)
   // ============================================================================
 
   /**
-   * Get pending reviews for moderation
-   *
-   * @param query - Query parameters for filtering reviews
-   * @returns Promise resolving to paginated pending reviews
+   * Get all users for admin management
+   * Requires ADMIN role
    */
-  async getPendingReviews(query: ContentModerationQuery = {}): Promise<PaginatedReviewsResponse> {
-    const searchParams = new URLSearchParams();
+  static async getUsers(query: UsersQuery = {}): Promise<PaginatedResponse<UserResponse>> {
+    setUserManagementLoading(true);
 
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, value.toString());
-      }
-    });
+    try {
+      const params = new URLSearchParams();
+      if (query.page) params.append('page', query.page.toString());
+      if (query.limit) params.append('limit', query.limit.toString());
+      if (query.search) params.append('search', query.search);
 
-    const endpoint = searchParams.toString()
-      ? `${ADMIN_ENDPOINTS.REVIEWS_PENDING}?${searchParams.toString()}`
-      : ADMIN_ENDPOINTS.REVIEWS_PENDING;
+      const response = await apiClient.get<PaginatedResponse<UserResponse>>(
+        `users?${params.toString()}`,
+      );
 
-    return apiClient.get<PaginatedReviewsResponse>(endpoint);
+      setAdminUsers(response);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch users';
+      setUserManagementError(message);
+      throw error;
+    }
   }
 
   /**
-   * Approve a review
-   *
-   * @param id - Review ID
-   * @returns Promise resolving when review is approved
+   * Get detailed user profile for admin management
+   * Requires ADMIN role
    */
-  async approveReview(id: string): Promise<void> {
-    if (!id) {
-      throw new Error('Review ID is required');
-    }
+  static async getUserProfile(userId: string): Promise<UserProfile> {
+    setUserManagementLoading(true);
 
-    return apiClient.post<void>(ADMIN_ENDPOINTS.REVIEW_APPROVE(id));
+    try {
+      const response = await apiClient.get<UserProfile>(`users/${userId}`);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch user profile';
+      setUserManagementError(message);
+      throw error;
+    }
   }
 
   /**
-   * Reject a review
-   *
-   * @param id - Review ID
-   * @param reason - Reason for rejection
-   * @returns Promise resolving when review is rejected
+   * Update user role (ADMIN only)
+   * Endpoint: PATCH /users/:id/role
    */
-  async rejectReview(id: string, reason: string): Promise<void> {
-    if (!id) {
-      throw new Error('Review ID is required');
-    }
-    if (!reason?.trim()) {
-      throw new Error('Rejection reason is required');
-    }
+  static async updateUserRole(userId: string, role: UserRole): Promise<UserResponse> {
+    setUserManagementLoading(true);
 
-    return apiClient.post<void>(ADMIN_ENDPOINTS.REVIEW_REJECT(id), { reason });
+    try {
+      const response = await apiClient.patch<UserResponse>(`users/${userId}/role`, { role });
+
+      updateAdminUser(userId, { ...response });
+      setAdminSuccess(`User role updated to ${role}`);
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'UPDATE_USER_ROLE',
+        resource: 'user',
+        resourceId: userId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { newRole: role },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update user role';
+      setUserManagementError(message);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete user (ADMIN only)
+   * Endpoint: DELETE /users/:id
+   */
+  static async deleteUser(userId: string): Promise<void> {
+    setUserManagementLoading(true);
+
+    try {
+      await apiClient.delete<void>(`users/${userId}`);
+
+      removeAdminUser(userId);
+      setAdminSuccess('User deleted successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'DELETE_USER',
+        resource: 'user',
+        resourceId: userId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: {},
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete user';
+      setUserManagementError(message);
+      throw error;
+    }
+  }
+
+  /**
+   * Update user information (ADMIN only)
+   * Endpoint: PATCH /users/:id
+   */
+  static async updateUser(userId: string, updates: UpdateUserRequest): Promise<UserResponse> {
+    setUserManagementLoading(true);
+
+    try {
+      const response = await apiClient.patch<UserResponse>(`users/${userId}`, updates);
+
+      updateAdminUser(userId, response);
+      setAdminSuccess('User updated successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'UPDATE_USER',
+        resource: 'user',
+        resourceId: userId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { updates },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update user';
+      setUserManagementError(message);
+      throw error;
+    }
   }
 
   // ============================================================================
-  // Reports Management
+  // Game Management (ADMIN/MODERATOR)
   // ============================================================================
 
   /**
-   * Get all reports
-   *
-   * @param query - Query parameters for filtering reports
-   * @returns Promise resolving to paginated reports response
+   * Create new game (ADMIN/MODERATOR)
+   * Endpoint: POST /games
    */
-  async getReports(query: ReportsQuery = {}): Promise<PaginatedReportsResponse> {
-    const searchParams = new URLSearchParams();
+  static async createGame(gameData: CreateGameRequest): Promise<GameResponse> {
+    setContentManagementLoading('games', true);
 
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, value.toString());
-      }
-    });
+    try {
+      const response = await apiClient.post<GameResponse>('games', gameData);
 
-    const endpoint = searchParams.toString()
-      ? `${ADMIN_ENDPOINTS.REPORTS}?${searchParams.toString()}`
-      : ADMIN_ENDPOINTS.REPORTS;
+      // Refresh games list
+      await this.getGames({ page: 1, limit: 20 });
+      setAdminSuccess('Game created successfully');
 
-    return apiClient.get<PaginatedReportsResponse>(endpoint);
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'CREATE_GAME',
+        resource: 'game',
+        resourceId: response.game.id,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { title: gameData.title },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create game';
+      setContentManagementError('games', message);
+      throw error;
+    }
   }
 
   /**
-   * Get report details by ID
-   *
-   * @param id - Report ID
-   * @returns Promise resolving to report details
+   * Update game (ADMIN/MODERATOR)
+   * Endpoint: PATCH /games/:id
    */
-  async getReportById(id: string): Promise<ReportResponse> {
-    if (!id) {
-      throw new Error('Report ID is required');
-    }
+  static async updateGame(gameId: string, updates: UpdateGameRequest): Promise<GameResponse> {
+    setContentManagementLoading('games', true);
 
-    return apiClient.get<ReportResponse>(ADMIN_ENDPOINTS.REPORT_BY_ID(id));
+    try {
+      const response = await apiClient.patch<GameResponse>(`games/${gameId}`, updates);
+
+      // Refresh games list
+      await this.getGames({ page: 1, limit: 20 });
+      setAdminSuccess('Game updated successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'UPDATE_GAME',
+        resource: 'game',
+        resourceId: gameId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { updates },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update game';
+      setContentManagementError('games', message);
+      throw error;
+    }
   }
 
   /**
-   * Resolve a report
-   *
-   * @param id - Report ID
-   * @param resolution - Resolution details
-   * @param action - Action taken ('DISMISSED' | 'RESOLVED')
-   * @returns Promise resolving when report is resolved
+   * Delete game (ADMIN only)
+   * Endpoint: DELETE /games/:id
    */
-  async resolveReport(
-    id: string,
-    resolution: string,
-    action: 'DISMISSED' | 'RESOLVED' = 'RESOLVED',
-  ): Promise<void> {
-    if (!id) {
-      throw new Error('Report ID is required');
-    }
-    if (!resolution?.trim()) {
-      throw new Error('Resolution is required');
-    }
+  static async deleteGame(gameId: string): Promise<void> {
+    setContentManagementLoading('games', true);
 
-    return apiClient.post<void>(ADMIN_ENDPOINTS.REPORT_RESOLVE(id), { resolution, action });
+    try {
+      await apiClient.delete<void>(`games/${gameId}`);
+
+      // Refresh games list
+      await this.getGames({ page: 1, limit: 20 });
+      setAdminSuccess('Game deleted successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'DELETE_GAME',
+        resource: 'game',
+        resourceId: gameId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: {},
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete game';
+      setContentManagementError('games', message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get games for admin management
+   */
+  static async getGames(query: GamesQuery = {}): Promise<PaginatedResponse<GameResponse>> {
+    setContentManagementLoading('games', true);
+
+    try {
+      const params = new URLSearchParams();
+      if (query.page) params.append('page', query.page.toString());
+      if (query.limit) params.append('limit', query.limit.toString());
+      if (query.search) params.append('search', query.search);
+      if (query.sortBy) params.append('sortBy', query.sortBy);
+      if (query.sortOrder) params.append('sortOrder', query.sortOrder);
+
+      const response = await apiClient.get<PaginatedResponse<GameResponse>>(
+        `games?${params.toString()}`,
+      );
+
+      setAdminGames(response);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch games';
+      setContentManagementError('games', message);
+      throw error;
+    }
   }
 
   // ============================================================================
-  // System Statistics
+  // Developer Management (ADMIN/MODERATOR)
   // ============================================================================
 
   /**
-   * Get system statistics
-   *
-   * @returns Promise resolving to system stats
+   * Create developer (ADMIN/MODERATOR)
+   * Endpoint: POST /games/developers
    */
-  async getSystemStats(): Promise<SystemStatsResponse> {
-    return apiClient.get<SystemStatsResponse>(ADMIN_ENDPOINTS.STATS);
+  static async createDeveloper(developerData: CreateDeveloperRequest): Promise<DeveloperResponse> {
+    setContentManagementLoading('developers', true);
+
+    try {
+      const response = await apiClient.post<DeveloperResponse>('games/developers', developerData);
+
+      // Refresh developers list
+      await this.getDevelopers({ page: 1, limit: 20 });
+      setAdminSuccess('Developer created successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'CREATE_DEVELOPER',
+        resource: 'developer',
+        resourceId: response.id,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { name: developerData.name },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create developer';
+      setContentManagementError('developers', message);
+      throw error;
+    }
   }
 
   /**
-   * Get user statistics
-   *
-   * @returns Promise resolving to user stats
+   * Update developer (ADMIN/MODERATOR)
+   * Endpoint: PATCH /games/developers/:id
    */
-  async getUserStats(): Promise<SystemStatsResponse['users']> {
-    return apiClient.get<SystemStatsResponse['users']>(ADMIN_ENDPOINTS.STATS_USERS);
+  static async updateDeveloper(
+    developerId: string,
+    updates: UpdateDeveloperRequest,
+  ): Promise<DeveloperResponse> {
+    setContentManagementLoading('developers', true);
+
+    try {
+      const response = await apiClient.patch<DeveloperResponse>(
+        `games/developers/${developerId}`,
+        updates,
+      );
+
+      // Refresh developers list
+      await this.getDevelopers({ page: 1, limit: 20 });
+      setAdminSuccess('Developer updated successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'UPDATE_DEVELOPER',
+        resource: 'developer',
+        resourceId: developerId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { updates },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update developer';
+      setContentManagementError('developers', message);
+      throw error;
+    }
   }
 
   /**
-   * Get content statistics
-   *
-   * @returns Promise resolving to content stats
+   * Delete developer (ADMIN only)
+   * Endpoint: DELETE /games/developers/:id
    */
-  async getContentStats(): Promise<SystemStatsResponse['content']> {
-    return apiClient.get<SystemStatsResponse['content']>(ADMIN_ENDPOINTS.STATS_CONTENT);
+  static async deleteDeveloper(developerId: string): Promise<void> {
+    setContentManagementLoading('developers', true);
+
+    try {
+      await apiClient.delete<void>(`games/developers/${developerId}`);
+
+      // Refresh developers list
+      await this.getDevelopers({ page: 1, limit: 20 });
+      setAdminSuccess('Developer deleted successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'DELETE_DEVELOPER',
+        resource: 'developer',
+        resourceId: developerId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: {},
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete developer';
+      setContentManagementError('developers', message);
+      throw error;
+    }
   }
 
   /**
-   * Get activity statistics
-   *
-   * @returns Promise resolving to activity stats
+   * Get developers for admin management
    */
-  async getActivityStats(): Promise<SystemStatsResponse['activity']> {
-    return apiClient.get<SystemStatsResponse['activity']>(ADMIN_ENDPOINTS.STATS_ACTIVITY);
+  static async getDevelopers(
+    query: DevelopersQuery = {},
+  ): Promise<PaginatedResponse<DeveloperResponse>> {
+    setContentManagementLoading('developers', true);
+
+    try {
+      const params = new URLSearchParams();
+      if (query.page) params.append('page', query.page.toString());
+      if (query.limit) params.append('limit', query.limit.toString());
+      if (query.search) params.append('search', query.search);
+
+      const response = await apiClient.get<PaginatedResponse<DeveloperResponse>>(
+        `games/developers?${params.toString()}`,
+      );
+
+      setAdminDevelopers(response);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch developers';
+      setContentManagementError('developers', message);
+      throw error;
+    }
   }
 
   // ============================================================================
-  // Bulk Operations
+  // Publisher Management (ADMIN/MODERATOR)
   // ============================================================================
 
   /**
-   * Bulk ban users
-   *
-   * @param userIds - Array of user IDs
-   * @param reason - Reason for ban
-   * @returns Promise resolving when users are banned
+   * Create publisher (ADMIN/MODERATOR)
+   * Endpoint: POST /games/publishers
    */
-  async bulkBanUsers(userIds: string[], reason: string): Promise<void> {
-    if (!userIds.length) {
-      throw new Error('User IDs are required');
-    }
-    if (!reason?.trim()) {
-      throw new Error('Ban reason is required');
-    }
+  static async createPublisher(publisherData: CreatePublisherRequest): Promise<PublisherResponse> {
+    setContentManagementLoading('publishers', true);
 
-    return apiClient.post<void>(`${ADMIN_ENDPOINTS.USERS}/bulk-ban`, { userIds, reason });
+    try {
+      const response = await apiClient.post<PublisherResponse>('games/publishers', publisherData);
+
+      // Refresh publishers list
+      await this.getPublishers({ page: 1, limit: 20 });
+      setAdminSuccess('Publisher created successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'CREATE_PUBLISHER',
+        resource: 'publisher',
+        resourceId: response.id,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { name: publisherData.name },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create publisher';
+      setContentManagementError('publishers', message);
+      throw error;
+    }
   }
 
   /**
-   * Bulk approve reviews
-   *
-   * @param reviewIds - Array of review IDs
-   * @returns Promise resolving when reviews are approved
+   * Update publisher (ADMIN/MODERATOR)
+   * Endpoint: PATCH /games/publishers/:id
    */
-  async bulkApproveReviews(reviewIds: string[]): Promise<void> {
-    if (!reviewIds.length) {
-      throw new Error('Review IDs are required');
-    }
+  static async updatePublisher(
+    publisherId: string,
+    updates: UpdatePublisherRequest,
+  ): Promise<PublisherResponse> {
+    setContentManagementLoading('publishers', true);
 
-    return apiClient.post<void>(`${ADMIN_ENDPOINTS.REVIEWS_PENDING}/bulk-approve`, { reviewIds });
+    try {
+      const response = await apiClient.patch<PublisherResponse>(
+        `games/publishers/${publisherId}`,
+        updates,
+      );
+
+      // Refresh publishers list
+      await this.getPublishers({ page: 1, limit: 20 });
+      setAdminSuccess('Publisher updated successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'UPDATE_PUBLISHER',
+        resource: 'publisher',
+        resourceId: publisherId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { updates },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update publisher';
+      setContentManagementError('publishers', message);
+      throw error;
+    }
   }
 
   /**
-   * Bulk reject reviews
-   *
-   * @param reviewIds - Array of review IDs
-   * @param reason - Reason for rejection
-   * @returns Promise resolving when reviews are rejected
+   * Delete publisher (ADMIN only)
+   * Endpoint: DELETE /games/publishers/:id
    */
-  async bulkRejectReviews(reviewIds: string[], reason: string): Promise<void> {
-    if (!reviewIds.length) {
-      throw new Error('Review IDs are required');
-    }
-    if (!reason?.trim()) {
-      throw new Error('Rejection reason is required');
-    }
+  static async deletePublisher(publisherId: string): Promise<void> {
+    setContentManagementLoading('publishers', true);
 
-    return apiClient.post<void>(`${ADMIN_ENDPOINTS.REVIEWS_PENDING}/bulk-reject`, {
-      reviewIds,
-      reason,
-    });
+    try {
+      await apiClient.delete<void>(`games/publishers/${publisherId}`);
+
+      // Refresh publishers list
+      await this.getPublishers({ page: 1, limit: 20 });
+      setAdminSuccess('Publisher deleted successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'DELETE_PUBLISHER',
+        resource: 'publisher',
+        resourceId: publisherId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: {},
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete publisher';
+      setContentManagementError('publishers', message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get publishers for admin management
+   */
+  static async getPublishers(
+    query: PublishersQuery = {},
+  ): Promise<PaginatedResponse<PublisherResponse>> {
+    setContentManagementLoading('publishers', true);
+
+    try {
+      const params = new URLSearchParams();
+      if (query.page) params.append('page', query.page.toString());
+      if (query.limit) params.append('limit', query.limit.toString());
+      if (query.search) params.append('search', query.search);
+
+      const response = await apiClient.get<PaginatedResponse<PublisherResponse>>(
+        `games/publishers?${params.toString()}`,
+      );
+
+      setAdminPublishers(response);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch publishers';
+      setContentManagementError('publishers', message);
+      throw error;
+    }
   }
 
   // ============================================================================
-  // Search and Filters
+  // Genre Management (ADMIN/MODERATOR)
   // ============================================================================
 
   /**
-   * Search users by username or email
-   *
-   * @param searchTerm - Search term
-   * @param options - Additional search options
-   * @returns Promise resolving to paginated users response
+   * Create genre (ADMIN/MODERATOR)
+   * Endpoint: POST /games/genres
    */
-  async searchUsers(
-    searchTerm: string,
-    options: Omit<UserManagementQuery, 'search'> = {},
-  ): Promise<PaginatedUsersResponse> {
-    if (!searchTerm.trim()) {
-      throw new Error('Search term is required');
+  static async createGenre(genreData: CreateGenreRequest): Promise<GenreResponse> {
+    setContentManagementLoading('genres', true);
+
+    try {
+      const response = await apiClient.post<GenreResponse>('games/genres', genreData);
+
+      // Refresh genres list
+      await this.getGenres({ page: 1, limit: 20 });
+      setAdminSuccess('Genre created successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'CREATE_GENRE',
+        resource: 'genre',
+        resourceId: response.id,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { name: genreData.name },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create genre';
+      setContentManagementError('genres', message);
+      throw error;
     }
-
-    return this.getUsers({
-      ...options,
-      search: searchTerm.trim(),
-    });
   }
 
   /**
-   * Get users by role
-   *
-   * @param role - User role
-   * @param options - Additional query options
-   * @returns Promise resolving to paginated users response
+   * Update genre (ADMIN/MODERATOR)
+   * Endpoint: PATCH /games/genres/:id
    */
-  async getUsersByRole(
-    role: 'USER' | 'MODERATOR' | 'ADMIN',
-    options: Omit<UserManagementQuery, 'role'> = {},
-  ): Promise<PaginatedUsersResponse> {
-    return this.getUsers({
-      ...options,
-      role,
-    });
+  static async updateGenre(genreId: string, updates: UpdateGenreRequest): Promise<GenreResponse> {
+    setContentManagementLoading('genres', true);
+
+    try {
+      const response = await apiClient.patch<GenreResponse>(`games/genres/${genreId}`, updates);
+
+      // Refresh genres list
+      await this.getGenres({ page: 1, limit: 20 });
+      setAdminSuccess('Genre updated successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'UPDATE_GENRE',
+        resource: 'genre',
+        resourceId: genreId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { updates },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update genre';
+      setContentManagementError('genres', message);
+      throw error;
+    }
   }
 
   /**
-   * Get banned users
-   *
-   * @param options - Additional query options
-   * @returns Promise resolving to paginated users response
+   * Delete genre (ADMIN only)
+   * Endpoint: DELETE /games/genres/:id
    */
-  async getBannedUsers(options: UserManagementQuery = {}): Promise<PaginatedUsersResponse> {
-    return this.getUsers({
-      ...options,
-      status: 'BANNED',
-    });
+  static async deleteGenre(genreId: string): Promise<void> {
+    setContentManagementLoading('genres', true);
+
+    try {
+      await apiClient.delete<void>(`games/genres/${genreId}`);
+
+      // Refresh genres list
+      await this.getGenres({ page: 1, limit: 20 });
+      setAdminSuccess('Genre deleted successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'DELETE_GENRE',
+        resource: 'genre',
+        resourceId: genreId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: {},
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete genre';
+      setContentManagementError('genres', message);
+      throw error;
+    }
   }
 
   /**
-   * Get pending reports
-   *
-   * @param options - Additional query options
-   * @returns Promise resolving to paginated reports response
+   * Get genres for admin management
    */
-  async getPendingReports(options: ReportsQuery = {}): Promise<PaginatedReportsResponse> {
-    return this.getReports({
-      ...options,
-      status: 'PENDING',
-    });
+  static async getGenres(query: GenresQuery = {}): Promise<PaginatedResponse<GenreResponse>> {
+    setContentManagementLoading('genres', true);
+
+    try {
+      const params = new URLSearchParams();
+      if (query.page) params.append('page', query.page.toString());
+      if (query.limit) params.append('limit', query.limit.toString());
+      if (query.search) params.append('search', query.search);
+
+      const response = await apiClient.get<PaginatedResponse<GenreResponse>>(
+        `games/genres?${params.toString()}`,
+      );
+
+      setAdminGenres(response);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch genres';
+      setContentManagementError('genres', message);
+      throw error;
+    }
+  }
+
+  // ============================================================================
+  // Platform Management (ADMIN/MODERATOR)
+  // ============================================================================
+
+  /**
+   * Create platform (ADMIN/MODERATOR)
+   * Endpoint: POST /games/platforms
+   */
+  static async createPlatform(platformData: CreatePlatformRequest): Promise<PlatformResponse> {
+    setContentManagementLoading('platforms', true);
+
+    try {
+      const response = await apiClient.post<PlatformResponse>('games/platforms', platformData);
+
+      // Refresh platforms list
+      await this.getPlatforms({ page: 1, limit: 20 });
+      setAdminSuccess('Platform created successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'CREATE_PLATFORM',
+        resource: 'platform',
+        resourceId: response.id,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { name: platformData.name },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to create platform';
+      setContentManagementError('platforms', message);
+      throw error;
+    }
+  }
+
+  /**
+   * Update platform (ADMIN/MODERATOR)
+   * Endpoint: PATCH /games/platforms/:id
+   */
+  static async updatePlatform(
+    platformId: string,
+    updates: UpdatePlatformRequest,
+  ): Promise<PlatformResponse> {
+    setContentManagementLoading('platforms', true);
+
+    try {
+      const response = await apiClient.patch<PlatformResponse>(
+        `games/platforms/${platformId}`,
+        updates,
+      );
+
+      // Refresh platforms list
+      await this.getPlatforms({ page: 1, limit: 20 });
+      setAdminSuccess('Platform updated successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'UPDATE_PLATFORM',
+        resource: 'platform',
+        resourceId: platformId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { updates },
+      });
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to update platform';
+      setContentManagementError('platforms', message);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete platform (ADMIN only)
+   * Endpoint: DELETE /games/platforms/:id
+   */
+  static async deletePlatform(platformId: string): Promise<void> {
+    setContentManagementLoading('platforms', true);
+
+    try {
+      await apiClient.delete<void>(`games/platforms/${platformId}`);
+
+      // Refresh platforms list
+      await this.getPlatforms({ page: 1, limit: 20 });
+      setAdminSuccess('Platform deleted successfully');
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'DELETE_PLATFORM',
+        resource: 'platform',
+        resourceId: platformId,
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: {},
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete platform';
+      setContentManagementError('platforms', message);
+      throw error;
+    }
+  }
+
+  /**
+   * Get platforms for admin management
+   */
+  static async getPlatforms(
+    query: PlatformsQuery = {},
+  ): Promise<PaginatedResponse<PlatformResponse>> {
+    setContentManagementLoading('platforms', true);
+
+    try {
+      const params = new URLSearchParams();
+      if (query.page) params.append('page', query.page.toString());
+      if (query.limit) params.append('limit', query.limit.toString());
+      if (query.search) params.append('search', query.search);
+
+      const response = await apiClient.get<PaginatedResponse<PlatformResponse>>(
+        `games/platforms?${params.toString()}`,
+      );
+
+      setAdminPlatforms(response);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch platforms';
+      setContentManagementError('platforms', message);
+      throw error;
+    }
+  }
+
+  // ============================================================================
+  // Dashboard & Stats
+  // ============================================================================
+
+  /**
+   * Get admin dashboard statistics
+   * Requires ADMIN or MODERATOR role
+   */
+  static async getDashboardStats(): Promise<AdminDashboardStats> {
+    setAdminLoading(true);
+
+    try {
+      // This would be a custom endpoint for admin stats
+      const response = await apiClient.get<AdminDashboardStats>('admin/stats');
+
+      setAdminStats(response);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to fetch dashboard stats';
+      setAdminError(message);
+      throw error;
+    }
+  }
+
+  // ============================================================================
+  // Utility Methods
+  // ============================================================================
+
+  /**
+   * Bulk actions for admin operations
+   */
+  static async bulkDeleteUsers(userIds: string[]): Promise<void> {
+    setAdminLoading(true);
+
+    try {
+      await apiClient.post<void>('admin/users/bulk-delete', { userIds });
+
+      // Refresh users list
+      await this.getUsers({ page: 1, limit: 20 });
+      setAdminSuccess(`${userIds.length} users deleted successfully`);
+
+      // Log admin activity
+      addAdminActivityLogEntry({
+        id: crypto.randomUUID(),
+        action: 'BULK_DELETE_USERS',
+        resource: 'user',
+        resourceId: userIds.join(','),
+        userId: '', // Will be filled by auth context
+        username: '', // Will be filled by auth context
+        timestamp: new Date(),
+        details: { count: userIds.length },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to delete users';
+      setAdminError(message);
+      throw error;
+    }
+  }
+
+  /**
+   * Export admin data
+   */
+  static async exportData(type: 'users' | 'games' | 'reviews'): Promise<Blob> {
+    setAdminLoading(true);
+
+    try {
+      // Use apiClient to make the request properly
+      const response = await apiClient.get<Blob>(`admin/export/${type}`);
+      setAdminSuccess(`${type} data exported successfully`);
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to export data';
+      setAdminError(message);
+      throw error;
+    }
   }
 }
-
-// ============================================================================
-// Singleton Instance
-// ============================================================================
-
-/**
- * Default admin service instance
- */
-export const adminService = new AdminService();
-
-/**
- * Create a new admin service instance (for testing purposes)
- */
-export function createAdminService(): AdminService {
-  return new AdminService();
-}
-
-// ============================================================================
-// Named Exports for Individual Functions
-// ============================================================================
-
-export const {
-  getUsers,
-  getUserById,
-  banUser,
-  unbanUser,
-  promoteUser,
-  demoteUser,
-  getPendingReviews,
-  approveReview,
-  rejectReview,
-  getReports,
-  getReportById,
-  resolveReport,
-  getSystemStats,
-  getUserStats,
-  getContentStats,
-  getActivityStats,
-  bulkBanUsers,
-  bulkApproveReviews,
-  bulkRejectReviews,
-  searchUsers,
-  getUsersByRole,
-  getBannedUsers,
-  getPendingReports,
-} = adminService;
-
-// ============================================================================
-// Export Types
-// ============================================================================
-
-export type {
-  AdminUserResponse,
-  PendingReviewResponse,
-  ReportResponse,
-  SystemStatsResponse,
-  PaginatedUsersResponse,
-  PaginatedReviewsResponse,
-  PaginatedReportsResponse,
-  UserManagementQuery,
-  ContentModerationQuery,
-  ReportsQuery,
-};
