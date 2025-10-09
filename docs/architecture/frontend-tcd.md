@@ -344,24 +344,37 @@ import type { AuthUser, UserRole } from "@questlog/shared-types";
 
 // Core authentication state
 export const $currentUser = atom<AuthUser | null>(null);
-export const $authToken = atom<string | null>(null);  
+export const $authToken = atom<string | null>(null);
 export const $refreshToken = atom<string | null>(null);
 export const $authLoading = atom<boolean>(false);
 export const $authError = atom<string | null>(null);
 
 // Computed state selectors
 export const $isAuthenticated = computed($currentUser, (user) => user !== null);
-export const $userRole = computed($currentUser, (user): UserRole | null => user?.role as UserRole || null);
-export const $isAdmin = computed($userRole, (role) => role === 'ADMIN');
-export const $isModerator = computed($userRole, (role) => role === 'MODERATOR' || role === 'ADMIN');
-export const $displayName = computed($currentUser, (user) => user?.username || 'Anonymous');
+export const $userRole = computed(
+  $currentUser,
+  (user): UserRole | null => (user?.role as UserRole) || null,
+);
+export const $isAdmin = computed($userRole, (role) => role === "ADMIN");
+export const $isModerator = computed(
+  $userRole,
+  (role) => role === "MODERATOR" || role === "ADMIN",
+);
+export const $displayName = computed(
+  $currentUser,
+  (user) => user?.username || "Anonymous",
+);
 ```
 
 **Games State** (`stores/games.ts`):
 
 ```typescript
 import { atom } from "nanostores";
-import type { GameResponse, GameDetail, PaginatedGamesResponse } from "@questlog/shared-types";
+import type {
+  GameResponse,
+  GameDetail,
+  PaginatedGamesResponse,
+} from "@questlog/shared-types";
 
 // Games list state
 export const $gamesData = atom<PaginatedGamesResponse | null>(null);
@@ -383,7 +396,10 @@ export const $similarGamesLoading = atom<boolean>(false);
 
 ```typescript
 import { atom } from "nanostores";
-import type { ReviewResponse, PaginatedReviewsResponse } from "@questlog/shared-types";
+import type {
+  ReviewResponse,
+  PaginatedReviewsResponse,
+} from "@questlog/shared-types";
 
 // Reviews list state
 export const $reviewsData = atom<PaginatedReviewsResponse | null>(null);
@@ -511,11 +527,20 @@ export const getGameBySlug = async (slug: string): Promise<GameResponse> => {
 **useAuth Hook** (`hooks/useAuth.ts`):
 
 ```typescript
-import { useCallback } from 'react';
-import { useStore } from '@nanostores/react';
-import type { LoginRequest, RegisterRequest, AuthResponse } from '@questlog/shared-types';
-import { login, register, logout } from '@/services/auth';
-import { $currentUser, $authToken, $authLoading, $authError } from '@/stores/auth';
+import { useCallback } from "react";
+import { useStore } from "@nanostores/react";
+import type {
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+} from "@questlog/shared-types";
+import { login, register, logout } from "@/services/auth";
+import {
+  $currentUser,
+  $authToken,
+  $authLoading,
+  $authError,
+} from "@/stores/auth";
 
 export function useAuth() {
   const user = useStore($currentUser);
@@ -525,17 +550,28 @@ export function useAuth() {
 
   const isAuthenticated = !!user && !!authToken;
 
-  const loginUser = useCallback(async (credentials: LoginRequest): Promise<AuthResponse> => {
-    return await login(credentials);
-  }, []);
+  const loginUser = useCallback(
+    async (credentials: LoginRequest): Promise<AuthResponse> => {
+      return await login(credentials);
+    },
+    [],
+  );
 
-  const registerUser = useCallback(async (userData: RegisterRequest): Promise<AuthResponse> => {
-    return await register(userData);
-  }, []);
+  const registerUser = useCallback(
+    async (userData: RegisterRequest): Promise<AuthResponse> => {
+      return await register(userData);
+    },
+    [],
+  );
 
   return {
-    user, isAuthenticated, isLoading, error,
-    login: loginUser, register: registerUser, logout
+    user,
+    isAuthenticated,
+    isLoading,
+    error,
+    login: loginUser,
+    register: registerUser,
+    logout,
   };
 }
 ```
@@ -543,11 +579,15 @@ export function useAuth() {
 **useReviews Hook** (`hooks/useReviews.ts`):
 
 ```typescript
-import { useCallback } from 'react';
-import { useStore } from '@nanostores/react';
-import type { ReviewsQuery, CreateReviewRequest, UpdateReviewRequest } from '@questlog/shared-types';
-import { reviewsService } from '@/services/reviews';
-import { $reviewsData, $reviewsLoading, $reviewsError } from '@/stores/reviews';
+import { useCallback } from "react";
+import { useStore } from "@nanostores/react";
+import type {
+  ReviewsQuery,
+  CreateReviewRequest,
+  UpdateReviewRequest,
+} from "@questlog/shared-types";
+import { reviewsService } from "@/services/reviews";
+import { $reviewsData, $reviewsLoading, $reviewsError } from "@/stores/reviews";
 
 export function useReviews() {
   const data = useStore($reviewsData);
@@ -562,16 +602,23 @@ export function useReviews() {
     return await reviewsService.createReview(reviewData);
   }, []);
 
-  const updateReview = useCallback(async (reviewId: string, updateData: UpdateReviewRequest) => {
-    return await reviewsService.updateReview(reviewId, updateData);
-  }, []);
+  const updateReview = useCallback(
+    async (reviewId: string, updateData: UpdateReviewRequest) => {
+      return await reviewsService.updateReview(reviewId, updateData);
+    },
+    [],
+  );
 
   return {
-    data, isLoading, error,
-    fetchReviews, createReview, updateReview,
+    data,
+    isLoading,
+    error,
+    fetchReviews,
+    createReview,
+    updateReview,
     deleteReview: reviewsService.deleteReview,
     likeReview: reviewsService.likeReview,
-    unlikeReview: reviewsService.unlikeReview
+    unlikeReview: reviewsService.unlikeReview,
   };
 }
 ```
