@@ -52,6 +52,17 @@ export interface UpdateReviewRequest {
   isSpoiler?: boolean;
 }
 
+// Paginated Reviews Response
+export interface PaginatedReviewsResponse {
+  items: ReviewResponse[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 // Review Query Types
 export interface ReviewsQuery {
   page?: number;
@@ -63,8 +74,8 @@ export interface ReviewsQuery {
   maxRating?: number;
   isPublished?: boolean;
   isSpoiler?: boolean;
-  sortBy?: "createdAt" | "updatedAt" | "rating" | "likesCount";
-  sortOrder?: "asc" | "desc";
+  sortBy?: 'createdAt' | 'updatedAt' | 'rating' | 'likesCount';
+  sortOrder?: 'asc' | 'desc';
 }
 
 // Review Filters
