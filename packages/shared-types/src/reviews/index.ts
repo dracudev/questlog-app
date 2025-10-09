@@ -74,8 +74,8 @@ export interface ReviewsQuery {
   maxRating?: number;
   isPublished?: boolean;
   isSpoiler?: boolean;
-  sortBy?: 'createdAt' | 'updatedAt' | 'rating' | 'likesCount';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "createdAt" | "updatedAt" | "rating" | "likesCount";
+  sortOrder?: "asc" | "desc";
 }
 
 // Review Filters
