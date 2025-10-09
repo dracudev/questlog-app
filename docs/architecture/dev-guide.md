@@ -91,7 +91,7 @@ In the future, it will integrate with the Steam API for login and game library d
 - **Follow**
   - follower_id, followed_id
 
-_(Relationships: User ↔ Review, User ↔ Follow, Game ↔ Review, Game ↔ Developer)_
+**Relationships:** User ↔ Review, User ↔ Follow, Game ↔ Review, Game ↔ Developer
 
 ---
 

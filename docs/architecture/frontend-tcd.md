@@ -14,18 +14,21 @@
 - **State Management**: Efficient client-side state with Nanostores for global state and React state for component-level interactions
 - **Search & Discovery**: Advanced filtering and search capabilities for games, users, and reviews
 - **User Experience**: Optimized loading states, error handling, and accessibility features
+- **Admin Panel**: Role-based admin interface for content management and user administration
 
 ### Current Implementation Features
 
-- **Hybrid Static/Dynamic Architecture**: Astro for static generation with React Islands for interactivity
+- **Hybrid Static/Dynamic Architecture**: Astro 5.x for static generation with React 19.x Islands for interactivity
 - **Type-Safe API Client**: Complete integration with backend APIs using `@questlog/shared-types`
-- **Responsive UI System**: Tailwind CSS v4 with custom component library
-- **Authentication Flow**: Login, registration, password management with JWT token handling
-- **Game Discovery**: Browse games with advanced filtering, search, and pagination
-- **User Profiles**: Public user profiles with reviews, followers, and gaming statistics
-- **Review System**: Create, edit, and interact with game reviews
-- **Social Features**: Follow users, view activity feeds, and social interactions
-- **Performance Optimization**: Code splitting, lazy loading, and optimized asset delivery
+- **Responsive UI System**: Tailwind CSS v4 with custom component library and Lucide React icons
+- **Authentication System**: Complete login/register flow with JWT token management, role-based access control, and persistent authentication
+- **Game Management**: Comprehensive games catalog with search, filtering, pagination, and detailed game pages
+- **Review System**: Full review CRUD operations with ratings, social interactions (like/unlike), and game-specific reviews
+- **Social Features**: User profiles, activity feeds, follow/unfollow functionality, and social statistics
+- **Admin Dashboard**: Role-based admin panel for managing games, users, reviews, and platform content
+- **Developer Tools**: Complete service layer architecture with specialized hooks for each domain
+- **State Management**: Comprehensive Nanostores implementation with persistent auth state and optimistic updates
+- **Performance Optimization**: Code splitting, lazy loading, caching strategies, and optimized asset delivery
 
 ### Future Vision
 
@@ -45,15 +48,18 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 
 ### Key Dependencies
 
-- **@astrojs/react**: React integration for Astro Islands
+- **@astrojs/react**: React 19.x integration for Astro Islands
+- **@astrojs/vercel**: Vercel deployment integration
 - **@nanostores/react**: React bindings for Nanostores state management
 - **@questlog/shared-types**: Type-safe API contracts from backend
 - **@questlog/ui-components**: Shared component library
 - **@questlog/utils**: Shared utility functions
 - **@tailwindcss/vite**: Tailwind CSS v4 Vite plugin
-- **react**: React library for interactive components
+- **react**: React 19.x library for interactive components
 - **react-dom**: React DOM rendering
-- **tailwindcss**: Utility-first CSS framework
+- **tailwindcss**: Utility-first CSS framework v4
+- **lucide-react**: Modern SVG icon library
+- **nanostores**: Lightweight state management
 
 ### Framework Choice Rationale
 
@@ -168,17 +174,28 @@ src/
 │   ├── AuthLayout.astro     # Authentication pages layout
 │   └── AdminLayout.astro    # Admin panel layout
 ├── stores/                  # State management (Nanostores)
-│   ├── auth.ts              # Authentication state
-│   ├── theme.ts             # Theme and UI preferences
-│   ├── search.ts            # Search state and filters
-│   └── notifications.ts    # User notifications
+│   ├── auth.ts              # Authentication state with persistence
+│   ├── games.ts             # Games catalog and detail state
+│   ├── reviews.ts           # Reviews management state
+│   ├── social.ts            # Social features state
+│   ├── users.ts             # User profiles and management
+│   ├── admin.ts             # Admin panel state
+│   ├── developers.ts        # Game developers state
+│   ├── publishers.ts        # Game publishers state
+│   ├── genres.ts            # Game genres state
+│   └── platforms.ts         # Gaming platforms state
 ├── services/                # API client services
-│   ├── api.ts               # Base API client configuration
-│   ├── auth.ts              # Authentication API calls
-│   ├── games.ts             # Game-related API calls
-│   ├── reviews.ts           # Review API calls
+│   ├── api.ts               # Base API client with error handling
+│   ├── auth.ts              # Authentication API calls with token management
+│   ├── games.ts             # Game-related API calls with caching
+│   ├── reviews.ts           # Review API calls with CRUD operations
 │   ├── social.ts            # Social features API calls
-│   └── users.ts             # User management API calls
+│   ├── users.ts             # User management API calls
+│   ├── admin.ts             # Admin-only API operations
+│   ├── developers.ts        # Game developers API service
+│   ├── publishers.ts        # Game publishers API service
+│   ├── genres.ts            # Game genres API service
+│   └── platforms.ts         # Gaming platforms API service
 ├── utils/                   # Utility functions
 │   ├── constants.ts         # Application constants
 │   ├── validation.ts        # Form validation schemas
@@ -186,11 +203,16 @@ src/
 │   ├── storage.ts           # Local storage utilities
 │   └── auth.ts              # Authentication utilities
 ├── hooks/                   # React hooks
-│   ├── useAuth.ts           # Authentication hook
-│   ├── useApi.ts            # API calling hook with loading states
-│   ├── useLocalStorage.ts   # Local storage hook
-│   ├── useDebounce.ts       # Debouncing hook for search
-│   └── usePagination.ts     # Pagination logic hook
+│   ├── useAuth.ts           # Authentication hook with role-based access
+│   ├── useGames.ts          # Games management hooks
+│   ├── useReviews.ts        # Reviews management hooks
+│   ├── useSocial.ts         # Social features hooks
+│   ├── useUsers.ts          # User management hooks
+│   ├── useAdmin.ts          # Admin operations hooks
+│   ├── useDevelopers.ts     # Game developers hooks
+│   ├── usePublishers.ts     # Game publishers hooks
+│   ├── useGenres.ts         # Game genres hooks
+│   └── usePlatforms.ts      # Gaming platforms hooks
 ├── types/                   # Frontend-specific types
 │   ├── components.ts        # Component prop types
 │   ├── pages.ts             # Page-specific types
@@ -317,32 +339,75 @@ const ReviewList = ({ gameId }: { gameId: string }) => {
 **Authentication State** (`stores/auth.ts`):
 
 ```typescript
-import { atom } from "nanostores";
-import type { AuthUser } from "@questlog/shared-types";
+import { atom, computed } from "nanostores";
+import type { AuthUser, UserRole } from "@questlog/shared-types";
 
+// Core authentication state
 export const $currentUser = atom<AuthUser | null>(null);
-export const $isAuthenticated = atom<boolean>(false);
-export const $authToken = atom<string | null>(null);
+export const $authToken = atom<string | null>(null);  
+export const $refreshToken = atom<string | null>(null);
+export const $authLoading = atom<boolean>(false);
+export const $authError = atom<string | null>(null);
+
+// Computed state selectors
+export const $isAuthenticated = computed($currentUser, (user) => user !== null);
+export const $userRole = computed($currentUser, (user): UserRole | null => user?.role as UserRole || null);
+export const $isAdmin = computed($userRole, (role) => role === 'ADMIN');
+export const $isModerator = computed($userRole, (role) => role === 'MODERATOR' || role === 'ADMIN');
+export const $displayName = computed($currentUser, (user) => user?.username || 'Anonymous');
 ```
 
-**Theme & UI State** (`stores/theme.ts`):
+**Games State** (`stores/games.ts`):
 
 ```typescript
 import { atom } from "nanostores";
+import type { GameResponse, GameDetail, PaginatedGamesResponse } from "@questlog/shared-types";
 
-export const $theme = atom<"light" | "dark">("light");
-export const $sidebarOpen = atom<boolean>(false);
+// Games list state
+export const $gamesData = atom<PaginatedGamesResponse | null>(null);
+export const $gamesLoading = atom<boolean>(false);
+export const $gamesError = atom<string | null>(null);
+
+// Game detail state
+export const $gameDetail = atom<GameDetail | null>(null);
+export const $currentGameSlug = atom<string | null>(null);
+export const $gameDetailLoading = atom<boolean>(false);
+export const $gameDetailError = atom<string | null>(null);
+
+// Similar games state
+export const $similarGames = atom<GameResponse[] | null>(null);
+export const $similarGamesLoading = atom<boolean>(false);
 ```
 
-**Search State** (`stores/search.ts`):
+**Reviews State** (`stores/reviews.ts`):
 
 ```typescript
 import { atom } from "nanostores";
-import type { GamesQuery } from "@questlog/shared-types";
+import type { ReviewResponse, PaginatedReviewsResponse } from "@questlog/shared-types";
 
-export const $searchQuery = atom<string>("");
-export const $searchFilters = atom<Partial<GamesQuery>>({});
-export const $searchResults = atom<any[]>([]);
+// Reviews list state
+export const $reviewsData = atom<PaginatedReviewsResponse | null>(null);
+export const $reviewsLoading = atom<boolean>(false);
+export const $reviewsError = atom<string | null>(null);
+
+// Review detail state
+export const $reviewDetail = atom<ReviewResponse | null>(null);
+export const $currentReviewId = atom<string | null>(null);
+export const $reviewDetailLoading = atom<boolean>(false);
+
+// User reviews state
+export const $userReviews = atom<PaginatedReviewsResponse | null>(null);
+export const $userReviewsLoading = atom<boolean>(false);
+export const $currentUserReviewsId = atom<string | null>(null);
+
+// Game reviews state
+export const $gameReviews = atom<PaginatedReviewsResponse | null>(null);
+export const $gameReviewsLoading = atom<boolean>(false);
+export const $currentGameReviewsId = atom<string | null>(null);
+
+// Review actions state
+export const $reviewActionLoading = atom<boolean>(false);
+export const $reviewActionError = atom<string | null>(null);
 ```
 
 ### Local Component State
@@ -443,38 +508,72 @@ export const getGameBySlug = async (slug: string): Promise<GameResponse> => {
 
 ### React Hooks for API Integration
 
-**useApi Hook** (`hooks/useApi.ts`):
+**useAuth Hook** (`hooks/useAuth.ts`):
 
 ```typescript
-import { useState, useEffect } from "react";
+import { useCallback } from 'react';
+import { useStore } from '@nanostores/react';
+import type { LoginRequest, RegisterRequest, AuthResponse } from '@questlog/shared-types';
+import { login, register, logout } from '@/services/auth';
+import { $currentUser, $authToken, $authLoading, $authError } from '@/stores/auth';
 
-export const useApi = <T>(
-  apiCall: () => Promise<T>,
-  dependencies: any[] = [],
-) => {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useAuth() {
+  const user = useStore($currentUser);
+  const authToken = useStore($authToken);
+  const isLoading = useStore($authLoading);
+  const error = useStore($authError);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const result = await apiCall();
-        setData(result);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const isAuthenticated = !!user && !!authToken;
 
-    fetchData();
-  }, dependencies);
+  const loginUser = useCallback(async (credentials: LoginRequest): Promise<AuthResponse> => {
+    return await login(credentials);
+  }, []);
 
-  return { data, loading, error, refetch: () => fetchData() };
-};
+  const registerUser = useCallback(async (userData: RegisterRequest): Promise<AuthResponse> => {
+    return await register(userData);
+  }, []);
+
+  return {
+    user, isAuthenticated, isLoading, error,
+    login: loginUser, register: registerUser, logout
+  };
+}
+```
+
+**useReviews Hook** (`hooks/useReviews.ts`):
+
+```typescript
+import { useCallback } from 'react';
+import { useStore } from '@nanostores/react';
+import type { ReviewsQuery, CreateReviewRequest, UpdateReviewRequest } from '@questlog/shared-types';
+import { reviewsService } from '@/services/reviews';
+import { $reviewsData, $reviewsLoading, $reviewsError } from '@/stores/reviews';
+
+export function useReviews() {
+  const data = useStore($reviewsData);
+  const isLoading = useStore($reviewsLoading);
+  const error = useStore($reviewsError);
+
+  const fetchReviews = useCallback(async (query?: ReviewsQuery) => {
+    return await reviewsService.getAllReviews(query);
+  }, []);
+
+  const createReview = useCallback(async (reviewData: CreateReviewRequest) => {
+    return await reviewsService.createReview(reviewData);
+  }, []);
+
+  const updateReview = useCallback(async (reviewId: string, updateData: UpdateReviewRequest) => {
+    return await reviewsService.updateReview(reviewId, updateData);
+  }, []);
+
+  return {
+    data, isLoading, error,
+    fetchReviews, createReview, updateReview,
+    deleteReview: reviewsService.deleteReview,
+    likeReview: reviewsService.likeReview,
+    unlikeReview: reviewsService.unlikeReview
+  };
+}
 ```
 
 ### Error Handling Strategy
@@ -687,52 +786,134 @@ pnpm build:analyze          # Analyze bundle size
 
 ## Current Status and Implementation Guidelines
 
-### Implemented Foundation
+### Implemented Features
 
 ✅ **Core Architecture**
 
-- Astro + React Islands setup with TypeScript
-- Tailwind CSS v4 integration
-- Shared types integration from backend
-- Basic component structure and patterns
+- Astro 5.x + React 19.x Islands setup with TypeScript
+- Tailwind CSS v4 integration with shared config
+- Complete shared types integration from backend
+- Comprehensive component architecture and patterns
+- Vercel deployment integration
 
-✅ **Development Environment**
+✅ **Authentication System**
 
-- PNPM workspace configuration
-- Development server setup
-- Build process configuration
-- Code quality tools integration
+- Complete login/register forms with validation using Zod schemas
+- JWT token management with automatic refresh
+- Persistent authentication state with localStorage
+- Role-based access control (USER/ADMIN/MODERATOR)
+- Protected route handling and guest-only routes
+- User session management with auth state persistence
 
-### Implementation Priorities
+✅ **Core Pages & Components**
 
-🔄 **Authentication Flow**
+- Complete authentication pages (login, register)
+- Responsive navigation with mobile menu support
+- Theme toggle component with system preferences
+- Base layouts for different page types
+- NoScript fallbacks for progressive enhancement
+- Footer component with proper styling
 
-- Login/register forms with validation
-- JWT token management and persistence
-- Protected route handling
-- User session management
+✅ **API Integration**
 
-🔄 **Core Pages & Components**
+- Complete service layer implementation for all domains
+- Comprehensive error handling and loading states
+- Type-safe API client with automatic token management
+- Specialized hooks for each service domain
+- Caching strategies for game details and user data
+- Optimistic updates for social interactions
 
-- Game catalog with search and filtering
-- User profiles with review listings
-- Review creation and editing interface
-- Social feed and activity tracking
+✅ **State Management**
 
-🔄 **API Integration**
+- Complete Nanostores implementation for all domains
+- Authentication state with computed selectors
+- Games catalog and detail state management
+- Reviews CRUD state with pagination support
+- Social features state (follows, likes, activity feed)
+- Admin panel state management
+- Persistent state for authentication and user preferences
 
-- Service layer implementation
-- Error handling and loading states
-- Type-safe API client setup
-- Real-time features preparation
+✅ **Game Management**
+
+- Games catalog with search, filtering, and pagination
+- Game detail pages with comprehensive information
+- Similar games recommendations
+- Game caching and optimization strategies
+- Support for game developers, publishers, genres, and platforms
+
+✅ **Review System**
+
+- Complete review CRUD operations
+- Rating system implementation
+- Review pagination and filtering by game/user
+- Social interactions (like/unlike reviews)
+- Review moderation capabilities
+- Optimistic updates for review actions
+
+✅ **Social Features**
+
+- User profile management
+- Activity feed implementation
+- Follow/unfollow functionality
+- Social statistics tracking
+- User search and discovery
+
+✅ **Admin Dashboard**
+
+- Role-based admin panel access
+- Content management interfaces
+- User administration capabilities
+- Game and review moderation tools
+- Admin-specific API endpoints and services
+
+### Implementation Priorities for Enhancement
+
+🔧 **UI Components & Pages**
+
+- Implement missing React components (GameCard, ReviewCard, etc.)
+- Create actual page implementations for games, users, and reviews
+- Build responsive layouts and component styling
+- Add loading skeletons and error boundaries
+
+🔧 **Advanced Features**
+
+- Real-time notifications and WebSocket integration
+- Advanced search with autocomplete
+- Infinite scrolling and virtual pagination
+- Image optimization and lazy loading
+- PWA features and offline functionality
+
+🔧 **Performance & UX**
+
+- Implement service workers for caching
+- Add background sync for user actions
+- Optimize bundle sizes and code splitting
+- Add comprehensive error handling and retry mechanisms
+- Implement comprehensive loading states and skeleton screens
 
 ### Development Guidelines
 
-1. **Type Safety First**: Always use types from `@questlog/shared-types` for API interactions
-2. **Performance Conscious**: Default to static generation, use client-side rendering only when necessary
-3. **Progressive Enhancement**: Ensure core functionality works without JavaScript
-4. **Component Reusability**: Build composable components that work across different contexts
-5. **Accessibility**: Include ARIA labels, keyboard navigation, and screen reader support
-6. **Mobile-First**: Design and implement with mobile devices as the primary consideration
+1. **Type Safety First**: Always use types from `@questlog/shared-types` for API interactions - fully implemented across all services and hooks
+2. **Performance Conscious**: Default to static generation, use client-side rendering only when necessary - architecture supports hybrid rendering
+3. **Progressive Enhancement**: Ensure core functionality works without JavaScript - NoScript fallbacks implemented
+4. **Component Reusability**: Build composable components that work across different contexts - component architecture established
+5. **Accessibility**: Include ARIA labels, keyboard navigation, and screen reader support - responsive navigation implemented
+6. **Mobile-First**: Design and implement with mobile devices as the primary consideration - mobile-responsive navigation and layouts
+7. **State Management**: Leverage comprehensive Nanostores implementation for consistent global state
+8. **Error Handling**: Use established error handling patterns across all API services
+9. **Caching**: Utilize implemented caching strategies for optimal performance
+10. **Role-Based Access**: Leverage role-based authentication system for proper access control
 
-This frontend architecture provides a solid foundation for building a modern, performant, and scalable gaming social network that can grow to support advanced features while maintaining excellent user experience and developer productivity.
+### Architecture Strengths
+
+This frontend implementation demonstrates several architectural strengths:
+
+- **Complete Service Layer**: All backend domains have corresponding frontend services with comprehensive error handling
+- **Consistent State Management**: Nanostores implementation across all features with computed selectors and actions
+- **Type Safety**: Complete integration with shared types package ensures API contract adherence
+- **Scalable Hook Architecture**: Domain-specific hooks provide consistent patterns for component integration
+- **Authentication System**: Robust authentication with role-based access, persistence, and automatic token management
+- **Performance Optimization**: Caching strategies, optimistic updates, and efficient state management
+- **Developer Experience**: Comprehensive TypeScript integration, consistent patterns, and clear separation of concerns
+
+This frontend architecture provides a solid, well-implemented foundation for a modern, performant, and scalable gaming social network with most core features already implemented and ready for UI enhancement and advanced feature development.
