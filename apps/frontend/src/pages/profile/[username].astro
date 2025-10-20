@@ -1,0 +1,114 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import ProfilePage from '@/components/profile/ProfilePage';
+import { fetchUserProfile } from '@/services/users';
+import type { UserProfile } from '@questlog/shared-types';
+
+// This page is server-rendered (SSR enabled at config level)
+
+// ============================================================================
+// Server-Side Data Fetching
+// ============================================================================
+
+const { username } = Astro.params;
+
+// Validate username parameter
+if (!username) {
+  return Astro.redirect('/404');
+}
+
+let profile: UserProfile | null = null;
+
+try {
+  // Fetch user profile from API
+  profile = await fetchUserProfile(username);
+} catch (err: any) {
+  // Handle 404 - User not found
+  if (err.status === 404) {
+    return new Response(null, {
+      status: 404,
+      statusText: 'User not found',
+    });
+  }
+
+  // Handle other errors
+  console.error('Error fetching user profile:', err);
+}
+
+// If profile fetch failed (and not 404), show error page
+if (!profile) {
+  return new Response(null, {
+    status: 500,
+    statusText: 'Internal Server Error',
+  });
+}
+
+// ============================================================================
+// SEO Meta Tags
+// ============================================================================
+
+const displayName = profile.displayName || profile.username;
+const pageTitle = `${displayName} (@${profile.username}) - Questlog`;
+const pageDescription = profile.bio 
+  ? `${profile.bio} - View ${displayName}'s gaming profile, reviews, and activity on Questlog.`
+  : `View ${displayName}'s gaming profile, reviews, and activity on Questlog. Follow to see their latest game reviews and recommendations.`;
+
+// Profile image for Open Graph
+const profileImage = profile.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profile.username)}`;
+
+// Canonical URL
+const canonicalURL = new URL(`/profile/${profile.username}`, Astro.site || Astro.url.origin).toString();
+
+// Structured data for rich results
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  'mainEntity': {
+    '@type': 'Person',
+    'name': displayName,
+    'alternateName': profile.username,
+    'description': profile.bio || `Gaming profile for ${displayName}`,
+    'image': profileImage,
+    'url': canonicalURL,
+    'interactionStatistic': [
+      {
+        '@type': 'InteractionCounter',
+        'interactionType': 'https://schema.org/WriteAction',
+        'userInteractionCount': profile.stats.reviewsCount,
+        'name': 'Reviews'
+      },
+      {
+        '@type': 'InteractionCounter',
+        'interactionType': 'https://schema.org/FollowAction',
+        'userInteractionCount': profile.stats.followersCount,
+        'name': 'Followers'
+      },
+      {
+        '@type': 'InteractionCounter',
+        'interactionType': 'https://schema.org/FollowAction',
+        'userInteractionCount': profile.stats.followingCount,
+        'name': 'Following'
+      }
+    ]
+  }
+};
+
+---
+
+<MainLayout
+  title={pageTitle}
+  description={pageDescription}
+  image={profileImage}
+  canonicalURL={canonicalURL}
+  noIndex={profile.isPrivate}
+>
+  <!-- Structured Data -->
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <!-- Profile Page Content -->
+  <ProfilePage 
+    profile={profile}
+    username={username}
+    client:load
+  />
+</MainLayout>
