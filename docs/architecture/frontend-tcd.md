@@ -18,17 +18,22 @@
 
 ### Current Implementation Features
 
-- **Hybrid Static/Dynamic Architecture**: Astro 5.x for static generation with React 19.x Islands for interactivity
+- **Server-Side Rendering Architecture**: Astro 5.x with SSR by default and opt-in static generation using `export const prerender = true`
+- **React 19.x Islands**: Selective client-side hydration for interactive components with Radix UI primitives
 - **Type-Safe API Client**: Complete integration with backend APIs using `@questlog/shared-types`
-- **Responsive UI System**: Tailwind CSS v4 with custom component library and Lucide React icons
+- **Accessible Component Library**: Radix UI primitives (Avatar, Dialog, Tabs) with Tailwind CSS styling
+- **Responsive UI System**: Mobile-first Tailwind CSS v4 design with responsive grids and Lucide React icons
 - **Authentication System**: Complete login/register flow with JWT token management, role-based access control, and persistent authentication
+- **User Profile Feature**: Complete implementation with ProfileHeader, ProfileTabs, FollowList, ReviewList, and EditProfileDialog
+- **Optimistic UI Updates**: Follow/unfollow actions with instant feedback and automatic rollback on errors
 - **Game Management**: Comprehensive games catalog with search, filtering, pagination, and detailed game pages
 - **Review System**: Full review CRUD operations with ratings, social interactions (like/unlike), and game-specific reviews
 - **Social Features**: User profiles, activity feeds, follow/unfollow functionality, and social statistics
 - **Admin Dashboard**: Role-based admin panel for managing games, users, reviews, and platform content
 - **Developer Tools**: Complete service layer architecture with specialized hooks for each domain
 - **State Management**: Comprehensive Nanostores implementation with persistent auth state and optimistic updates
-- **Performance Optimization**: Code splitting, lazy loading, caching strategies, and optimized asset delivery
+- **Performance Optimization**: SSR for initial page load, code splitting, lazy loading, caching strategies, and optimized asset delivery
+- **SEO Optimization**: Dynamic meta tags, Open Graph, structured data (Schema.org), and canonical URLs
 
 ### Future Vision
 
@@ -40,6 +45,7 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 
 - **Framework**: Astro 5.x (Static Site Generator with hybrid rendering)
 - **UI Library**: React 19.x for interactive components (Islands Architecture)
+- **UI Components**: Radix UI primitives for accessible, unstyled components
 - **Styling**: Tailwind CSS v4 with utility-first approach
 - **Type Safety**: TypeScript with strict mode and `@questlog/shared-types` integration
 - **State Management**: Nanostores for global state, React state for local component state
@@ -49,7 +55,10 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 ### Key Dependencies
 
 - **@astrojs/react**: React 19.x integration for Astro Islands
-- **@astrojs/vercel**: Vercel deployment integration
+- **@astrojs/node**: Node.js adapter for server-side rendering
+- **@radix-ui/react-avatar**: Accessible avatar component primitives
+- **@radix-ui/react-dialog**: Accessible modal dialog primitives
+- **@radix-ui/react-tabs**: Accessible tabs component primitives
 - **@nanostores/react**: React bindings for Nanostores state management
 - **@questlog/shared-types**: Type-safe API contracts from backend
 - **@questlog/ui-components**: Shared component library
@@ -67,7 +76,7 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 
 - **Hybrid Architecture**: Perfect balance between static generation and dynamic interactivity
 - **Islands Architecture**: Ship minimal JavaScript, only for components that need interactivity
-- **SEO Optimization**: Server-side generation for excellent search engine visibility
+- **SEO Optimization**: Server-side rendering for excellent search engine visibility and dynamic content
 - **Performance**: Zero JavaScript by default, progressive enhancement approach
 - **Framework Agnostic**: Can integrate React, Vue, Svelte, or other frameworks as needed
 - **Developer Experience**: Modern tooling with TypeScript, Vite, and hot module replacement
@@ -87,6 +96,15 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 - **Responsive Design**: Mobile-first responsive design out of the box
 - **Developer Experience**: IntelliSense support and consistent class naming
 
+**Radix UI** provides:
+
+- **Accessibility**: WCAG compliant components with proper ARIA attributes
+- **Unstyled**: Complete styling control with Tailwind CSS
+- **Composable**: Flexible primitives that compose into complex components
+- **Type-Safe**: Full TypeScript support with excellent type definitions
+- **Battle-Tested**: Production-ready components used by major companies
+- **Focus Management**: Automatic focus handling and keyboard navigation
+
 ## 3. Architecture & Design Patterns
 
 ### Overall Architecture
@@ -105,22 +123,22 @@ The frontend follows a **hybrid static/dynamic architecture** with clear separat
 
 ```tree
 src/
-├── pages/                    # Astro pages (SSG/SSR)
-│   ├── index.astro          # Home page
-│   ├── games/               # Game catalog pages
-│   │   ├── index.astro      # Games listing with SSG
-│   │   └── [slug].astro     # Individual game pages (SSG)
-│   ├── users/               # User profile pages
-│   │   └── [username].astro # User profile pages (SSG)
-│   ├── reviews/             # Review pages
-│   │   └── [id].astro       # Individual review pages (SSG)
-│   ├── auth/                # Authentication pages
-│   │   ├── login.astro      # Login page
-│   │   ├── register.astro   # Registration page
-│   │   └── reset.astro      # Password reset page
-│   ├── feed/                # Social feed (hybrid SSR/CSR)
+├── pages/                    # Astro pages (SSR by default, opt-in SSG)
+│   ├── index.astro          # Home page (future)
+│   ├── games/               # Game catalog pages (future)
+│   │   ├── index.astro      # Games listing
+│   │   └── [slug].astro     # Individual game pages
+│   ├── profile/             # User profile pages (✅ IMPLEMENTED)
+│   │   └── [username].astro # User profile pages (SSR with dynamic data and SEO)
+│   ├── reviews/             # Review pages (future)
+│   │   └── [id].astro       # Individual review pages
+│   ├── auth/                # Authentication pages (✅ STATIC with prerender)
+│   │   ├── login.astro      # Login page (export const prerender = true)
+│   │   ├── register.astro   # Registration page (export const prerender = true)
+│   │   └── reset.astro      # Password reset page (future)
+│   ├── feed/                # Social feed (future)
 │   │   └── index.astro      # Activity feed page
-│   ├── admin/               # Admin panel (protected)
+│   ├── admin/               # Admin panel (protected) (future)
 │   │   └── index.astro      # Admin dashboard
 │   └── indie/               # Indie games showcase (future)
 │       └── index.astro      # Indie showcase page
@@ -145,20 +163,21 @@ src/
 │   ├── reviews/             # Review components
 │   │   ├── ReviewForm.tsx   # Review creation/editing
 │   │   ├── ReviewCard.tsx   # Review display component
-│   │   ├── ReviewList.tsx   # Review listing with pagination
 │   │   ├── RatingStars.tsx  # Star rating component
 │   │   └── ReviewFilters.tsx# Review filtering controls
 │   ├── social/              # Social features
 │   │   ├── FeedItem.tsx     # Activity feed item
 │   │   ├── ActivityFeed.tsx # Social activity feed
-│   │   ├── FollowButton.tsx # Follow/unfollow button
 │   │   ├── UserCard.tsx     # User profile card
 │   │   └── SocialStats.tsx  # Social statistics display
-│   ├── profile/             # User profile components
-│   │   ├── ProfileHeader.tsx# Profile banner and info
-│   │   ├── ProfileEdit.tsx  # Profile editing form
-│   │   ├── UserReviews.tsx  # User's reviews list
-│   │   └── FollowersList.tsx# Followers/following lists
+│   ├── profile/             # User profile components (✅ IMPLEMENTED)
+│   │   ├── ProfilePage.tsx  # Main profile page component with SSR data initialization
+│   │   ├── ProfileHeader.tsx# Profile header with avatar (Radix Avatar), bio, stats, and actions
+│   │   ├── ProfileTabs.tsx  # Tab navigation (Radix Tabs) for Reviews/Followers/Following
+│   │   ├── ReviewList.tsx   # User's reviews list with infinite scroll and responsive grid
+│   │   ├── FollowList.tsx   # Followers/following lists with pagination and responsive grid
+│   │   ├── FollowButton.tsx # Follow/unfollow button with optimistic updates
+│   │   └── EditProfileDialog.tsx # Profile editing modal (Radix Dialog)
 │   ├── search/              # Search components
 │   │   ├── SearchBar.tsx    # Global search component
 │   │   ├── SearchFilters.tsx# Advanced search filters
@@ -245,57 +264,115 @@ src/
 
 ## 4. Page Types & Rendering Strategy
 
-The application uses different rendering strategies based on content type and user interaction requirements:
+The application uses **Server-Side Rendering (SSR) by default** with opt-in static generation for specific pages. This is configured in `astro.config.mjs` with `output: 'server'` and `adapter: node()`.
 
-### Static Pages (SSG - Static Site Generation)
+### Rendering Configuration
 
-**Game Catalog Pages**:
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  output: 'server', // SSR by default
+  adapter: node({ mode: 'standalone' }),
+  // ...
+});
+```
 
-- `/games` - Games listing with pagination (pre-rendered)
-- `/games/[slug]` - Individual game detail pages (pre-rendered from API data)
-- Benefits: Fast loading, excellent SEO, cacheable content
+### Static Pages (Opt-in SSG with `export const prerender = true`)
 
-**User Profiles**:
+**Authentication Pages**:
 
-- `/users/[username]` - Public user profiles (pre-rendered)
-- `/users/[username]/reviews` - User reviews (pre-rendered with pagination)
-- `/users/[username]/followers` - Follower lists (pre-rendered)
-- Benefits: Fast profile loading, social media sharing optimization
+- `/auth/login` - Login form (static with client-side validation)
+- `/auth/register` - Registration form (static with client-side validation)
+- Benefits: Fast loading, cacheable, no server computation needed
 
-**Review Pages**:
-
-- `/reviews/[id]` - Individual review detail pages (pre-rendered)
-- Benefits: SEO optimization for review content, fast loading
-
-**Marketing & Info Pages**:
+**Marketing & Info Pages** (Future):
 
 - `/` - Home page with featured content
 - `/about` - About page
 - `/privacy` - Privacy policy
 - `/terms` - Terms of service
 
-### Hybrid Pages (SSR + Client Hydration)
+**Usage Pattern**:
 
-**Authentication Pages**:
+```astro
+---
+// Add this directive to opt into static generation
+export const prerender = true;
 
-- `/auth/login` - Login form (static shell, dynamic form validation)
-- `/auth/register` - Registration form (static shell, dynamic validation)
-- `/auth/reset` - Password reset (static shell, dynamic form handling)
+import LoginForm from '@/components/auth/LoginForm';
+---
 
-**Social Feed**:
+<MainLayout>
+  <LoginForm client:load />
+</MainLayout>
+```
 
-- `/feed` - Activity feed (server-rendered initial content, client-side updates)
-- Benefits: Fast initial load, real-time updates after hydration
+### Server-Side Rendered Pages (SSR - Default)
 
-### Client-Side Rendered Components (CSR)
+**User Profiles**:
 
-**Interactive Features**:
+- `/profile/[username]` - Dynamic user profiles (server-rendered with client hydration)
+- Benefits: Real-time data, personalized content, SEO optimization
+- Pattern: Server fetches data → Hydrates React Islands with initial data → Client loads additional data
 
+**Game Pages** (Future):
+
+- `/games` - Games listing with pagination
+- `/games/[slug]` - Individual game detail pages
+- Benefits: Dynamic content, search indexing, personalized recommendations
+
+**Review Pages** (Future):
+
+- `/reviews/[id]` - Individual review detail pages
+- Benefits: Real-time review data, social interactions
+
+**Social Feed** (Future):
+
+- `/feed` - Personalized activity feed
+- Benefits: Dynamic content, authentication-based data, real-time updates
+
+### Server-Side Rendering Pattern
+
+```astro
+---
+// No prerender directive = SSR by default
+import ProfilePage from '@/components/profile/ProfilePage';
+import { fetchUserProfile } from '@/services/users';
+
+const { username } = Astro.params;
+
+// Server-side data fetching
+const profile = await fetchUserProfile(username);
+
+if (!profile) {
+  return new Response(null, { status: 404 });
+}
+---
+
+<MainLayout>
+  <!-- Hydrate with server-fetched data -->
+  <ProfilePage profile={profile} username={username} client:load />
+</MainLayout>
+```
+
+### Client-Side Rendered Components (CSR Islands)
+
+**Interactive Features** (React Islands with `client:load` directive):
+
+- Profile editing modal (Radix Dialog)
+- Follow/unfollow buttons with optimistic updates
+- Review creation and editing forms
 - Search and filtering interfaces
-- Form submissions and validation
-- Social interactions (follow, like, comment)
-- Real-time notifications
+- Social interactions (like, comment)
+- Tab navigation (Radix Tabs)
 - User preference updates
+
+**Hydration Directives**:
+
+- `client:load` - Hydrate immediately on page load (interactive components)
+- `client:idle` - Hydrate when browser is idle (lower priority)
+- `client:visible` - Hydrate when component is visible (lazy loading)
+- `client:only` - Skip server rendering, client-only (rare cases)
 
 ### API Integration Strategy
 
@@ -915,28 +992,41 @@ pnpm build:analyze          # Analyze bundle size
 
 ### Implementation Priorities for Enhancement
 
-🔧 **UI Components & Pages**
+✅ **Profile Feature - COMPLETE**
 
-- Implement missing React components (GameCard, ReviewCard, etc.)
-- Create actual page implementations for games, users, and reviews
-- Build responsive layouts and component styling
-- Add loading skeletons and error boundaries
+- ✅ ProfilePage component with SSR data initialization
+- ✅ ProfileHeader with Radix Avatar, responsive layout, stats
+- ✅ ProfileTabs with Radix Tabs for navigation
+- ✅ ReviewList with infinite scroll and responsive grid (mobile: 1 col, tablet: 2 cols, desktop: 3 cols)
+- ✅ FollowList with pagination and responsive grid
+- ✅ FollowButton with optimistic updates and error rollback
+- ✅ EditProfileDialog with Radix Dialog
+- ✅ Mobile-first responsive design throughout
+- ✅ Loading skeletons for all content sections
+- ✅ SEO optimization with dynamic meta tags and structured data
+
+🔧 **Games & Reviews Pages**
+
+- Implement games catalog page with search and filtering
+- Create game detail pages with SSR
+- Build review detail pages with social interactions
+- Add review creation and editing forms
 
 🔧 **Advanced Features**
 
 - Real-time notifications and WebSocket integration
 - Advanced search with autocomplete
-- Infinite scrolling and virtual pagination
 - Image optimization and lazy loading
 - PWA features and offline functionality
+- Activity feed with real-time updates
 
 🔧 **Performance & UX**
 
 - Implement service workers for caching
 - Add background sync for user actions
-- Optimize bundle sizes and code splitting
-- Add comprehensive error handling and retry mechanisms
-- Implement comprehensive loading states and skeleton screens
+- Further optimize bundle sizes and code splitting
+- Expand error boundaries to all major sections
+- Add more loading states and skeleton screens
 
 ### Development Guidelines
 
