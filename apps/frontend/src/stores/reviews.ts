@@ -202,11 +202,32 @@ export function updateReviewDetail(updates: Partial<ReviewResponse>) {
 // ============================================================================
 
 /**
- * Set user reviews data
+ * Set user reviews data (replaces existing data)
  */
 export function setUserReviews(data: PaginatedReviewsResponse, userId: string) {
   $userReviews.set(data);
   $currentUserReviewsId.set(userId);
+}
+
+/**
+ * Append user reviews data (for infinite scroll pagination)
+ */
+export function appendUserReviews(data: PaginatedReviewsResponse) {
+  const currentData = $userReviews.get();
+
+  if (!currentData) {
+    $userReviews.set(data);
+    return;
+  }
+
+  // Merge items, avoiding duplicates
+  const existingIds = new Set(currentData.items.map((item) => item.id));
+  const newItems = data.items.filter((item) => !existingIds.has(item.id));
+
+  $userReviews.set({
+    ...data,
+    items: [...currentData.items, ...newItems],
+  });
 }
 
 /**
@@ -230,11 +251,32 @@ export function clearUserReviewsState() {
 // ============================================================================
 
 /**
- * Set game reviews data
+ * Set game reviews data (replaces existing data)
  */
 export function setGameReviews(data: PaginatedReviewsResponse, gameId: string) {
   $gameReviews.set(data);
   $currentGameReviewsId.set(gameId);
+}
+
+/**
+ * Append game reviews data (for infinite scroll pagination)
+ */
+export function appendGameReviews(data: PaginatedReviewsResponse) {
+  const currentData = $gameReviews.get();
+
+  if (!currentData) {
+    $gameReviews.set(data);
+    return;
+  }
+
+  // Merge items, avoiding duplicates
+  const existingIds = new Set(currentData.items.map((item) => item.id));
+  const newItems = data.items.filter((item) => !existingIds.has(item.id));
+
+  $gameReviews.set({
+    ...data,
+    items: [...currentData.items, ...newItems],
+  });
 }
 
 /**

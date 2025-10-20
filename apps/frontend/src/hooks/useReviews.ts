@@ -29,8 +29,10 @@ import {
   setReviewDetailError,
   setReviewDetail,
   setUserReviews,
+  appendUserReviews,
   setUserReviewsLoading,
   setGameReviews,
+  appendGameReviews,
   setGameReviewsLoading,
   setReviewActionLoading,
   setReviewActionError,
@@ -90,6 +92,10 @@ interface UseUserReviewsReturn {
 
   // Actions
   fetchUserReviews: (
+    userId: string,
+    query?: Omit<ReviewsQuery, 'userId'>,
+  ) => Promise<PaginatedReviewsResponse>;
+  fetchMoreUserReviews: (
     userId: string,
     query?: Omit<ReviewsQuery, 'userId'>,
   ) => Promise<PaginatedReviewsResponse>;
@@ -504,6 +510,30 @@ export function useUserReviews(): UseUserReviewsReturn {
     [],
   );
 
+  const fetchMoreUserReviews = useCallback(
+    async (
+      userId: string,
+      query: Omit<ReviewsQuery, 'userId'> = {},
+    ): Promise<PaginatedReviewsResponse> => {
+      setUserReviewsLoading(true);
+      setReviewsError(null); // Clear any existing errors
+
+      try {
+        const response = await reviewsService.getReviewsByUser(userId, query);
+        appendUserReviews(response); // Append instead of replace
+        return response;
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Failed to fetch more user reviews';
+        setReviewsError(errorMessage);
+        throw error;
+      } finally {
+        setUserReviewsLoading(false);
+      }
+    },
+    [],
+  );
+
   // ============================================================================
   // Utility Actions
   // ============================================================================
@@ -534,6 +564,7 @@ export function useUserReviews(): UseUserReviewsReturn {
 
     // Actions
     fetchUserReviews,
+    fetchMoreUserReviews,
     clearError,
     clearData,
 
