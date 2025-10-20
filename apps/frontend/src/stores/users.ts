@@ -1,5 +1,10 @@
 import { atom } from 'nanostores';
-import type { UserResponse, UserProfile, PaginatedResponse } from '@questlog/shared-types';
+import type {
+  UserResponse,
+  UserProfile,
+  PaginatedResponse,
+  UpdateProfileRequest,
+} from '@questlog/shared-types';
 
 // ============================================================================
 // Users State
@@ -57,6 +62,35 @@ export const $profileUpdateError = atom<string | null>(null);
  * Username availability cache
  */
 export const $usernameAvailability = atom<Record<string, boolean>>({});
+
+// ============================================================================
+// Viewed User Profile State (User Profile Feature)
+// ============================================================================
+
+/**
+ * Currently viewed user profile
+ */
+export const $viewedProfile = atom<UserProfile | null>(null);
+
+/**
+ * Followers of the viewed user
+ */
+export const $viewedFollowers = atom<PaginatedResponse<UserResponse> | null>(null);
+
+/**
+ * Users that the viewed user follows
+ */
+export const $viewedFollowing = atom<PaginatedResponse<UserResponse> | null>(null);
+
+/**
+ * Viewed profile loading state
+ */
+export const $profileLoading = atom<boolean>(false);
+
+/**
+ * Viewed profile error state
+ */
+export const $profileError = atom<string | null>(null);
 
 // ============================================================================
 // Users State Actions
@@ -258,6 +292,72 @@ export function clearProfileUpdateState(): void {
 }
 
 // ============================================================================
+// Viewed User Profile Actions (User Profile Feature)
+// ============================================================================
+
+/**
+ * Set viewed profile
+ */
+export function setViewedProfile(profile: UserProfile | null): void {
+  $viewedProfile.set(profile);
+  $profileError.set(null);
+}
+
+/**
+ * Set viewed followers
+ */
+export function setViewedFollowers(followers: PaginatedResponse<UserResponse> | null): void {
+  $viewedFollowers.set(followers);
+}
+
+/**
+ * Set viewed following
+ */
+export function setViewedFollowing(following: PaginatedResponse<UserResponse> | null): void {
+  $viewedFollowing.set(following);
+}
+
+/**
+ * Set profile loading state
+ */
+export function setProfileLoading(loading: boolean): void {
+  $profileLoading.set(loading);
+  if (loading) {
+    $profileError.set(null);
+  }
+}
+
+/**
+ * Set profile error
+ */
+export function setProfileError(error: string | null): void {
+  $profileError.set(error);
+  $profileLoading.set(false);
+}
+
+/**
+ * Clear viewed profile state
+ */
+export function clearViewedProfileState(): void {
+  $viewedProfile.set(null);
+  $viewedFollowers.set(null);
+  $viewedFollowing.set(null);
+  $profileLoading.set(false);
+  $profileError.set(null);
+}
+
+/**
+ * Update viewed profile with partial data (optimistic updates)
+ */
+export function updateViewedProfile(updates: Partial<UserProfile>): void {
+  const currentProfile = $viewedProfile.get();
+  if (currentProfile) {
+    const updatedProfile = { ...currentProfile, ...updates };
+    setViewedProfile(updatedProfile);
+  }
+}
+
+// ============================================================================
 // Users State Helpers
 // ============================================================================
 
@@ -343,4 +443,122 @@ export function getUserAvatarUrl(userId: string, size: number = 40): string {
   // Fallback to generated avatar based on username
   const username = userData.username || 'Anonymous';
   return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(username)}&size=${size}`;
+}
+
+// ============================================================================
+// Service Integration Actions (User Profile Feature)
+// ============================================================================
+
+/**
+ * Load user profile by username and populate the viewed profile state
+ *
+ * @param username - The username of the user to load
+ *
+ * @example
+ * ```typescript
+ * await loadUserProfile('johndoe');
+ * ```
+ */
+export async function loadUserProfile(username: string): Promise<void> {
+  setProfileLoading(true);
+
+  try {
+    const { fetchUserProfile } = await import('../services/users');
+    const profile = await fetchUserProfile(username);
+
+    setViewedProfile(profile);
+    setProfileLoading(false);
+  } catch (error: any) {
+    const errorMessage = error?.message || 'Failed to load user profile';
+    setProfileError(errorMessage);
+    console.error('Failed to load user profile:', error);
+  }
+}
+
+/**
+ * Load user followers by username and populate the viewed followers state
+ *
+ * @param username - The username of the user whose followers to load
+ *
+ * @example
+ * ```typescript
+ * await loadUserFollowers('johndoe');
+ * ```
+ */
+export async function loadUserFollowers(username: string): Promise<void> {
+  try {
+    const { fetchUserFollowers } = await import('../services/users');
+    const followers = await fetchUserFollowers(username);
+
+    setViewedFollowers(followers);
+  } catch (error: any) {
+    console.error('Failed to load user followers:', error);
+    throw error;
+  }
+}
+
+/**
+ * Load user following by username and populate the viewed following state
+ *
+ * @param username - The username of the user whose following list to load
+ *
+ * @example
+ * ```typescript
+ * await loadUserFollowing('johndoe');
+ * ```
+ */
+export async function loadUserFollowing(username: string): Promise<void> {
+  try {
+    const { fetchUserFollowing } = await import('../services/users');
+    const following = await fetchUserFollowing(username);
+
+    setViewedFollowing(following);
+  } catch (error: any) {
+    console.error('Failed to load user following:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update current user's profile and update the $currentUser atom in auth store
+ *
+ * @param data - Profile update data
+ * @returns Promise resolving to updated profile
+ *
+ * @example
+ * ```typescript
+ * await updateProfile({
+ *   displayName: 'John Doe',
+ *   bio: 'Gaming enthusiast',
+ * });
+ * ```
+ */
+export async function updateProfile(data: UpdateProfileRequest): Promise<UserProfile> {
+  setProfileUpdateLoading(true);
+
+  try {
+    const { updateProfile: updateProfileService } = await import('../services/users');
+    const { updateCurrentUser } = await import('./auth');
+
+    const updatedProfile = await updateProfileService(data);
+
+    // Update current user profile in users store
+    setCurrentUserProfile(updatedProfile);
+
+    // Update current user in auth store with the new profile data
+    updateCurrentUser({
+      username: updatedProfile.username,
+      email: updatedProfile.email,
+      avatar: updatedProfile.avatar,
+      // Map other relevant fields from UserProfile to AuthUser
+    });
+
+    setProfileUpdateLoading(false);
+    return updatedProfile;
+  } catch (error: any) {
+    const errorMessage = error?.message || 'Failed to update profile';
+    setProfileUpdateError(errorMessage);
+    console.error('Failed to update profile:', error);
+    throw error;
+  }
 }

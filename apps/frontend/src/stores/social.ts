@@ -377,3 +377,131 @@ export function clearSocialStatsState(): void {
   $socialStatsLoading.set(false);
   $socialStatsError.set(null);
 }
+
+// ============================================================================
+// Service Integration Actions (User Profile Feature)
+// ============================================================================
+
+/**
+ * Follow a user with optimistic update logic
+ * Temporarily modifies the viewed profile follower count and follow status
+ * before the API call returns
+ *
+ * @param userId - The user ID to follow
+ *
+ * @example
+ * ```typescript
+ * await followUser('user-id');
+ * ```
+ */
+export async function followUser(userId: string): Promise<void> {
+  // Optimistic update - immediately update UI
+  setFollowActionLoading(userId, true);
+  setFollowingStatus(userId, true);
+
+  // Update viewed profile if it matches the user being followed
+  const { $viewedProfile, updateViewedProfile } = await import('./users');
+  const viewedProfile = $viewedProfile.get();
+
+  if (viewedProfile && viewedProfile.id === userId) {
+    updateViewedProfile({
+      isFollowing: true,
+      stats: {
+        ...viewedProfile.stats,
+        followersCount: viewedProfile.stats.followersCount + 1,
+      },
+    });
+  }
+
+  // Update current user's following count
+  updateCurrentUserStatsAfterFollow(true);
+
+  try {
+    const { followUser: followUserService } = await import('../services/social');
+    await followUserService(userId);
+
+    // Success - optimistic update was correct
+    setFollowActionLoading(userId, false);
+  } catch (error: any) {
+    // Rollback optimistic updates on error
+    setFollowingStatus(userId, false);
+
+    if (viewedProfile && viewedProfile.id === userId) {
+      updateViewedProfile({
+        isFollowing: false,
+        stats: {
+          ...viewedProfile.stats,
+          followersCount: Math.max(0, viewedProfile.stats.followersCount - 1),
+        },
+      });
+    }
+
+    updateCurrentUserStatsAfterFollow(false);
+
+    setFollowActionLoading(userId, false);
+    console.error('Failed to follow user:', error);
+    throw error;
+  }
+}
+
+/**
+ * Unfollow a user with optimistic update logic
+ * Temporarily modifies the viewed profile follower count and follow status
+ * before the API call returns
+ *
+ * @param userId - The user ID to unfollow
+ *
+ * @example
+ * ```typescript
+ * await unfollowUser('user-id');
+ * ```
+ */
+export async function unfollowUser(userId: string): Promise<void> {
+  // Optimistic update - immediately update UI
+  setFollowActionLoading(userId, true);
+  setFollowingStatus(userId, false);
+
+  // Update viewed profile if it matches the user being unfollowed
+  const { $viewedProfile, updateViewedProfile } = await import('./users');
+  const viewedProfile = $viewedProfile.get();
+
+  if (viewedProfile && viewedProfile.id === userId) {
+    updateViewedProfile({
+      isFollowing: false,
+      stats: {
+        ...viewedProfile.stats,
+        followersCount: Math.max(0, viewedProfile.stats.followersCount - 1),
+      },
+    });
+  }
+
+  // Update current user's following count
+  updateCurrentUserStatsAfterFollow(false);
+
+  try {
+    const { unfollowUser: unfollowUserService } = await import('../services/social');
+    await unfollowUserService(userId);
+
+    // Success - optimistic update was correct
+    setFollowActionLoading(userId, false);
+  } catch (error: any) {
+    // Rollback optimistic updates on error
+    setFollowingStatus(userId, true);
+
+    if (viewedProfile && viewedProfile.id === userId) {
+      updateViewedProfile({
+        isFollowing: true,
+        stats: {
+          ...viewedProfile.stats,
+          followersCount: viewedProfile.stats.followersCount + 1,
+        },
+      });
+    }
+
+    updateCurrentUserStatsAfterFollow(true);
+
+    setFollowActionLoading(userId, false);
+    console.error('Failed to unfollow user:', error);
+    throw error;
+  }
+}

@@ -169,6 +169,28 @@ class ReviewsService {
   }
 
   /**
+   * Fetch reviews by a specific user (alias for User Profile feature)
+   *
+   * @param userId - The user's unique identifier
+   * @param query - Query parameters for pagination and filtering
+   * @returns Promise resolving to paginated reviews response
+   *
+   * @example
+   * ```typescript
+   * const userReviews = await reviewsService.fetchUserReviews('user-id', {
+   *   page: 1,
+   *   limit: 10
+   * });
+   * ```
+   */
+  async fetchUserReviews(
+    userId: string,
+    query: Omit<ReviewsQuery, 'userId'> = {},
+  ): Promise<PaginatedReviewsResponse> {
+    return this.getReviewsByUser(userId, query);
+  }
+
+  /**
    * Get a specific user's review for a specific game
    *
    * @param userId - The user's unique identifier
@@ -457,20 +479,19 @@ export function createReviewsService(): ReviewsService {
 // Named Exports for Individual Functions
 // ============================================================================
 
-export const {
-  getAllReviews,
-  getReviewById,
-  getReviewsByGame,
-  getReviewsByUser,
-  getReviewByUserAndGame,
-  createReview,
-  updateReview,
-  deleteReview,
-  likeReview,
-  unlikeReview,
-  searchReviews,
-  getTopRatedReviews,
-  getRecentReviews,
-  getPopularReviews,
-  getReviewsByRatingRange,
-} = reviewsService;
+export const getAllReviews = reviewsService.getAllReviews.bind(reviewsService);
+export const getReviewById = reviewsService.getReviewById.bind(reviewsService);
+export const getReviewsByGame = reviewsService.getReviewsByGame.bind(reviewsService);
+export const getReviewsByUser = reviewsService.getReviewsByUser.bind(reviewsService);
+export const fetchUserReviews = reviewsService.fetchUserReviews.bind(reviewsService);
+export const getReviewByUserAndGame = reviewsService.getReviewByUserAndGame.bind(reviewsService);
+export const createReview = reviewsService.createReview.bind(reviewsService);
+export const updateReview = reviewsService.updateReview.bind(reviewsService);
+export const deleteReview = reviewsService.deleteReview.bind(reviewsService);
+export const likeReview = reviewsService.likeReview.bind(reviewsService);
+export const unlikeReview = reviewsService.unlikeReview.bind(reviewsService);
+export const searchReviews = reviewsService.searchReviews.bind(reviewsService);
+export const getTopRatedReviews = reviewsService.getTopRatedReviews.bind(reviewsService);
+export const getRecentReviews = reviewsService.getRecentReviews.bind(reviewsService);
+export const getPopularReviews = reviewsService.getPopularReviews.bind(reviewsService);
+export const getReviewsByRatingRange = reviewsService.getReviewsByRatingRange.bind(reviewsService);

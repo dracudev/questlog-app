@@ -508,3 +508,37 @@ export function getReviewsErrorState() {
     ),
   };
 }
+
+// ============================================================================
+// Service Integration Actions (User Profile Feature)
+// ============================================================================
+
+/**
+ * Load user reviews and populate the user reviews state
+ *
+ * @param userId - The user ID whose reviews to load
+ * @param query - Optional query parameters for pagination and filtering
+ *
+ * @example
+ * ```typescript
+ * await loadUserReviews('user-id', { page: 1, limit: 10 });
+ * ```
+ */
+export async function loadUserReviews(
+  userId: string,
+  query: import('@questlog/shared-types').ReviewsQuery = {},
+): Promise<void> {
+  setUserReviewsLoading(true);
+
+  try {
+    const { fetchUserReviews } = await import('../services/reviews');
+    const reviews = await fetchUserReviews(userId, query);
+
+    setUserReviews(reviews, userId);
+    setUserReviewsLoading(false);
+  } catch (error: any) {
+    setUserReviewsLoading(false);
+    console.error('Failed to load user reviews:', error);
+    throw error;
+  }
+}

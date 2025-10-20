@@ -16,8 +16,11 @@ const USERS_ENDPOINTS = {
   GET_USER_BY_ID: (userId: string) => `users/${userId}`,
   GET_USER_BY_USERNAME: (username: string) => `users/username/${username}`,
   GET_CURRENT_USER_PROFILE: 'users/me',
-  UPDATE_PROFILE: 'users/me',
+  UPDATE_PROFILE: 'users/profile',
   GET_USER_PROFILE: (userId: string) => `users/${userId}/profile`,
+  GET_USER_PROFILE_BY_USERNAME: (username: string) => `users/profile/${username}`,
+  GET_USER_FOLLOWERS: (username: string) => `users/profile/${username}/followers`,
+  GET_USER_FOLLOWING: (username: string) => `users/profile/${username}/following`,
 } as const;
 
 // ============================================================================
@@ -149,6 +152,70 @@ class UsersService {
     }
 
     return apiClient.get<UserProfile>(USERS_ENDPOINTS.GET_USER_PROFILE(userId));
+  }
+
+  /**
+   * Fetch user profile by username (for User Profile feature)
+   *
+   * @param username - The user's username
+   * @returns Promise resolving to user's public profile
+   *
+   * @example
+   * ```typescript
+   * const profile = await usersService.fetchUserProfile('johndoe');
+   * console.log(profile.displayName);
+   * ```
+   */
+  async fetchUserProfile(username: string): Promise<UserProfile> {
+    if (!username) {
+      throw new Error('Username is required');
+    }
+
+    return apiClient.get<UserProfile>(USERS_ENDPOINTS.GET_USER_PROFILE_BY_USERNAME(username));
+  }
+
+  /**
+   * Fetch user followers by username
+   *
+   * @param username - The user's username
+   * @returns Promise resolving to paginated list of followers
+   *
+   * @example
+   * ```typescript
+   * const followers = await usersService.fetchUserFollowers('johndoe');
+   * console.log(followers.items.length); // Number of followers
+   * ```
+   */
+  async fetchUserFollowers(username: string): Promise<PaginatedResponse<UserResponse>> {
+    if (!username) {
+      throw new Error('Username is required');
+    }
+
+    return apiClient.get<PaginatedResponse<UserResponse>>(
+      USERS_ENDPOINTS.GET_USER_FOLLOWERS(username),
+    );
+  }
+
+  /**
+   * Fetch users that this user follows by username
+   *
+   * @param username - The user's username
+   * @returns Promise resolving to paginated list of following users
+   *
+   * @example
+   * ```typescript
+   * const following = await usersService.fetchUserFollowing('johndoe');
+   * console.log(following.items.length); // Number of users being followed
+   * ```
+   */
+  async fetchUserFollowing(username: string): Promise<PaginatedResponse<UserResponse>> {
+    if (!username) {
+      throw new Error('Username is required');
+    }
+
+    return apiClient.get<PaginatedResponse<UserResponse>>(
+      USERS_ENDPOINTS.GET_USER_FOLLOWING(username),
+    );
   }
 
   /**
@@ -323,6 +390,9 @@ export const {
   getCurrentUserProfile,
   updateProfile,
   getUserProfile,
+  fetchUserProfile,
+  fetchUserFollowers,
+  fetchUserFollowing,
   searchUsers,
   getUsersPage,
   isUsernameAvailable,
