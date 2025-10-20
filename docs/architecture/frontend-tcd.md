@@ -271,8 +271,8 @@ The application uses **Server-Side Rendering (SSR) by default** with opt-in stat
 ```javascript
 // astro.config.mjs
 export default defineConfig({
-  output: 'server', // SSR by default
-  adapter: node({ mode: 'standalone' }),
+  output: "server", // SSR by default
+  adapter: node({ mode: "standalone" }),
   // ...
 });
 ```
