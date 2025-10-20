@@ -462,7 +462,7 @@ export class ReviewsService {
 
   async getReviewsByGame(
     gameId: string,
-    query: Omit<ReviewsQueryDto, 'gameId'>,
+    query: ReviewsQueryDto,
     currentUserId?: string,
   ): Promise<PaginatedReviewsResponseDto> {
     return this.findAll({ ...query, gameId }, currentUserId);
@@ -470,7 +470,7 @@ export class ReviewsService {
 
   async getReviewsByUser(
     userId: string,
-    query: Omit<ReviewsQueryDto, 'userId'>,
+    query: ReviewsQueryDto,
     currentUserId?: string,
   ): Promise<PaginatedReviewsResponseDto> {
     return this.findAll({ ...query, userId }, currentUserId);

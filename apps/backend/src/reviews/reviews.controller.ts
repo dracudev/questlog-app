@@ -115,7 +115,7 @@ export class ReviewsController {
   @ApiQuery({ name: 'sortOrder', required: false, type: String })
   async getReviewsByGame(
     @Param('gameId') gameId: string,
-    @Query() query: Omit<ReviewsQueryDto, 'gameId'>,
+    @Query() query: ReviewsQueryDto,
     @GetUser() user?: User,
   ): Promise<PaginatedReviewsResponseDto> {
     return this.reviewsService.getReviewsByGame(gameId, query, user?.id);
@@ -140,7 +140,7 @@ export class ReviewsController {
   @ApiQuery({ name: 'sortOrder', required: false, type: String })
   async getReviewsByUser(
     @Param('userId') userId: string,
-    @Query() query: Omit<ReviewsQueryDto, 'userId'>,
+    @Query() query: ReviewsQueryDto,
     @GetUser() user?: User,
   ): Promise<PaginatedReviewsResponseDto> {
     return this.reviewsService.getReviewsByUser(userId, query, user?.id);
