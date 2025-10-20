@@ -39,8 +39,8 @@ model User {
 
   // Relations
   reviews       Review[]
-  followers     Follow[] @relation("UserFollowers")
-  following     Follow[] @relation("UserFollowing")
+  followers     Follow[] @relation("UserFollowing")
+  following     Follow[] @relation("UserFollowers")
   likes         Like[]
   gameLists     GameList[]
   comments      Comment[]
