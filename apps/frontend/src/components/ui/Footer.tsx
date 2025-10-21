@@ -2,11 +2,27 @@ interface FooterProps {
   className?: string;
 }
 
+/**
+ * Site footer component with responsive layout and design system compliance
+ *
+ * Features:
+ * - Mobile-first responsive design (stacked on mobile, grid on desktop)
+ * - Full design token integration (backgrounds, text, spacing)
+ * - Social media links with proper accessibility
+ *
+ * @example
+ * ```tsx
+ * <Footer />
+ * ```
+ */
 export default function Footer({ className = '' }: FooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={`bg-secondary border-t border-tertiary ${className}`}>
+    <footer
+      className={`border-t border-tertiary ${className}`}
+      style={{ backgroundColor: 'var(--bg-primary)' }}
+    >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-8">
           {/* Main Footer Content */}
@@ -14,12 +30,19 @@ export default function Footer({ className = '' }: FooterProps) {
             {/* Brand Section */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-brand-primary rounded-md flex items-center justify-center">
-                  <span className="text-primary font-bold text-sm">Q</span>
+                <div
+                  className="w-8 h-8 rounded-md flex items-center justify-center"
+                  style={{ backgroundColor: 'var(--brand-primary)' }}
+                >
+                  <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
+                    Q
+                  </span>
                 </div>
-                <span className="font-bold text-xl text-primary">Questlog</span>
+                <span className="font-bold text-xl" style={{ color: 'var(--text-primary)' }}>
+                  Questlog
+                </span>
               </div>
-              <p className="text-sm text-muted max-w-md">
+              <p className="text-sm max-w-md" style={{ color: 'var(--text-muted)' }}>
                 The social network for gamers. Discover games, write reviews, and connect with
                 fellow gamers around the world.
               </p>
@@ -27,12 +50,17 @@ export default function Footer({ className = '' }: FooterProps) {
 
             {/* Quick Links */}
             <div>
-              <h3 className="text-sm font-semibold text-primary mb-4">Quick Links</h3>
+              <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Quick Links
+              </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/explore"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     Explore Games
                   </a>
@@ -40,7 +68,10 @@ export default function Footer({ className = '' }: FooterProps) {
                 <li>
                   <a
                     href="/reviews"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     Recent Reviews
                   </a>
@@ -48,7 +79,10 @@ export default function Footer({ className = '' }: FooterProps) {
                 <li>
                   <a
                     href="/about"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     About Us
                   </a>
@@ -56,7 +90,10 @@ export default function Footer({ className = '' }: FooterProps) {
                 <li>
                   <a
                     href="/blog"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     Blog
                   </a>
@@ -66,12 +103,17 @@ export default function Footer({ className = '' }: FooterProps) {
 
             {/* Support */}
             <div>
-              <h3 className="text-sm font-semibold text-primary mb-4">Support</h3>
+              <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Support
+              </h3>
               <ul className="space-y-2">
                 <li>
                   <a
                     href="/help"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     Help Center
                   </a>
@@ -79,7 +121,10 @@ export default function Footer({ className = '' }: FooterProps) {
                 <li>
                   <a
                     href="/support"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     Contact Support
                   </a>
@@ -87,7 +132,10 @@ export default function Footer({ className = '' }: FooterProps) {
                 <li>
                   <a
                     href="/privacy"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     Privacy Policy
                   </a>
@@ -95,7 +143,10 @@ export default function Footer({ className = '' }: FooterProps) {
                 <li>
                   <a
                     href="/terms"
-                    className="text-sm text-muted hover:text-primary transition-colors"
+                    className="text-sm transition-colors"
+                    style={{ color: 'var(--text-muted)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   >
                     Terms of Service
                   </a>
@@ -108,7 +159,7 @@ export default function Footer({ className = '' }: FooterProps) {
           <div className="mt-8 pt-6 border-t border-tertiary">
             <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
               {/* Copyright */}
-              <div className="text-sm text-muted">
+              <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
                 © {currentYear} Questlog. All rights reserved.
               </div>
 
@@ -118,7 +169,10 @@ export default function Footer({ className = '' }: FooterProps) {
                   href="https://twitter.com/questlog"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted hover:text-primary transition-colors"
+                  className="transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   aria-label="Follow us on Twitter"
                 >
                   <svg
@@ -134,7 +188,10 @@ export default function Footer({ className = '' }: FooterProps) {
                   href="https://discord.gg/questlog"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted hover:text-primary transition-colors"
+                  className="transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   aria-label="Join our Discord server"
                 >
                   <svg
@@ -150,7 +207,10 @@ export default function Footer({ className = '' }: FooterProps) {
                   href="https://github.com/questlog"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted hover:text-primary transition-colors"
+                  className="transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
                   aria-label="View our GitHub repository"
                 >
                   <svg
