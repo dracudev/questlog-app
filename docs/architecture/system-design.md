@@ -194,6 +194,7 @@ All Radix components are styled with design system tokens for consistency.
 ## Implementation Status
 
 ### ✅ Completed Components
+
 - **Navbar:** Mobile hamburger + desktop navigation with user dropdown
 - **Footer:** Responsive 4-column layout with social links
 - **ThemeToggle:** Radix Switch with icon and smooth transitions
@@ -203,6 +204,7 @@ All Radix components are styled with design system tokens for consistency.
 - **Forms:** Input fields with validation states
 
 ### 🔄 In Progress
+
 - Game card components
 - Review card components
 - Search components
