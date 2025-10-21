@@ -182,7 +182,7 @@ function ReviewCard({ review }: ReviewCardProps) {
 
   return (
     <a
-      href={`/games/${review.game.slug}/reviews/${review.id}`}
+      href={`/reviews/${review.id}`}
       className="block bg-secondary rounded-lg border border-tertiary p-4 hover:border-brand-primary transition-colors"
     >
       <div className="flex gap-4">
