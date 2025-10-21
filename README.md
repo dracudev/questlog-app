@@ -240,7 +240,7 @@ pnpm test:e2e              # End-to-end tests
 
 ## Roadmap
 
-### Phase 1: Core Foundation (Complete)
+### Phase 1: Core Foundation ✅ (Complete)
 
 - [x] Project architecture and monorepo setup
 - [x] Authentication system with JWT and roles
@@ -248,42 +248,53 @@ pnpm test:e2e              # End-to-end tests
 - [x] Frontend architecture with Astro + React
 - [x] Comprehensive state management
 - [x] Type-safe API integration
+- [x] Radix UI integration for accessibility
+- [x] Design system with CSS custom properties
 
-### Phase 2: UI Development (In Progress)
+### Phase 2: UI Development 🔄 (In Progress - ~65% Complete)
 
-- [ ] Complete React component library
-- [ ] Responsive page implementations
-- [ ] Mobile-optimized user experience
-- [ ] Advanced search and filtering UI
-- [ ] Real-time notifications
-
-### Phase 3: Social Features
-
+- [x] Core layout refactoring with Radix UI (Navbar, Footer, ThemeToggle)
+- [x] User profile feature implementation (complete 3-layer architecture)
+- [x] Authentication pages (login, register)
+- [x] Mobile-first responsive design patterns
+- [x] Optimistic UI updates with automatic rollback
+- [ ] Games catalog and detail pages
+- [ ] Review creation and editing UI
+- [ ] Search and filtering interfaces
 - [ ] Activity feed implementation
-- [ ] Advanced social interactions
-- [ ] User discovery and recommendations
-- [ ] Community features and groups
 
-### Phase 4: Game Integration
+### Phase 3: Social Features Enhancement (Next - Q1 2026)
+
+- [ ] Real-time activity feed with polling
+- [ ] Comment system for reviews
+- [ ] Enhanced user discovery and recommendations
+- [ ] Notification center UI
+- [ ] Advanced social interactions (mentions, shares)
+
+### Phase 4: Game Integration & APIs (Q2 2026)
 
 - [ ] RAWG API integration for game data
 - [ ] Steam OAuth and library sync
 - [ ] Achievement tracking system
-- [ ] Personal game lists and tracking
+- [ ] Personal game lists (wishlist, playing, completed, backlog)
+- [ ] IGDB integration for enhanced metadata
 
-### Phase 5: Indie Showcase
+### Phase 5: Indie Showcase (Q3 2026)
 
-- [ ] Developer dashboard for game submissions
-- [ ] Indie game showcase section
+- [ ] Developer portal and registration
+- [ ] Game submission system
 - [ ] Demo hosting and embedding
-- [ ] Analytics for developers
+- [ ] Developer analytics dashboard
+- [ ] Featured indie games section
 
-### Phase 6: Advanced Features
+### Phase 6: Advanced Features (Q4 2026+)
 
+- [ ] AI-powered game recommendations
 - [ ] Mobile applications (React Native)
 - [ ] Real-time chat and messaging
+- [ ] WebSocket integration for live updates
 - [ ] Advanced analytics and insights
-- [ ] AI-powered recommendations
+- [ ] Multi-language support (i18n)
 
 ## Contributing
 
