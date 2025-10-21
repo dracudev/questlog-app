@@ -50,7 +50,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
     `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(review.user.username)}`;
 
   // Generate game cover URL
-  const coverUrl = review.game.coverImage || '/placeholder-game.png';
+  const coverUrl = review.game.coverImage || '/placeholder-game.webp';
 
   // ============================================================================
   // Render
