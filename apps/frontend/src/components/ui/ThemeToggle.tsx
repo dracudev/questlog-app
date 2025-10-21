@@ -1,6 +1,18 @@
 import { Moon, Sun } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import * as Switch from '@radix-ui/react-switch';
 
+/**
+ * Theme toggle component using Radix UI Switch
+ *
+ * Fully accessible theme switcher with proper keyboard navigation and
+ * screen reader support. Persists theme preference to localStorage.
+ *
+ * @example
+ * ```tsx
+ * <ThemeToggle />
+ * ```
+ */
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<string>('');
   const [mounted, setMounted] = useState(false);
@@ -15,8 +27,8 @@ export default function ThemeToggle() {
     }
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+  const handleThemeChange = (checked: boolean) => {
+    const newTheme = checked ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
 
@@ -29,28 +41,26 @@ export default function ThemeToggle() {
     }
   };
 
-  // Don't render until mounted to prevent hydration mismatch
   if (!mounted) {
-    return (
-      <button className="w-9 h-9 rounded-md border bg-secondary border-tertiary">
-        <span className="sr-only">Toggle theme</span>
-      </button>
-    );
+    return <div className="w-11 h-6" />;
   }
 
   const isDarkTheme = theme === 'dark';
 
   return (
-    <button
-      onClick={toggleTheme}
-      className="w-9 h-9 rounded-md border transition-colors flex items-center justify-center bg-secondary border-tertiary hover:bg-tertiary"
+    <Switch.Root
+      checked={isDarkTheme}
+      onCheckedChange={handleThemeChange}
+      className="w-11 h-6 bg-tertiary rounded-full relative data-[state=checked]:bg-brand-primary/20 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
       aria-label={`Switch to ${isDarkTheme ? 'light' : 'dark'} mode`}
     >
-      {isDarkTheme ? (
-        <Sun size={16} className="text-secondary flex-shrink-0" strokeWidth={2} />
-      ) : (
-        <Moon size={16} className="text-secondary flex-shrink-0" strokeWidth={2} />
-      )}
-    </button>
+      <Switch.Thumb>
+        {isDarkTheme ? (
+          <Moon size={12} className="text-primary" strokeWidth={2.5} />
+        ) : (
+          <Sun size={12} className="text-muted" strokeWidth={2.5} />
+        )}
+      </Switch.Thumb>
+    </Switch.Root>
   );
 }
