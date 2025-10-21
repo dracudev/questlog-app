@@ -25,6 +25,7 @@ import {
   setReviewsLoading,
   setReviewsError,
   setReviewsData,
+  appendReviewsData,
   setReviewDetailLoading,
   setReviewDetailError,
   setReviewDetail,
@@ -62,6 +63,7 @@ interface UseReviewsReturn {
   getTopRatedReviews: (options?: ReviewsQuery) => Promise<PaginatedReviewsResponse>;
   getRecentReviews: (options?: ReviewsQuery) => Promise<PaginatedReviewsResponse>;
   getPopularReviews: (options?: ReviewsQuery) => Promise<PaginatedReviewsResponse>;
+  loadMoreReviews: () => Promise<void>;
   clearError: () => void;
   clearData: () => void;
 
@@ -295,6 +297,34 @@ export function useReviews(): UseReviewsReturn {
     [],
   );
 
+  const loadMoreReviews = useCallback(async (): Promise<void> => {
+    const currentData = data;
+    const currentIsLoading = isLoading;
+
+    // Don't load if already loading or no more pages
+    if (currentIsLoading || !currentData || currentData.meta.page >= currentData.meta.totalPages) {
+      return;
+    }
+
+    setReviewsLoading(true);
+
+    try {
+      const nextPage = currentData.meta.page + 1;
+      const response = await reviewsService.getAllReviews({
+        page: nextPage,
+        limit: currentData.meta.limit,
+      });
+
+      appendReviewsData(response);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load more reviews';
+      setReviewsError(errorMessage);
+      throw error;
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, [data, isLoading]);
+
   // ============================================================================
   // Utility Actions
   // ============================================================================
@@ -326,6 +356,7 @@ export function useReviews(): UseReviewsReturn {
     getTopRatedReviews,
     getRecentReviews,
     getPopularReviews,
+    loadMoreReviews,
     clearError,
     clearData,
 
