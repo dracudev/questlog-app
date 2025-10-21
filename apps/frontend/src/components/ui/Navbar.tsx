@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Search, User } from 'lucide-react';
+import { Menu, X, Search, User, LogOut, Settings } from 'lucide-react';
 import { useStore } from '@nanostores/react';
 import { $currentUser, $isAuthenticated, initializeAuthState } from '@/stores/auth';
+import { logout } from '@/services/auth';
 import ThemeToggle from './ThemeToggle';
+import * as Dialog from '@radix-ui/react-dialog';
+import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as Avatar from '@radix-ui/react-avatar';
 
 interface NavbarProps {
   currentPath?: string;
@@ -18,9 +23,22 @@ const navigationItems: NavigationItem[] = [
   { label: 'Home', href: '/' },
   { label: 'Explore', href: '/explore' },
   { label: 'Reviews', href: '/reviews' },
-  { label: 'Profile', href: '/profile' },
 ];
 
+/**
+ * Main navigation bar component with mobile-first responsive design
+ *
+ * Features:
+ * - Mobile: Hamburger menu with Radix Dialog drawer
+ * - Desktop: Horizontal navigation with Radix NavigationMenu
+ * - Auth: User dropdown with Radix DropdownMenu and Avatar
+ * - Fully accessible with keyboard navigation
+ *
+ * @example
+ * ```tsx
+ * <Navbar currentPath="/explore" />
+ * ```
+ */
 export default function Navbar({ currentPath }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [authInitialized, setAuthInitialized] = useState(false);
@@ -43,14 +61,19 @@ export default function Navbar({ currentPath }: NavbarProps) {
       }
     : undefined;
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
   const isActiveRoute = (href: string) => {
     if (href === '/' && currentPath === '/') return true;
     if (href !== '/' && currentPath?.startsWith(href)) return true;
     return false;
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -70,73 +93,115 @@ export default function Navbar({ currentPath }: NavbarProps) {
             </a>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              {navigationItems.map((item) => {
-                const isActive = isActiveRoute(item.href);
-                return (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-brand-primary/10 text-brand-primary'
-                        : 'text-secondary hover:text-primary hover:bg-tertiary'
-                    }`}
-                    aria-current={isActive ? 'page' : undefined}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })}
-            </div>
+          {/* Desktop Navigation - Radix NavigationMenu */}
+          <div className="hidden lg:block">
+            <NavigationMenu.Root className="relative">
+              <NavigationMenu.List className="flex items-center space-x-1">
+                {navigationItems.map((item) => {
+                  const isActive = isActiveRoute(item.href);
+                  return (
+                    <NavigationMenu.Item key={item.href}>
+                      <NavigationMenu.Link
+                        href={item.href}
+                        className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                          isActive
+                            ? 'bg-brand-primary/10 text-brand-primary'
+                            : 'text-secondary hover:text-primary hover:bg-tertiary'
+                        }`}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        {item.label}
+                      </NavigationMenu.Link>
+                    </NavigationMenu.Item>
+                  );
+                })}
+              </NavigationMenu.List>
+            </NavigationMenu.Root>
           </div>
 
           {/* Desktop Right Side */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Search Button */}
-            <button
-              type="button"
-              className="p-2 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors"
-              aria-label="Search"
-            >
-              <Search size={20} />
-            </button>
-
+          <div className="hidden lg:flex items-center space-x-4">
             {/* Theme Toggle */}
             <ThemeToggle />
 
             {/* User Authentication */}
             {authInitialized ? (
               isAuthenticated && user ? (
-                <div className="relative">
-                  <button
-                    type="button"
-                    className="flex items-center space-x-2 p-2 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors"
-                    aria-label="User menu"
-                  >
-                    {user.avatar ? (
-                      <img src={user.avatar} alt={user.username} className="w-6 h-6 rounded-full" />
-                    ) : (
-                      <User size={20} />
-                    )}
-                    <span className="text-sm font-medium">{user.username}</span>
-                  </button>
-                </div>
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 text-secondary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary "
+                      aria-label="User menu"
+                    >
+                      <Avatar.Root className="w-8 h-8 rounded-full overflow-hidden">
+                        <Avatar.Image
+                          src={user.avatar || undefined}
+                          alt={user.username}
+                          className="w-full h-full object-cover"
+                        />
+                        <Avatar.Fallback
+                          className="w-full h-full bg-brand-primary/20 text-brand-primary flex items-center justify-center text-sm font-medium"
+                          delayMs={600}
+                        >
+                          {user.username.charAt(0).toUpperCase()}
+                        </Avatar.Fallback>
+                      </Avatar.Root>
+                      <span className="text-sm font-medium hidden xl:inline">{user.username}</span>
+                    </button>
+                  </DropdownMenu.Trigger>
+
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="min-w-[200px] bg-secondary border border-tertiary rounded-md shadow-lg p-1 z-[100]"
+                      sideOffset={8}
+                      align="end"
+                    >
+                      <DropdownMenu.Item
+                        className="px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-tertiary rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
+                        asChild
+                      >
+                        <a href={`/profile/${user.username}`}>
+                          <User size={16} />
+                          <span>Profile</span>
+                        </a>
+                      </DropdownMenu.Item>
+
+                      <DropdownMenu.Item
+                        className="px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-tertiary rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
+                        asChild
+                      >
+                        <a href="/settings">
+                          <Settings size={16} />
+                          <span>Settings</span>
+                        </a>
+                      </DropdownMenu.Item>
+
+                      <DropdownMenu.Separator className="h-px bg-tertiary my-1" />
+
+                      <DropdownMenu.Item
+                        className="px-3 py-2 text-sm text-state-error hover:bg-state-error/10 rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
+                        onSelect={handleLogout}
+                      >
+                        <LogOut size={16} />
+                        <span>Logout</span>
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
               ) : (
                 <div className="flex items-center space-x-2">
                   <a
                     href="/auth/login"
                     className="px-3 py-2 text-sm font-medium text-secondary hover:text-primary transition-colors"
                   >
-                    Sign In
+                    Login
                   </a>
                   <a
                     href="/auth/register"
                     className="px-4 py-2 text-sm font-medium bg-brand-primary text-primary rounded-md hover:bg-brand-primary/90 transition-colors"
                   >
-                    Sign Up
+                    Register
                   </a>
                 </div>
               )
@@ -146,100 +211,157 @@ export default function Navbar({ currentPath }: NavbarProps) {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
+          <div className="lg:hidden flex items-center space-x-2">
             <ThemeToggle />
-            <button
-              onClick={toggleMobileMenu}
-              type="button"
-              className="p-2 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors"
-              aria-controls="mobile-menu"
-              aria-expanded={isMobileMenuOpen}
-              aria-label="Toggle navigation menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </div>
+            <Dialog.Root open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <Dialog.Trigger asChild>
+                <button
+                  type="button"
+                  className="p-2 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+                  aria-label="Toggle navigation menu"
+                >
+                  {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+              </Dialog.Trigger>
 
-      {/* Mobile menu */}
-      <div
-        className={`md:hidden transition-all duration-200 ease-in-out ${
-          isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-        }`}
-        id="mobile-menu"
-      >
-        <div className="px-2 pt-2 pb-3 space-y-1 border-t bg-secondary border-tertiary">
-          {/* Mobile Navigation Links */}
-          {navigationItems.map((item) => {
-            const isActive = isActiveRoute(item.href);
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  isActive
-                    ? 'bg-brand-primary/10 text-brand-primary'
-                    : 'text-secondary hover:text-primary hover:bg-tertiary'
-                }`}
-                aria-current={isActive ? 'page' : undefined}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.label}
-              </a>
-            );
-          })}
+              <Dialog.Portal>
+                <Dialog.Overlay className="fixed inset-0 bg-primary/80 backdrop-blur-sm z-50" />
+                <Dialog.Content
+                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-secondary border-l border-tertiary shadow-lg z-50 focus:outline-none"
+                  aria-describedby={undefined}
+                >
+                  {/* Mobile Menu Header */}
+                  <div className="flex items-center justify-between p-4 border-b border-tertiary">
+                    <Dialog.Title className="text-lg font-semibold text-primary">Menu</Dialog.Title>
+                    <Dialog.Close asChild>
+                      <button
+                        type="button"
+                        className="p-2 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors"
+                        aria-label="Close menu"
+                      >
+                        <X size={20} />
+                      </button>
+                    </Dialog.Close>
+                  </div>
 
-          {/* Mobile Search */}
-          <button
-            type="button"
-            className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-secondary hover:text-primary hover:bg-tertiary transition-colors"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <div className="flex items-center space-x-2">
-              <Search size={20} />
-              <span>Search</span>
-            </div>
-          </button>
+                  {/* Mobile Menu Content */}
+                  <div className="flex flex-col h-full overflow-y-auto">
+                    {/* Navigation Links */}
+                    <nav className="flex-1 p-4 space-y-1">
+                      {navigationItems.map((item) => {
+                        const isActive = isActiveRoute(item.href);
+                        return (
+                          <a
+                            key={item.href}
+                            href={item.href}
+                            className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                              isActive
+                                ? 'bg-brand-primary/10 text-brand-primary'
+                                : 'text-secondary hover:text-primary hover:bg-tertiary'
+                            }`}
+                            aria-current={isActive ? 'page' : undefined}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            {item.label}
+                          </a>
+                        );
+                      })}
 
-          {/* Mobile Authentication */}
-          <div className="border-t pt-4 mt-4 border-tertiary">
-            {authInitialized ? (
-              isAuthenticated && user ? (
-                <div className="px-3 py-2">
-                  <div className="flex items-center space-x-3 mb-3">
-                    {user.avatar ? (
-                      <img src={user.avatar} alt={user.username} className="w-8 h-8 rounded-full" />
-                    ) : (
-                      <User size={24} className="text-secondary" />
-                    )}
-                    <div>
-                      <div className="text-base font-medium text-primary">{user.username}</div>
-                      <div className="text-sm text-muted">View profile</div>
+                      {/* Search Link */}
+                      <button
+                        type="button"
+                        className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-secondary hover:text-primary hover:bg-tertiary transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <Search size={20} />
+                          <span>Search</span>
+                        </div>
+                      </button>
+                    </nav>
+
+                    {/* Mobile Authentication Section */}
+                    <div className="border-t border-tertiary p-4">
+                      {authInitialized ? (
+                        isAuthenticated && user ? (
+                          <div className="space-y-3">
+                            {/* User Info */}
+                            <div className="flex items-center space-x-3 px-3 py-2">
+                              <Avatar.Root className="w-10 h-10 rounded-full overflow-hidden">
+                                <Avatar.Image
+                                  src={user.avatar || undefined}
+                                  alt={user.username}
+                                  className="w-full h-full object-cover"
+                                />
+                                <Avatar.Fallback className="w-full h-full bg-brand-primary/20 text-brand-primary flex items-center justify-center text-base font-medium">
+                                  {user.username.charAt(0).toUpperCase()}
+                                </Avatar.Fallback>
+                              </Avatar.Root>
+                              <div>
+                                <div className="text-base font-medium text-primary">
+                                  {user.username}
+                                </div>
+                                <div className="text-sm text-muted">View profile</div>
+                              </div>
+                            </div>
+
+                            {/* User Menu Links */}
+                            <a
+                              href={`/profile/${user.username}`}
+                              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-secondary hover:text-primary hover:bg-tertiary rounded-md transition-colors"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <User size={16} />
+                              <span>Profile</span>
+                            </a>
+
+                            <a
+                              href="/settings"
+                              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-secondary hover:text-primary hover:bg-tertiary rounded-md transition-colors"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <Settings size={16} />
+                              <span>Settings</span>
+                            </a>
+
+                            <button
+                              type="button"
+                              className="w-full flex items-center space-x-2 px-3 py-2 text-sm font-medium text-state-error hover:bg-state-error/10 rounded-md transition-colors"
+                              onClick={() => {
+                                setIsMobileMenuOpen(false);
+                                handleLogout();
+                              }}
+                            >
+                              <LogOut size={16} />
+                              <span>Logout</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <a
+                              href="/auth/login"
+                              className="block w-full text-center px-4 py-2 text-sm font-medium text-secondary hover:text-primary border border-tertiary rounded-md hover:bg-tertiary transition-colors"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              Login
+                            </a>
+                            <a
+                              href="/auth/register"
+                              className="block w-full text-center px-4 py-2 text-sm font-medium bg-brand-primary text-primary rounded-md hover:bg-brand-primary/90 transition-colors"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              Register
+                            </a>
+                          </div>
+                        )
+                      ) : (
+                        <div className="h-20"></div>
+                      )}
                     </div>
                   </div>
-                </div>
-              ) : (
-                <div className="px-3 py-2 space-y-2">
-                  <a
-                    href="/auth/login"
-                    className="block w-full text-center px-4 py-2 text-sm font-medium text-secondary hover:text-primary border border-tertiary rounded-md hover:bg-tertiary transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Sign In
-                  </a>
-                  <a
-                    href="/auth/register"
-                    className="block w-full text-center px-4 py-2 text-sm font-medium bg-brand-primary text-primary rounded-md hover:bg-brand-primary/90 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Sign Up
-                  </a>
-                </div>
-              )
-            ) : (
-              <div className="px-3 py-2 h-20"></div>
-            )}
+                </Dialog.Content>
+              </Dialog.Portal>
+            </Dialog.Root>
           </div>
         </div>
       </div>
