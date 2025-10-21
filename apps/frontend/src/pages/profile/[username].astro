@@ -1,10 +1,10 @@
 ---
+export const prerender = false;
+
 import MainLayout from '@/layouts/MainLayout.astro';
 import ProfilePage from '@/components/profile/ProfilePage';
 import { fetchUserProfile } from '@/services/users';
 import type { UserProfile } from '@questlog/shared-types';
-
-// This page is server-rendered (SSR enabled at config level)
 
 // ============================================================================
 // Server-Side Data Fetching

@@ -5,10 +5,8 @@ import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
-  // Enable server-side rendering (all pages SSR by default, opt-out with prerender: true)
-  output: 'server',
+  output: 'static',
 
-  // Node.js adapter for SSR
   adapter: node({
     mode: 'standalone',
   }),
