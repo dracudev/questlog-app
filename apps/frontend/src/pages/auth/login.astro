@@ -1,7 +1,6 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
+import AuthLayout from '@/layouts/AuthLayout.astro';
 import LoginForm from '@/components/auth/LoginForm';
-import ThemeToggle from '@/components/ui/ThemeToggle';
 import NoScriptFallback from '@/components/ui/NoScriptFallback';
 
 // Static page metadata
@@ -9,17 +8,12 @@ const pageTitle = "Login";
 const pageDescription = "Sign in to your Questlog account to discover games, write reviews, and connect with fellow gamers.";
 ---
 
-<BaseLayout 
+<AuthLayout 
   title={pageTitle}
   description={pageDescription}
   noIndex={true}
 >
-  <div id="main-content" class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-primary">
-    <div class="absolute top-4 right-4">
-      <ThemeToggle client:load />
-    </div>
-    
-    <div class="max-w-md w-full space-y-8">
+  <div class="max-w-md w-full space-y-8">
       <div class="text-center">
         <a href="/" class="inline-block">
           <h1 class="text-4xl font-bold text-primary">
@@ -31,12 +25,12 @@ const pageDescription = "Sign in to your Questlog account to discover games, wri
         </a>
       </div>
       
-      <div class="py-8 px-6 shadow-lg rounded-lg border bg-secondary border-tertiary">
-        <div class="mb-6">
-          <h2 class="text-2xl font-bold text-center text-primary">
+      <div class="space-y-6">
+        <div class="text-center">
+          <h2 class="text-2xl font-bold text-primary">
             Sign In
           </h2>
-          <p class="mt-2 text-sm text-center text-muted">
+          <p class="mt-2 text-sm text-muted">
             Don't have an account?{' '}
             <a 
               href="/auth/register" 
@@ -78,7 +72,6 @@ const pageDescription = "Sign in to your Questlog account to discover games, wri
             Support
           </a>
         </div>
-      </div>
     </div>
   </div>
-</BaseLayout>
+</AuthLayout>
