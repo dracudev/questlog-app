@@ -57,11 +57,11 @@ export default function ReviewCard({ review }: ReviewCardProps) {
   // ============================================================================
 
   return (
-    <article className="bg-secondary rounded-lg border border-tertiary overflow-hidden hover:border-brand-primary transition-all duration-200 hover:shadow-lg group">
-      {/* Game Cover Image - Link to Game */}
+    <article className="bg-secondary rounded-lg border border-tertiary overflow-hidden hover:border-brand-primary transition-all duration-200 hover:shadow-lg group flex flex-col md:flex-row">
+      {/* Game Cover Image */}
       <a
         href={`/games/${review.game.slug}`}
-        className="block aspect-[3/4] relative overflow-hidden bg-tertiary"
+        className="block w-full md:w-36 flex-shrink-0 md:aspect-[3/4] h-48 md:h-auto relative overflow-hidden bg-tertiary"
       >
         <img
           src={coverUrl}
@@ -85,7 +85,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
       </a>
 
       {/* Card Content */}
-      <div className="p-4">
+      <div className="p-4 flex-1">
         {/* Game Title - Link to Game */}
         <a
           href={`/games/${review.game.slug}`}
