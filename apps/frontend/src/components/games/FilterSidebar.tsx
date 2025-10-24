@@ -71,39 +71,73 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
             />
           </div>
 
-          {/* Sort By */}
-          <CollapsibleSection title="Sort By" defaultOpen>
-            <Select.Root
-              value={`${selectedFilters.sortBy}-${selectedFilters.sortOrder}`}
-              onValueChange={(value: string) => {
-                const [sortBy, sortOrder] = value.split('-');
-                setFilter('sortBy', sortBy);
-                setFilter('sortOrder', sortOrder);
-              }}
-            >
-              <Select.Trigger
-                className="w-full flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-sm hover:bg-accent"
-                aria-label="Sort games by"
+          {/* Sort By  */}
+          <div className="space-y-2">
+            <div>
+              <Select.Root
+                value={`${selectedFilters.sortBy}-${selectedFilters.sortOrder}`}
+                onValueChange={(value: string) => {
+                  const [sortBy, sortOrder] = value.split('-');
+                  setFilter('sortBy', sortBy);
+                  setFilter('sortOrder', sortOrder);
+                }}
               >
-                <Select.Value />
-                <ChevronDown className="h-4 w-4" aria-hidden="true" />
-              </Select.Trigger>
+                <Select.Trigger
+                  className="w-full flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-sm hover:bg-accent"
+                  aria-label="Sort games by"
+                >
+                  <Select.Value />
+                  <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                </Select.Trigger>
 
-              <Select.Portal>
-                <Select.Content className="rounded-lg border border-border bg-popover shadow-lg">
-                  <Select.Viewport className="p-1">
-                    <SelectItem value="averageRating-desc">Highest Rated</SelectItem>
-                    <SelectItem value="averageRating-asc">Lowest Rated</SelectItem>
-                    <SelectItem value="reviewCount-desc">Most Reviewed</SelectItem>
-                    <SelectItem value="releaseDate-desc">Recently Released</SelectItem>
-                    <SelectItem value="releaseDate-asc">Oldest First</SelectItem>
-                    <SelectItem value="title-asc">Title (A-Z)</SelectItem>
-                    <SelectItem value="title-desc">Title (Z-A)</SelectItem>
-                  </Select.Viewport>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
-          </CollapsibleSection>
+                <Select.Portal>
+                  <Select.Content className="rounded-lg border border-border bg-popover bg-zinc-900 text-[var(--brand-accent)] shadow-lg">
+                    <Select.Viewport className="p-1">
+                      <SelectItem value="averageRating-desc">Highest Rated</SelectItem>
+                      <SelectItem value="averageRating-asc">Lowest Rated</SelectItem>
+                      <SelectItem value="reviewCount-desc">Most Reviewed</SelectItem>
+                      <SelectItem value="releaseDate-desc">Recently Released</SelectItem>
+                      <SelectItem value="releaseDate-asc">Oldest First</SelectItem>
+                      <SelectItem value="title-asc">Title (A-Z)</SelectItem>
+                      <SelectItem value="title-desc">Title (Z-A)</SelectItem>
+                    </Select.Viewport>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
+          </div>
+
+          {/* Game Status */}
+          <div className="space-y-2">
+            <div>
+              <Select.Root
+                value={selectedFilters.status || 'all'}
+                onValueChange={(value: string) => {
+                  setFilter('status', value === 'all' ? undefined : value);
+                }}
+              >
+                <Select.Trigger className="w-full flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-sm hover:bg-accent">
+                  <Select.Value />
+                  <ChevronDown className="h-4 w-4" />
+                </Select.Trigger>
+
+                <Select.Portal>
+                  <Select.Content className="rounded-lg border border-border bg-zinc-900 text-[var(--brand-accent)] shadow-lg">
+                    <Select.Viewport className="p-1">
+                      <SelectItem value="all">All Games</SelectItem>
+                      <SelectItem value="RELEASED">Released</SelectItem>
+                      <SelectItem value="EARLY_ACCESS">Early Access</SelectItem>
+                      <SelectItem value="UNRELEASED">Upcoming</SelectItem>
+                      <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                    </Select.Viewport>
+                  </Select.Content>
+                </Select.Portal>
+              </Select.Root>
+            </div>
+          </div>
+
+          {/* Separator */}
+          <div className="my-4 border-t border-border" aria-hidden="true" />
 
           {/* Genres */}
           {filterOptions?.genres && filterOptions.genres.length > 0 && (
@@ -182,33 +216,6 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
               </div>
             </CollapsibleSection>
           )}
-
-          {/* Game Status */}
-          <CollapsibleSection title="Status">
-            <Select.Root
-              value={selectedFilters.status || 'all'}
-              onValueChange={(value: string) => {
-                setFilter('status', value === 'all' ? undefined : value);
-              }}
-            >
-              <Select.Trigger className="w-full flex items-center justify-between rounded-lg border border-border bg-background px-3 py-2 text-sm hover:bg-accent">
-                <Select.Value />
-                <ChevronDown className="h-4 w-4" />
-              </Select.Trigger>
-
-              <Select.Portal>
-                <Select.Content className="rounded-lg border border-border bg-popover shadow-lg">
-                  <Select.Viewport className="p-1">
-                    <SelectItem value="all">All Games</SelectItem>
-                    <SelectItem value="RELEASED">Released</SelectItem>
-                    <SelectItem value="EARLY_ACCESS">Early Access</SelectItem>
-                    <SelectItem value="UNRELEASED">Upcoming</SelectItem>
-                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                  </Select.Viewport>
-                </Select.Content>
-              </Select.Portal>
-            </Select.Root>
-          </CollapsibleSection>
         </>
       )}
     </div>
@@ -248,20 +255,31 @@ function CollapsibleSection({
   defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
+  const countNum = typeof count === 'number' ? count : 0;
+
   return (
     <Collapsible.Root defaultOpen={defaultOpen}>
       <Collapsible.Trigger className="flex w-full items-center justify-between py-2 text-sm font-medium hover:opacity-80">
         <span className="flex items-center gap-2">
-          {title}
-          {count && count > 0 && (
-            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
-              {count}
+          <span>{title}</span>
+          {/* Badge */}
+          {countNum > 0 && (
+            <span
+              role="status"
+              aria-label={`${countNum} selected`}
+              title={`${countNum} selected`}
+              className="inline-flex items-center rounded-full bg-zinc-600 px-2 py-0.5 text-xs font-semibold text-primary"
+            >
+              <span className="sr-only">{`${countNum} selected`}</span>
+              <span aria-hidden>{countNum}</span>
             </span>
           )}
         </span>
-        <ChevronDown className="h-4 w-4 transition-transform [[data-state=open]>&]:rotate-180" />
+        <ChevronDown className="h-4 w-4 transition-transform" />
       </Collapsible.Trigger>
-      <Collapsible.Content className="pt-2">{children}</Collapsible.Content>
+      <Collapsible.Content className="pt-2">
+        <div className="pl-3 ml-1 border-l border-border space-y-2">{children}</div>
+      </Collapsible.Content>
     </Collapsible.Root>
   );
 }
