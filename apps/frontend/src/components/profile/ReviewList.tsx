@@ -188,7 +188,7 @@ function ReviewCard({ review }: ReviewCardProps) {
       <div className="flex gap-4">
         {/* Game Cover */}
         <img
-          src={review.game.coverImage || '/placeholder-game.webp'}
+          src={review.game.coverImage || '/images/game-placeholder.svg'}
           alt={review.game.title}
           className="w-20 h-28 object-cover rounded"
         />
