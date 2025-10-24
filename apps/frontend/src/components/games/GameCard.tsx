@@ -17,20 +17,20 @@ export default function GameCard({ game }: GameCardProps) {
     >
       {/* Game Cover */}
       <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted">
-        {basic.coverImage ? (
-          <img
-            src={basic.coverImage}
-            alt={`${basic.title} cover`}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-            <span className="text-2xl font-bold text-muted-foreground opacity-20">
-              {basic.title?.charAt(0) ?? ''}
-            </span>
-          </div>
-        )}
+        {/* Always render an img; if there's no coverImage use the local placeholder. Add onError to guard against broken remote URLs. */}
+        <img
+          src={basic.coverImage || '/images/game-placeholder.svg'}
+          alt={basic.coverImage ? `${basic.title} cover` : `${basic.title} placeholder cover`}
+          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          loading="lazy"
+          onError={(e) => {
+            try {
+              (e.currentTarget as HTMLImageElement).src = '/images/game-placeholder.svg';
+            } catch (_) {
+              /* swallow errors silently */
+            }
+          }}
+        />
 
         {/* Average Rating Badge */}
         {basic.averageRating !== undefined && basic.averageRating !== null && (

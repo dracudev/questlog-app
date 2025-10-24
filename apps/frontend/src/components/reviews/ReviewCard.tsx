@@ -50,7 +50,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
     `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(review.user.username)}`;
 
   // Generate game cover URL
-  const coverUrl = review.game.coverImage || '/placeholder-game.webp';
+  const coverUrl = review.game.coverImage || '/images/game-placeholder.svg';
 
   // ============================================================================
   // Render
@@ -68,6 +68,13 @@ export default function ReviewCard({ review }: ReviewCardProps) {
           alt={review.game.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           loading="lazy"
+          onError={(e) => {
+            try {
+              (e.currentTarget as HTMLImageElement).src = '/images/game-placeholder.svg';
+            } catch (_) {
+              /* noop */
+            }
+          }}
         />
         {/* Spoiler Badge */}
         {review.isSpoiler && (
