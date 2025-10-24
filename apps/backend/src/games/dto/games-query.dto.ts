@@ -1,5 +1,5 @@
 import { ApiPropertyOptional, ApiExtraModels } from '@nestjs/swagger';
-import { IsOptional, IsArray, IsEnum, IsNumber, IsUUID, Min, Max, IsString } from 'class-validator';
+import { IsOptional, IsArray, IsEnum, IsNumber, Min, Max, IsString } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { PaginationQueryDto } from '@/common/dto/pagination-query.dto';
 import { GameFiltersDto } from './game-filters.dto';
@@ -12,24 +12,24 @@ export class GamesQueryDto extends PaginationQueryDto implements GameFiltersDto 
   @IsOptional()
   @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   @IsArray()
-  @IsUUID(undefined, { each: true })
+  @IsString({ each: true })
   genreIds?: string[];
 
   @ApiPropertyOptional({ example: ['cm2a3b4c5d6e7f8g9h0i'] })
   @IsOptional()
   @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   @IsArray()
-  @IsUUID(undefined, { each: true })
+  @IsString({ each: true })
   platformIds?: string[];
 
   @ApiPropertyOptional({ example: 'cm2a3b4c5d6e7f8g9h0i' })
   @IsOptional()
-  @IsUUID()
+  @IsString()
   developerId?: string;
 
   @ApiPropertyOptional({ example: 'cm2a3b4c5d6e7f8g9h0i' })
   @IsOptional()
-  @IsUUID()
+  @IsString()
   publisherId?: string;
 
   @ApiPropertyOptional({ enum: GameStatus })
