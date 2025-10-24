@@ -21,7 +21,7 @@ interface NavigationItem {
 
 const navigationItems: NavigationItem[] = [
   { label: 'Home', href: '/' },
-  { label: 'Explore', href: '/explore' },
+  { label: 'Explore', href: '/games' },
   { label: 'Reviews', href: '/reviews' },
 ];
 
@@ -153,7 +153,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
 
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
-                      className="min-w-[200px] bg-secondary border border-tertiary rounded-md shadow-lg p-1 z-[100]"
+                      className="min-w-[200px] bg-secondary border border-tertiary rounded-md shadow-lg p-1 z-[100] bg-zinc-900 text-[var(--brand-accent)]"
                       sideOffset={8}
                       align="end"
                     >
@@ -227,7 +227,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
               <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-primary/80 backdrop-blur-sm z-50" />
                 <Dialog.Content
-                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-secondary border-l border-tertiary shadow-lg z-50 focus:outline-none"
+                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-zinc-900 border-l border-tertiary shadow-lg z-50 focus:outline-none"
                   aria-describedby={undefined}
                 >
                   {/* Mobile Menu Header */}
@@ -245,7 +245,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
                   </div>
 
                   {/* Mobile Menu Content */}
-                  <div className="flex flex-col h-full overflow-y-auto">
+                  <div className="flex flex-col h-full overflow-y-auto ">
                     {/* Navigation Links */}
                     <nav className="flex-1 p-4 space-y-1">
                       {navigationItems.map((item) => {
