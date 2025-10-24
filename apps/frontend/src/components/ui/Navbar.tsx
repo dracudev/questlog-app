@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Search, User, LogOut, Settings } from 'lucide-react';
+import { Menu, X, User, LogOut, Settings } from 'lucide-react';
 import { useStore } from '@nanostores/react';
 import { $currentUser, $isAuthenticated, initializeAuthState } from '@/stores/auth';
 import { logout } from '@/services/auth';
