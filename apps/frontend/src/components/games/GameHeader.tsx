@@ -152,7 +152,7 @@ function ActionButtons({ onWriteReview }: { onWriteReview: () => void }) {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="min-w-[220px] bg-bg-secondary rounded-md p-2 shadow-lg"
+            className="min-w-[220px] bg-zinc-800 text-[var(--brand-accent)] rounded-md p-2 shadow-lg"
             sideOffset={5}
           >
             <DropdownMenu.Item className="px-3 py-2 text-text-primary rounded hover:bg-bg-tertiary cursor-pointer outline-none">
