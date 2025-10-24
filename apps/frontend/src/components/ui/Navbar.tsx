@@ -131,10 +131,10 @@ export default function Navbar({ currentPath }: NavbarProps) {
                   <DropdownMenu.Trigger asChild>
                     <button
                       type="button"
-                      className="flex items-center gap-2 text-secondary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary "
+                      className="flex items-center text-secondary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary "
                       aria-label="User menu"
                     >
-                      <Avatar.Root className="w-8 h-8 rounded-full overflow-hidden">
+                      <Avatar.Root className="w-6 h-6 rounded-full overflow-hidden">
                         <Avatar.Image
                           src={user.avatar || undefined}
                           alt={user.username}
@@ -147,7 +147,6 @@ export default function Navbar({ currentPath }: NavbarProps) {
                           {user.username.charAt(0).toUpperCase()}
                         </Avatar.Fallback>
                       </Avatar.Root>
-                      <span className="text-sm font-medium hidden xl:inline">{user.username}</span>
                     </button>
                   </DropdownMenu.Trigger>
 
@@ -217,17 +216,17 @@ export default function Navbar({ currentPath }: NavbarProps) {
               <Dialog.Trigger asChild>
                 <button
                   type="button"
-                  className="p-2 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+                  className="p-1 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
                   aria-label="Toggle navigation menu"
                 >
-                  {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                  {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
                 </button>
               </Dialog.Trigger>
 
               <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-primary/80 backdrop-blur-sm z-50" />
+                <Dialog.Overlay className="fixed inset-0 bg-primary/80 backdrop-blur-sm z-[60]" />
                 <Dialog.Content
-                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-zinc-900 border-l border-tertiary shadow-lg z-50 focus:outline-none"
+                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-zinc-900 border-l border-tertiary shadow-lg z-[60] focus:outline-none"
                   aria-describedby={undefined}
                 >
                   {/* Mobile Menu Header */}
@@ -236,18 +235,18 @@ export default function Navbar({ currentPath }: NavbarProps) {
                     <Dialog.Close asChild>
                       <button
                         type="button"
-                        className="p-2 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors"
+                        className="p-1 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors"
                         aria-label="Close menu"
                       >
-                        <X size={20} />
+                        <X size={16} />
                       </button>
                     </Dialog.Close>
                   </div>
 
                   {/* Mobile Menu Content */}
-                  <div className="flex flex-col h-full overflow-y-auto ">
+                  <div className="flex flex-col max-h-screen overflow-y-auto">
                     {/* Navigation Links */}
-                    <nav className="flex-1 p-4 space-y-1">
+                    <nav className="p-4 space-y-1">
                       {navigationItems.map((item) => {
                         const isActive = isActiveRoute(item.href);
                         return (
@@ -266,18 +265,6 @@ export default function Navbar({ currentPath }: NavbarProps) {
                           </a>
                         );
                       })}
-
-                      {/* Search Link */}
-                      <button
-                        type="button"
-                        className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-secondary hover:text-primary hover:bg-tertiary transition-colors"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <Search size={20} />
-                          <span>Search</span>
-                        </div>
-                      </button>
                     </nav>
 
                     {/* Mobile Authentication Section */}
@@ -301,19 +288,13 @@ export default function Navbar({ currentPath }: NavbarProps) {
                                 <div className="text-base font-medium text-primary">
                                   {user.username}
                                 </div>
-                                <div className="text-sm text-muted">View profile</div>
+                                <a href={`/profile/${user.username}`}>
+                                  <div className="text-sm text-muted">View profile</div>
+                                </a>
                               </div>
                             </div>
 
                             {/* User Menu Links */}
-                            <a
-                              href={`/profile/${user.username}`}
-                              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-secondary hover:text-primary hover:bg-tertiary rounded-md transition-colors"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                              <User size={16} />
-                              <span>Profile</span>
-                            </a>
 
                             <a
                               href="/settings"
