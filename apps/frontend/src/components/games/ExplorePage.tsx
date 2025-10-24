@@ -84,11 +84,13 @@ export default function ExplorePage({
         {/* Main Content */}
         <main>
           {/* Mobile Filter Button */}
-          <div className="mb-4 lg:hidden">
-            <MobileFilterButton
-              onClick={() => setIsMobileFilterOpen(true)}
-              activeFilterCount={getActiveFilterCount(selectedFilters)}
-            />
+          <div className="mb-4 lg:hidden sticky top-16 z-40">
+            <div className="bg-background/80 px-0 py-2">
+              <MobileFilterButton
+                onClick={() => setIsMobileFilterOpen(true)}
+                activeFilterCount={getActiveFilterCount(selectedFilters)}
+              />
+            </div>
           </div>
 
           <GameResultsList />
