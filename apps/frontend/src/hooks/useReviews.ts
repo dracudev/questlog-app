@@ -33,7 +33,6 @@ import {
   appendUserReviews,
   setUserReviewsLoading,
   setGameReviews,
-  appendGameReviews,
   setGameReviewsLoading,
   setReviewActionLoading,
   setReviewActionError,
