@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { useGames } from '@/hooks/useGames';
-import { $selectedFilters } from '@/stores/explore';
+import { $selectedFilters, clearFilters } from '@/stores/explore';
 import GameCard from './GameCard.tsx';
 import { Loader2, AlertCircle } from 'lucide-react';
 import type { GameResponse } from '@questlog/shared-types';
@@ -92,8 +92,12 @@ export default function GameResultsList() {
         </p>
         <button
           onClick={() => {
-            const { clearFilters } = require('@/stores/explore');
             clearFilters();
+            setTimeout(() => {
+              fetchGames($selectedFilters.get()).catch(() => {
+                fetchGames().catch(() => {});
+              });
+            }, 0);
           }}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
@@ -107,7 +111,7 @@ export default function GameResultsList() {
     <div>
       <ResultsHeader total={data.total} page={data.page} totalPages={data.totalPages} />
 
-      {/* Game Grid - Mobile First Responsive */}
+      {/* Game Grid  */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {data.data.map((game: GameResponse) => (
           <GameCard key={game.game.id} game={game} />
