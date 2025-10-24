@@ -1,0 +1,126 @@
+---
+export const prerender = false;
+
+import MainLayout from '@/layouts/MainLayout.astro';
+import ExplorePage from '@/components/games/ExplorePage';
+import type {
+  GamesQuery,
+  PaginatedGamesResponse,
+  GenreResponse,
+  PlatformResponse,
+  DeveloperResponse,
+  PublisherResponse,
+} from '@questlog/shared-types';
+
+import { getAllGames } from '@/services/games';
+import { getAllGenres } from '@/services/genres';
+import { getAllPlatforms } from '@/services/platforms';
+import { getDevelopers } from '@/services/developers';
+import { getAllPublishers } from '@/services/publishers';
+
+// Parse URL query params for SSR
+const url = new URL(Astro.request.url);
+const searchParams = url.searchParams;
+
+// Build initial query from URL
+const initialQuery: GamesQuery = {
+  page: parseInt(searchParams.get('page') || '1', 10),
+  limit: parseInt(searchParams.get('limit') || '20', 10),
+  sortBy: (searchParams.get('sortBy') as any) || 'averageRating',
+  sortOrder: (searchParams.get('sortOrder') as any) || 'desc',
+  genreIds: searchParams.get('genreIds')?.split(',').filter(Boolean) || [],
+  platformIds: searchParams.get('platformIds')?.split(',').filter(Boolean) || [],
+  // Accept either developerId or developerIds (comma list) — pick the first
+  developerId:
+    searchParams.get('developerId') || searchParams.get('developerIds')?.split(',').filter(Boolean)?.[0] || undefined,
+  // Accept either publisherId or publisherIds
+  publisherId:
+    searchParams.get('publisherId') || searchParams.get('publisherIds')?.split(',').filter(Boolean)?.[0] || undefined,
+  search: searchParams.get('search') || '',
+  status: (searchParams.get('status') as any) || undefined,
+};
+
+let initialGamesData: PaginatedGamesResponse | null = null;
+let filterOptions: {
+  genres: GenreResponse[];
+  platforms: PlatformResponse[];
+  developers: DeveloperResponse[];
+  publishers: PublisherResponse[];
+} | null = null;
+let error: string | null = null;
+
+try {
+  // Fetch initial games with URL query params and filter option lists
+  const [gamesResponse, genresRes, platformsRes, developersRes, publishersRes] =
+    await Promise.all([
+      getAllGames(initialQuery),
+      getAllGenres(),
+      getAllPlatforms(),
+      getDevelopers(),
+      getAllPublishers(),
+    ]);
+
+  initialGamesData = gamesResponse;
+
+  // Normalize services responses (some return { data } vs { items })
+  const genres = (genresRes as any).data || (genresRes as any).items || [];
+  const platforms = (platformsRes as any).data || (platformsRes as any).items || [];
+  const developers = (developersRes as any).items || (developersRes as any).data || [];
+  const publishers = (publishersRes as any).data || (publishersRes as any).items || [];
+
+  filterOptions = { genres, platforms, developers, publishers };
+} catch (err: any) {
+  console.error('Error loading explore page:', err);
+  error = err?.message || 'Failed to load games';
+}
+
+// SEO metadata
+const title = initialQuery.search
+  ? `Search: "${initialQuery.search}" | Questlog`
+  : 'Explore Games | Questlog';
+
+const description = initialQuery.search
+  ? `Search results for "${initialQuery.search}" - Discover and review video games`
+  : 'Discover thousands of video games, read reviews, and share your gaming experiences with the Questlog community.';
+
+const canonicalUrl = new URL('/games', Astro.site ?? Astro.request.url);
+---
+
+<MainLayout title={title} description={description}>
+  <Fragment slot="head">
+    <link rel="canonical" href={canonicalUrl.toString()} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl.toString()} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: title,
+        description,
+        url: canonicalUrl.toString(),
+      })}
+    />
+  </Fragment>
+
+  {error ? (
+    <div class="container mx-auto px-4 py-8">
+      <div class="rounded-lg bg-red-50 p-6 text-center dark:bg-red-900/20">
+        <h2 class="text-xl font-semibold text-red-900 dark:text-red-100">Failed to Load Games</h2>
+        <p class="mt-2 text-red-700 dark:text-red-300">{error}</p>
+        <button onclick="window.location.reload()" class="mt-4 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">Try Again</button>
+      </div>
+    </div>
+  ) : (
+    <ExplorePage
+      initialGames={initialGamesData}
+      filterOptions={filterOptions}
+      initialQuery={initialQuery}
+      client:load
+    />
+  )}
+</MainLayout>
