@@ -826,7 +826,6 @@ pnpm preview                # Preview production build locally
 
 - ESLint with React and Astro-specific rules
 - Prettier for consistent code formatting
-- Husky pre-commit hooks for quality assurance
 
 **Testing Strategy**:
 
