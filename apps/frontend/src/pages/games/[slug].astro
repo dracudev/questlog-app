@@ -1,0 +1,201 @@
+---
+import type { GetStaticPaths } from 'astro';
+import MainLayout from '@/layouts/MainLayout.astro';
+import GameDetailPage from '@/components/games/GameDetailPage';
+import { gamesService } from '@/services/games';
+import { reviewsService } from '@/services/reviews';
+import type { GameDetail, PaginatedReviewsResponse, GameResponse } from '@questlog/shared-types';
+
+// ============================================================================
+// STATIC PATH GENERATION
+// ============================================================================
+
+export const getStaticPaths = (async () => {
+  try {  
+    // Fetch all games from API
+    const gamesResponse = await gamesService.getAllGames({ 
+      page: 1, 
+      limit: 100
+    });
+    
+    const paths = gamesResponse.data.map((game) => ({
+      params: { slug: game.game.slug },
+    }));
+    
+    console.log(`[GameDetail] Generated ${paths.length} static paths`);
+    
+    return paths;
+  } catch (error) {
+    console.error('[GameDetail] Failed to generate static paths:', error);
+    return [];
+  }
+}) satisfies GetStaticPaths;
+
+// ============================================================================
+// SERVER-SIDE DATA FETCHING
+// ============================================================================
+
+const { slug } = Astro.params;
+
+// Validate slug format (alphanumeric with hyphens)
+if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+  return Astro.redirect('/404', 404);
+}
+
+// Fetch primary game data
+let game: GameDetail;
+try {
+  game = await gamesService.getGameBySlug(slug);
+} catch (error) {
+  // Log error for monitoring
+  console.error(`[GameDetail] Failed to fetch game with slug: ${slug}`, {
+    error: error instanceof Error ? error.message : 'Unknown error',
+    slug,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Return 404 if game not found
+  return Astro.redirect('/404', 404);
+}
+
+// Parallel fetch of related data for optimal performance
+const [reviewsResult, similarGamesResult] = await Promise.allSettled([
+  reviewsService.getReviewsByGame(game.game.id, { page: 1, limit: 10 }),
+  gamesService.getSimilarGames(game.game.id, 6)
+]);
+
+// Extract results with fallback values
+const reviews: PaginatedReviewsResponse = reviewsResult.status === 'fulfilled'
+  ? reviewsResult.value
+  : { items: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+
+const similarGames: GameResponse[] = similarGamesResult.status === 'fulfilled'
+  ? similarGamesResult.value
+  : [];
+
+// Log errors for failed parallel requests (non-blocking)
+if (reviewsResult.status === 'rejected') {
+  console.error(`[GameDetail] Failed to fetch reviews for game: ${game.game.id}`, {
+    error: reviewsResult.reason,
+    gameId: game.game.id,
+    slug,
+    timestamp: new Date().toISOString()
+  });
+}
+
+if (similarGamesResult.status === 'rejected') {
+  console.error(`[GameDetail] Failed to fetch similar games for: ${game.game.id}`, {
+    error: similarGamesResult.reason,
+    gameId: game.game.id,
+    slug,
+    timestamp: new Date().toISOString()
+  });
+}
+
+// ============================================================================
+// SEO META TAGS
+// ============================================================================
+
+const pageTitle = `${game.game.title} - Game Reviews & Details | Questlog`;
+const pageDescription = game.summary
+  ? `${game.summary.substring(0, 160)}...`
+  : `Discover reviews, ratings, and details for ${game.game.title}. Join the Questlog community to share your gaming experiences.`;
+
+const coverImageUrl = (() => {
+  const img = game.game.coverImage;
+
+  if (!img) {
+    return Astro.site ? new URL('/game-placeholder.svg', Astro.site).href : '/game-placeholder.svg';
+  }
+
+  if (/^(https?:)?\/\//i.test(img)) {
+    return img;
+  }
+  return Astro.site ? new URL(img, Astro.site).href : img;
+})();
+
+function safeUrl(pathOrUrl: string) {
+  if (!pathOrUrl) return pathOrUrl;
+  if (/^(https?:)?\/\//i.test(pathOrUrl)) return pathOrUrl;
+  return Astro.site ? new URL(pathOrUrl, Astro.site).href : pathOrUrl;
+}
+
+const canonicalUrl = safeUrl(`/games/${slug}`);
+
+// Structured data for search engines (Schema.org JSON-LD)
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": game.game.title,
+  "description": game.summary || game.description,
+  "image": coverImageUrl,
+  "genre": game.genres?.map(g => g.name).join(", "),
+  "publisher": game.publisher?.name,
+  "gamePlatform": game.platforms?.map(p => p.name).join(", "),
+  "datePublished": game.game.releaseDate,
+  "aggregateRating": game.game.averageRating && game.game.reviewCount ? {
+    "@type": "AggregateRating",
+    "ratingValue": game.game.averageRating,
+    "reviewCount": game.game.reviewCount,
+    "bestRating": 10,
+    "worstRating": 0
+  } : undefined
+};
+
+// Breadcrumb structured data for navigation
+const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Games",
+      "item": safeUrl('/games')
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": game.game.title,
+      "item": canonicalUrl
+    }
+  ]
+};
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+>
+  <!-- SEO Meta Tags -->
+  <Fragment slot="head">
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalUrl} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:image" content={coverImageUrl} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalUrl} />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={pageDescription} />
+    <meta property="twitter:image" content={coverImageUrl} />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbData)} />
+  </Fragment>
+
+  <!-- Hydrate React Island with server-fetched data -->
+  <GameDetailPage 
+    initialGame={game}
+    initialReviews={reviews}
+    initialSimilarGames={similarGames}
+    client:load
+  />
+</MainLayout>
