@@ -36,6 +36,7 @@ import {
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
+import { Public } from '@/auth/decorators/public.decorator';
 import { UserRole } from '@prisma/client';
 
 @ApiTags('Publishers')
@@ -63,6 +64,7 @@ export class PublishersController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'Get all publishers',
     description: 'Retrieves a paginated list of all game publishers',
@@ -112,6 +114,7 @@ export class PublishersController {
   }
 
   @Get(':identifier')
+  @Public()
   @ApiOperation({
     summary: 'Get publisher by ID or slug',
     description: 'Retrieves a specific publisher by their ID or slug',

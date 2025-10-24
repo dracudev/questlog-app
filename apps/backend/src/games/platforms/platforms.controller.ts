@@ -36,6 +36,7 @@ import {
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
+import { Public } from '@/auth/decorators/public.decorator';
 import { UserRole } from '@prisma/client';
 
 @ApiTags('Platforms')
@@ -63,6 +64,7 @@ export class PlatformsController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'Get all platforms',
     description: 'Retrieves a paginated list of all game platforms',
@@ -104,6 +106,7 @@ export class PlatformsController {
   }
 
   @Get(':identifier')
+  @Public()
   @ApiOperation({
     summary: 'Get platform by ID or slug',
     description: 'Retrieves a specific platform by their ID or slug',

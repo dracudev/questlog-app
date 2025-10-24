@@ -36,6 +36,7 @@ import {
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
+import { Public } from '@/auth/decorators/public.decorator';
 import { UserRole } from '@prisma/client';
 
 @ApiTags('Genres')
@@ -63,6 +64,7 @@ export class GenresController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'Get all genres',
     description: 'Retrieves a paginated list of all game genres',
@@ -104,6 +106,7 @@ export class GenresController {
   }
 
   @Get(':identifier')
+  @Public()
   @ApiOperation({
     summary: 'Get genre by ID or slug',
     description: 'Retrieves a specific genre by their ID or slug',

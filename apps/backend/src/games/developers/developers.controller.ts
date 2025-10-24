@@ -37,10 +37,11 @@ import {
 import { JwtAuthGuard } from '@/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/auth/guards/roles.guard';
 import { Roles } from '@/auth/decorators/roles.decorator';
+import { Public } from '@/auth/decorators/public.decorator';
 import { UserRole } from '@prisma/client';
 
 @ApiTags('Developers')
-@Controller('developers')
+@Controller('games/developers')
 export class DevelopersController {
   constructor(private readonly developersService: DevelopersService) {}
 
@@ -64,6 +65,7 @@ export class DevelopersController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'Get all developers',
     description: 'Retrieves a paginated list of all game developers',
@@ -123,6 +125,7 @@ export class DevelopersController {
   }
 
   @Get(':identifier')
+  @Public()
   @ApiOperation({
     summary: 'Get developer by ID or slug',
     description: 'Retrieves a specific developer by their ID or slug',
@@ -205,6 +208,7 @@ export class DevelopersController {
   }
 
   @Get(':id/games')
+  @Public()
   @ApiOperation({
     summary: 'Get games by developer',
     description: 'Retrieves all games developed by a specific developer',
@@ -241,6 +245,7 @@ export class DevelopersController {
   }
 
   @Get(':id/stats')
+  @Public()
   @ApiOperation({
     summary: 'Get developer statistics',
     description: 'Retrieves statistics for a developer (game count, average rating, etc.)',
