@@ -44,7 +44,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
     `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(review.user.username)}`;
 
   // Generate game cover URL
-  const coverUrl = review.game.coverImage || '/placeholder-game.webp';
+  const coverUrl = review.game.coverImage || '/images/game-placeholder.svg';
 
   // ============================================================================
   // Render Star Rating
