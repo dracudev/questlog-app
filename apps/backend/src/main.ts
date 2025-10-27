@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import helmet from 'helmet';
 import * as compression from 'compression';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/database/prisma.service';
 
@@ -41,6 +42,8 @@ async function bootstrap() {
 
   // Compression
   app.use(compression());
+
+  app.use(cookieParser());
 
   // Global validation pipe
   app.useGlobalPipes(

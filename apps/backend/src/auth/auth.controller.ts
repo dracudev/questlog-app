@@ -1,6 +1,16 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Req,
+  Get,
+  Res,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard, JwtAuthGuard, JwtRefreshGuard } from './guards';
 import {
@@ -35,8 +45,30 @@ export class AuthController {
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({ status: 200, description: 'User successfully logged in' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Body() loginDto: LoginDto, @Req() req: Request): Promise<AuthResponse> {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<AuthResponse> {
+    const authResponse = await this.authService.login(loginDto);
+
+    const isProd = process.env.NODE_ENV === 'production';
+    const accessTokenOptions = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax' as const,
+      path: '/',
+      // TODO: set maxAge here to match access token expiry
+    };
+    const refreshTokenOptions = {
+      ...accessTokenOptions,
+      // TODO: set a longer maxAge for refresh token
+    };
+
+    res.cookie('authToken', authResponse.accessToken, accessTokenOptions);
+    res.cookie('refreshToken', authResponse.refreshToken, refreshTokenOptions);
+
+    return authResponse;
   }
 
   @Post('refresh')
@@ -46,8 +78,24 @@ export class AuthController {
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({ status: 200, description: 'Token successfully refreshed' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  async refreshToken(@GetUser('id') userId: string) {
-    return this.authService.refreshToken(userId);
+  async refreshToken(@GetUser('id') userId: string, @Res({ passthrough: true }) res: Response) {
+    const tokens = await this.authService.refreshToken(userId);
+
+    const isProd = process.env.NODE_ENV === 'production';
+    const accessTokenOptions = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax' as const,
+      path: '/',
+    };
+    const refreshTokenOptions = {
+      ...accessTokenOptions,
+    };
+
+    res.cookie('authToken', tokens.accessToken, accessTokenOptions);
+    res.cookie('refreshToken', tokens.refreshToken, refreshTokenOptions);
+
+    return tokens;
   }
 
   @Post('change-password')
