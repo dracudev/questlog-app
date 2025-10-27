@@ -13,6 +13,16 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    // Dev proxy: forward /api to the backend so cookies are same-origin in development
+    server: {
+      proxy: {
+        '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
+    },
   },
 
   integrations: [react()],
