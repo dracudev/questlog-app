@@ -98,6 +98,30 @@ export class AuthController {
     return tokens;
   }
 
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Logout user and clear auth cookies' })
+  async logout(@Res({ passthrough: true }) res: Response): Promise<void> {
+    // Optional: Invalidate tokens server-side (blacklist) here if implemented
+
+    const isProd = process.env.NODE_ENV === 'production';
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax' as const,
+      path: '/',
+      // domain: add if your cookie was set with a specific domain
+    };
+
+    res.clearCookie('authToken', cookieOptions);
+    res.clearCookie('refreshToken', cookieOptions);
+
+    // No content response
+    return;
+  }
+
   @Post('change-password')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
