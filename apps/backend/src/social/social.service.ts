@@ -199,16 +199,15 @@ export class SocialService {
         user: review.user,
         targetId: review.gameId,
         targetType: 'game',
-        metadata: {
-          review: {
-            id: review.id,
-            title: review.title,
-            rating: review.rating,
-            game: review.game,
-            stats: {
-              likesCount: review._count.likes,
-              commentsCount: review._count.comments,
-            },
+        review: {
+          id: review.id,
+          title: review.title,
+          content: review.content,
+          rating: review.rating,
+          game: review.game,
+          stats: {
+            likesCount: review._count.likes,
+            commentsCount: review._count.comments,
           },
         },
         createdAt: review.createdAt,
@@ -224,9 +223,7 @@ export class SocialService {
         user: follow.follower,
         targetId: follow.followingId,
         targetType: 'user',
-        metadata: {
-          targetUser: follow.following,
-        },
+        followedUser: follow.following,
         createdAt: follow.createdAt,
       });
     });

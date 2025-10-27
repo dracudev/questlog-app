@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ReviewGameDto, ReviewStatsDto } from '@/reviews/dto/review-response.dto';
 
 export class ActivityUserDto {
   @ApiProperty({ description: 'User ID' })
@@ -12,6 +13,27 @@ export class ActivityUserDto {
 
   @ApiProperty({ description: 'Avatar URL' })
   avatar: string;
+}
+
+// Lightweight DTO used for feed payloads (smaller than full ReviewResponseDto)
+export class ReviewFeedDto {
+  @ApiProperty({ description: 'Review ID' })
+  id: string;
+
+  @ApiPropertyOptional({ description: 'Review title' })
+  title?: string;
+
+  @ApiPropertyOptional({ description: 'Optional review content or snippet' })
+  content?: string;
+
+  @ApiProperty({ description: 'Review rating' })
+  rating: number;
+
+  @ApiProperty({ description: 'Game summary for the review', type: ReviewGameDto })
+  game: ReviewGameDto;
+
+  @ApiProperty({ description: 'Review statistics', type: ReviewStatsDto })
+  stats: ReviewStatsDto;
 }
 
 export class ActivityItemDto {
@@ -32,6 +54,15 @@ export class ActivityItemDto {
 
   @ApiPropertyOptional({ description: 'Target type (e.g., game, user)' })
   targetType?: string;
+
+  @ApiPropertyOptional({ description: 'Review details, if type is REVIEW_*', type: ReviewFeedDto })
+  review?: ReviewFeedDto;
+
+  @ApiPropertyOptional({
+    description: 'Followed user details, if type is FOLLOW',
+    type: ActivityUserDto,
+  })
+  followedUser?: ActivityUserDto;
 
   @ApiPropertyOptional({ description: 'Additional activity metadata' })
   metadata?: Record<string, any>;

@@ -1,3 +1,5 @@
+import { ReviewGame, ReviewStats } from '../reviews';
+
 // Social Stats
 export interface SocialStats {
   followersCount: number;
@@ -8,19 +10,32 @@ export interface SocialStats {
 
 // Activity Feed Types
 export type ActivityType =
-  | "REVIEW_CREATED"
-  | "REVIEW_LIKED"
-  | "USER_FOLLOWED"
-  | "GAME_ADDED"
-  | "REVIEW_UPDATED";
+  | 'REVIEW_CREATED'
+  | 'REVIEW_LIKED'
+  | 'USER_FOLLOWED'
+  | 'GAME_ADDED'
+  | 'REVIEW_UPDATED';
 
-export type ActivityTargetType = "GAME" | "USER" | "REVIEW";
+export type ActivityTargetType = 'GAME' | 'USER' | 'REVIEW';
 
 export interface ActivityUser {
   id: string;
   username: string;
-  displayName: string;
-  avatar: string;
+  // displayName and avatar may be absent in some responses
+  displayName?: string;
+  avatar?: string;
+}
+
+// Feed-focused review payload (subset of full ReviewResponse)
+
+export interface ReviewFeed {
+  id: string;
+  title?: string;
+  // Optional review body or snippet included in feed items
+  content?: string;
+  rating: number;
+  game: ReviewGame;
+  stats: ReviewStats;
 }
 
 export interface ActivityItem {
@@ -30,6 +45,11 @@ export interface ActivityItem {
   user: ActivityUser;
   targetId?: string;
   targetType?: ActivityTargetType;
+  // Optional structured payloads for common activity types
+  review?: ReviewFeed;
+  followedUser?: ActivityUser;
+
+  // Generic metadata for miscellaneous activity data
   metadata?: Record<string, any>;
   createdAt: Date;
 }
