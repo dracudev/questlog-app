@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "description": "Questlog Frontend",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --host localhost",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
