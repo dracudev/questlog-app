@@ -132,6 +132,8 @@ class ApiClient {
       ...config,
       headers,
       signal: this.createAbortSignal(config.timeout),
+      // Ensure cookies are sent/accepted when backend sets them
+      credentials: 'include',
     };
   }
 
@@ -252,6 +254,7 @@ class ApiClient {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${refreshToken}`,
         },
+        credentials: 'include',
       });
 
       if (!response.ok) {
