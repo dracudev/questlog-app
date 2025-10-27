@@ -49,7 +49,9 @@ export default function FeedItem({ activity }: FeedItemProps) {
 
   // Render content based on activity type
   const renderActivityContent = () => {
-    switch (type) {
+    const activityType = String(type);
+
+    switch (activityType) {
       case 'REVIEW_CREATED':
       case 'REVIEW_UPDATED': {
         const review = activity.review;
@@ -127,7 +129,8 @@ export default function FeedItem({ activity }: FeedItemProps) {
         );
       }
 
-      case 'USER_FOLLOWED': {
+      case 'USER_FOLLOWED':
+      case 'follow': {
         const followedUser = activity.followedUser;
         if (!followedUser) return null;
 
@@ -171,6 +174,82 @@ export default function FeedItem({ activity }: FeedItemProps) {
                   {followedUser.displayName ?? followedUser.username}
                 </a>
               </p>
+            </div>
+          </div>
+        );
+      }
+
+      case 'review': {
+        const review = activity.review;
+        if (!review?.game) return null;
+
+        const snippet = review.content
+          ? review.content.slice(0, 150) + (review.content.length > 150 ? '...' : '')
+          : '';
+
+        return (
+          <div className="flex gap-4">
+            {/* Game Cover */}
+            {review.game?.coverImage && (
+              <a href={`/games/${review.game?.slug}`} className="flex-shrink-0">
+                <img
+                  src={review.game?.coverImage}
+                  alt={review.game?.title}
+                  className="w-20 h-28 object-cover rounded"
+                  style={{ borderRadius: 'var(--radius-sm)' }}
+                />
+              </a>
+            )}
+
+            {/* Review Content */}
+            <div className="flex-1 min-w-0">
+              <div className="mb-2">
+                <a
+                  href={`/games/${review.game?.slug}`}
+                  className="font-semibold hover:underline"
+                  style={{
+                    color: 'var(--brand-primary)',
+                    fontSize: 'var(--font-size-lg)',
+                  }}
+                >
+                  {review.game?.title}
+                </a>
+              </div>
+
+              {/* Rating */}
+              {review.rating !== null && review.rating !== undefined && (
+                <div className="mb-2">{renderRating(review.rating)}</div>
+              )}
+
+              {/* Review snippet */}
+              {snippet && (
+                <p
+                  className="mb-2"
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontSize: 'var(--font-size-base)',
+                  }}
+                >
+                  {snippet}
+                </p>
+              )}
+
+              {/* Read more link */}
+              <a
+                href={`/reviews/${review.id}`}
+                className="font-medium hover:underline inline-flex items-center gap-1"
+                style={{ color: 'var(--brand-primary)', fontSize: 'var(--font-size-sm)' }}
+              >
+                Read full review
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </a>
             </div>
           </div>
         );
