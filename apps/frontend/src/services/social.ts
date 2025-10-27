@@ -100,7 +100,10 @@ class SocialService {
    * console.log(feed.items.length); // Number of activity items
    * ```
    */
-  async getActivityFeed(query: ActivityFeedQuery = {}): Promise<ActivityFeedResponse> {
+  async getActivityFeed(
+    query: ActivityFeedQuery = {},
+    ssrHeaders?: HeadersInit,
+  ): Promise<ActivityFeedResponse> {
     const searchParams = new URLSearchParams();
 
     // Add query parameters
@@ -118,7 +121,7 @@ class SocialService {
       ? `${SOCIAL_ENDPOINTS.ACTIVITY_FEED}?${searchParams.toString()}`
       : SOCIAL_ENDPOINTS.ACTIVITY_FEED;
 
-    return apiClient.get<ActivityFeedResponse>(endpoint);
+    return apiClient.get<ActivityFeedResponse>(endpoint, {}, ssrHeaders);
   }
 
   /**

@@ -51,9 +51,15 @@ class ApiClient {
   /**
    * Make a type-safe HTTP request to the API
    */
-  async request<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
+  // Add an optional parameter for SSR headers
+  async request<T>(
+    endpoint: string,
+    config: RequestConfig = {},
+    ssrHeaders?: HeadersInit,
+  ): Promise<T> {
     const url = this.buildURL(endpoint);
-    const requestConfig = await this.buildRequestConfig(config);
+    // Pass ssrHeaders to buildRequestConfig
+    const requestConfig = await this.buildRequestConfig(config, ssrHeaders);
 
     return this.executeRequest<T>(url, requestConfig);
   }
@@ -61,37 +67,59 @@ class ApiClient {
   /**
    * GET request
    */
-  async get<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: 'GET' });
+  async get<T>(endpoint: string, config: RequestConfig = {}, ssrHeaders?: HeadersInit): Promise<T> {
+    return this.request<T>(endpoint, { ...config, method: 'GET' }, ssrHeaders);
   }
 
   /**
    * POST request
    */
-  async post<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, {
-      ...config,
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+  async post<T>(
+    endpoint: string,
+    data?: unknown,
+    config: RequestConfig = {},
+    ssrHeaders?: HeadersInit,
+  ): Promise<T> {
+    return this.request<T>(
+      endpoint,
+      {
+        ...config,
+        method: 'POST',
+        body: data ? JSON.stringify(data) : undefined,
+      },
+      ssrHeaders,
+    );
   }
 
   /**
    * PATCH request
    */
-  async patch<T>(endpoint: string, data?: unknown, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, {
-      ...config,
-      method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+  async patch<T>(
+    endpoint: string,
+    data?: unknown,
+    config: RequestConfig = {},
+    ssrHeaders?: HeadersInit,
+  ): Promise<T> {
+    return this.request<T>(
+      endpoint,
+      {
+        ...config,
+        method: 'PATCH',
+        body: data ? JSON.stringify(data) : undefined,
+      },
+      ssrHeaders,
+    );
   }
 
   /**
    * DELETE request
    */
-  async delete<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: 'DELETE' });
+  async delete<T>(
+    endpoint: string,
+    config: RequestConfig = {},
+    ssrHeaders?: HeadersInit,
+  ): Promise<T> {
+    return this.request<T>(endpoint, { ...config, method: 'DELETE' }, ssrHeaders);
   }
 
   // ============================================================================
@@ -110,8 +138,11 @@ class ApiClient {
   /**
    * Build the request configuration with headers and authentication
    */
-  private async buildRequestConfig(config: RequestConfig): Promise<RequestInit> {
-    const headers = new Headers(this.defaultHeaders);
+  private async buildRequestConfig(
+    config: RequestConfig,
+    ssrHeaders?: HeadersInit,
+  ): Promise<RequestInit> {
+    const headers = new Headers(ssrHeaders || this.defaultHeaders); // Use ssrHeaders if provided
 
     // Add custom headers from config
     if (config.headers) {
@@ -120,19 +151,19 @@ class ApiClient {
       });
     }
 
-    // Add authentication header if not skipped
-    if (!config.skipAuth) {
-      const token = await this.getValidToken();
+    if (!config.skipAuth && !ssrHeaders) {
+      // Only use $authToken if NOT SSR call
+      const token = await this.getValidToken(); // This uses client-side store
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
     }
+    // For SSR calls with cookies, the 'Cookie' header will be in ssrHeaders
 
     return {
       ...config,
       headers,
       signal: this.createAbortSignal(config.timeout),
-      // Ensure cookies are sent/accepted when backend sets them
       credentials: 'include',
     };
   }
