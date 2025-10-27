@@ -1,0 +1,65 @@
+---
+export const prerender = false;
+
+import MainLayout from '@/layouts/MainLayout.astro';
+import ActivityFeedPage from '@/components/social/ActivityFeedPage';
+import type { ActivityFeedResponse } from '@questlog/shared-types';
+import { getActivityFeed } from '@/services/social';
+
+// Authentication check
+const authToken = Astro.cookies.get('authToken')?.value;
+const refreshToken = Astro.cookies.get('refreshToken')?.value;
+
+// Redirect to login if not authenticated
+if (!authToken && !refreshToken) {
+  return Astro.redirect('/auth/login?redirect=/feed');
+}
+
+// Fetch initial feed data (server-side)
+let initialFeedData: ActivityFeedResponse | null = null;
+let fetchError: string | null = null;
+
+try {
+  const headers = new Headers();
+  if (authToken) {
+    // Forward cookies in the 'Cookie' header for the server-side fetch
+    headers.append('Cookie', `authToken=${authToken}${refreshToken ? `; refreshToken=${refreshToken}` : ''}`);
+    // Add Authorization header if your strategy needs it AND you prefer it server-side
+    // headers.append('Authorization', `Bearer ${authToken}`);
+  }
+
+  initialFeedData = await getActivityFeed(
+    { page: 1, limit: 15 },
+    headers
+  );
+} catch (error) {
+  console.error('Error fetching activity feed:', error);
+  fetchError = error instanceof Error ? error.message : 'Failed to load feed';
+}
+
+// SEO Configuration
+const pageTitle = 'Feed | Questlog';
+const pageDescription = 'Stay updated with gaming activities from people you follow on Questlog';
+---
+
+<MainLayout 
+  title={pageTitle}
+  description={pageDescription}
+>
+  <!-- Set noindex for personalized content -->
+  <meta name="robots" content="noindex, nofollow" slot="head" />
+  
+  <!-- Open Graph tags -->
+  <meta property="og:title" content={pageTitle} slot="head" />
+  <meta property="og:description" content={pageDescription} slot="head" />
+  <meta property="og:type" content="website" slot="head" />
+  
+  <!-- Main content -->
+  <div class="min-h-screen">
+    <ActivityFeedPage 
+      initialData={initialFeedData}
+      initialError={fetchError}
+      client:load 
+    />
+  </div>
+</MainLayout>
