@@ -20,7 +20,7 @@ interface NavigationItem {
 }
 
 const navigationItems: NavigationItem[] = [
-  { label: 'Home', href: '/feed' },
+  { label: 'Home', href: '/' },
   { label: 'Explore', href: '/games' },
   { label: 'Reviews', href: '/reviews' },
 ];

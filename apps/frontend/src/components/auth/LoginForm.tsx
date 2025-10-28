@@ -9,7 +9,7 @@ interface LoginFormProps {
   className?: string;
 }
 
-export default function LoginForm({ redirectTo = '/feed', className = '' }: LoginFormProps) {
+export default function LoginForm({ redirectTo = '/', className = '' }: LoginFormProps) {
   const { login, isLoading, error, clearError } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);

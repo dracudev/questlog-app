@@ -9,7 +9,7 @@ interface RegisterFormProps {
   className?: string;
 }
 
-export default function RegisterForm({ redirectTo = '/feed', className = '' }: RegisterFormProps) {
+export default function RegisterForm({ redirectTo = '/', className = '' }: RegisterFormProps) {
   const { register, isLoading, error, clearError } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
