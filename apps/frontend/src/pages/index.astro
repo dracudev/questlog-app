@@ -1,0 +1,22 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro';
+import ClientAuthRedirect from '@/components/fallbacks/ClientAuthRedirect';
+
+const pageTitle = 'Welcome to Questlog';
+const pageDescription = 'Your Social Network for Gaming';
+---
+
+<MainLayout title={pageTitle} description={pageDescription}>
+  <main class="max-w-3xl mx-auto py-24 px-6 text-center">
+    <h1 class="text-4xl font-extrabold mb-4">Welcome to Questlog</h1>
+    <p class="text-lg text-muted-foreground mb-8">Your Social Network for Gaming</p>
+
+    <div class="flex items-center justify-center gap-4">
+      <a href="/auth/login" class="rounded-md bg-primary text-white px-4 py-2 hover:opacity-90">Log in</a>
+      <a href="/auth/register" class="rounded-md border border-border px-4 py-2">Sign up</a>
+    </div>
+  </main>
+</MainLayout>
+
+<!-- Client-only redirect island: bundler will resolve imports like `@/stores/auth` -->
+<ClientAuthRedirect client:load />
