@@ -18,7 +18,7 @@ const SOCIAL_ENDPOINTS = {
   FOLLOW_USER: (userId: string) => `social/follow/${userId}`,
   UNFOLLOW_USER: (userId: string) => `social/follow/${userId}`,
   CHECK_FOLLOWING: (userId: string) => `social/following/${userId}`,
-  ACTIVITY_FEED: 'social/',
+  ACTIVITY_FEED: 'social/feed',
   SOCIAL_STATS: 'social/stats',
   USER_SOCIAL_STATS: (userId: string) => `social/stats/${userId}`,
   FOLLOW_SUGGESTIONS: 'social/suggestions',
