@@ -7,14 +7,6 @@ import FeedItemSkeleton from './FeedItemSkeleton';
 export default function ActivityFeedPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { fetchFeed, feed, isLoading: isFeedLoading, error: feedError } = useActivityFeed();
-
-  useEffect(() => {
-    if (!isAuthLoading && !isAuthenticated) {
-      // If auth is loaded and user is NOT authenticated, redirect
-      window.location.href = '/auth/login?redirect=/feed';
-    }
-  }, [isAuthenticated, isAuthLoading]);
-
   useEffect(() => {
     if (isAuthenticated && !feed && !isFeedLoading) {
       fetchFeed({ page: 1, limit: 15 }).catch((err) => {
@@ -22,8 +14,8 @@ export default function ActivityFeedPage() {
       });
     }
   }, [isAuthenticated, fetchFeed, feed, isFeedLoading]);
-
-  if (isAuthLoading || (isAuthenticated && isFeedLoading && !feed)) {
+  // If auth is loading, show the skeleton
+  if (isAuthLoading) {
     return (
       <div className="container mx-auto px-4 py-6 lg:py-8">
         <div className="mx-auto max-w-4xl">
@@ -34,9 +26,32 @@ export default function ActivityFeedPage() {
     );
   }
 
-  // If not authenticated, render nothing (the effect will redirect)
+  // If auth is loaded but user is NOT authenticated, show a prompt to log in
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="container mx-auto px-4 py-6 lg:py-8 text-center">
+        <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
+        <p className="text-text-secondary">
+          Please{' '}
+          <a href="/auth/login?redirect=/feed" className="text-brand-primary underline">
+            log in
+          </a>{' '}
+          to view your feed.
+        </p>
+      </div>
+    );
+  }
+
+  // From here we know the user IS authenticated. Show loading skeleton ONLY if we are fetching the feed and have no data yet.
+  if (isFeedLoading && !feed) {
+    return (
+      <div className="container mx-auto px-4 py-6 lg:py-8">
+        <div className="mx-auto max-w-4xl">
+          <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
+          <FeedItemSkeleton />
+        </div>
+      </div>
+    );
   }
 
   // Render error state if feed fetch failed
