@@ -194,7 +194,7 @@ export default function ActivityFeedList({ initialError }: ActivityFeedListProps
       ))}
 
       {/* Loading more indicator */}
-      {isLoading && (
+      {isLoading && feed?.meta?.hasNext && (
         <div className="space-y-4">
           {Array.from({ length: 3 }).map((_, i) => (
             <FeedItemSkeleton key={`loading-${i}`} />
