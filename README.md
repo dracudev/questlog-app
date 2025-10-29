@@ -240,7 +240,7 @@ pnpm test:e2e              # End-to-end tests
 
 ## Roadmap
 
-### Phase 1: Core Foundation ✅ (Complete)
+### Phase 1: Core Foundation
 
 - [x] Project architecture and monorepo setup
 - [x] Authentication system with JWT and roles
@@ -251,19 +251,19 @@ pnpm test:e2e              # End-to-end tests
 - [x] Radix UI integration for accessibility
 - [x] Design system with CSS custom properties
 
-### Phase 2: UI Development 🔄 (In Progress - ~65% Complete)
+### Phase 2: UI Development
 
 - [x] Core layout refactoring with Radix UI (Navbar, Footer, ThemeToggle)
 - [x] User profile feature implementation (complete 3-layer architecture)
 - [x] Authentication pages (login, register)
 - [x] Mobile-first responsive design patterns
 - [x] Optimistic UI updates with automatic rollback
-- [ ] Games catalog and detail pages
+- [x] Games catalog and detail pages
 - [ ] Review creation and editing UI
-- [ ] Search and filtering interfaces
-- [ ] Activity feed implementation
+- [x] Search and filtering interfaces
+- [x] Activity feed implementation
 
-### Phase 3: Social Features Enhancement (Next - Q1 2026)
+### Phase 3: Social Features Enhancement (Q1 2026)
 
 - [ ] Real-time activity feed with polling
 - [ ] Comment system for reviews
