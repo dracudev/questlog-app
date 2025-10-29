@@ -324,6 +324,24 @@ GET    /api/social/suggestions          # Get follow suggestions
 GET    /api/social/mutual/:userId       # Get mutual follows with another user
 ```
 
+**Notes on /api/social/feed DTO**
+
+The `GET /api/social/feed` endpoint returns an array of `ActivityItemDto` objects. The DTO was recently refactored: `ActivityItemDto` now surfaces `review` and `followedUser` as top-level properties to simplify client rendering. Example shape:
+
+```ts
+interface ActivityItemDto {
+  id: string;
+  type: 'review' | 'follow' | 'like' | 'comment';
+  createdAt: string;
+  // top-level payloads
+  review?: ReviewResponse; // populated for review/like/comment items
+  followedUser?: UserResponse; // populated for follow items
+  // legacy/aux data kept under `meta` when needed
+}
+```
+
+This change reduces nested lookups on the client and aligns the feed contract with the frontend `ActivityFeed*` components.
+
 ### Request/Response Format
 
 All endpoints use consistent JSON format:
@@ -371,89 +389,49 @@ All endpoints use consistent JSON format:
 
 ## 6. Authentication & Authorization
 
-### Authentication Strategy
+### Overview (as-implemented)
 
-The system uses **JWT-based stateless authentication** with a dual-token approach:
+The backend uses a cookie-first session model backed by JWTs. Authentication cookies are set as HTTP-only and secure from the server (the `auth.controller.ts` sets `authToken` and `refreshToken` cookies). This improves security for browser-based clients by avoiding persistent access tokens in JavaScript-accessible storage.
 
-1. **Access Token**: Short-lived (7 days) for API access
-2. **Refresh Token**: Long-lived (30 days) for token renewal
+### Tokens & Cookie handling
 
-### Token Flow
+- Access Token: short-lived JWT used for API access (also available via Authorization header when needed)
+- Refresh Token: long-lived JWT used to obtain new access tokens
+- HTTP cookies: `authToken` and `refreshToken` are set with `HttpOnly`, `Secure`, `SameSite` and appropriate expiry, directly by `auth.controller.ts` responses.
 
-```tree
-1. User logs in with email/password
-2. System validates credentials
-3. Server generates access + refresh tokens
-4. Client stores tokens securely
-5. Client sends access token in Authorization header
-6. Server validates token on protected routes
-7. Client refreshes tokens before expiration
-```
+### Strategy Details
+
+- JwtStrategy and JwtRefreshStrategy are configured to extract tokens from both the `Authorization: Bearer <token>` header and from HTTP cookies. This allows programmatic clients to use headers while browsers rely on secure cookies.
+- The refresh flow (`POST /api/auth/refresh`) validates the refresh token (cookie or header), issues new tokens, and sets replacement cookies in the response.
+- The logout endpoint clears the `authToken` and `refreshToken` cookies to fully terminate the session.
 
 ### Authorization Levels
 
-**Public Routes** (No authentication required):
+**Public Routes** (no cookies or headers required):
 
-- Game catalog browsing and detailed views
+- Game catalog browsing and detail views
 - Public user profiles and follower/following lists
 - Public reviews and review browsing
-- Game metadata (developers, genres, platforms, publishers)
 
-**Authenticated Routes** (Valid JWT required):
+**Authenticated Routes** (valid access token required via cookie or Authorization header):
 
 - Profile management and updating
 - Creating, editing, and deleting reviews
 - Social features (following, unfollowing, liking reviews)
 - Activity feed and social statistics
-- Review interactions (like/unlike)
 
-**Admin/Moderator Routes** (Admin or Moderator role required):
+**Admin/Moderator Routes** (Admin/Moderator role required):
 
-- Game management (CRUD operations)
-- Developer/Publisher/Genre/Platform management (Create, Update)
-- User role management (Admin only)
+- Game and metadata management (CRUD operations)
+- User role management and moderation endpoints
 
-**Admin-Only Routes** (Admin role required):
+### Implementation Notes & Security
 
-- Deleting games, developers, publishers, genres, platforms
-- User account deletion
-- Advanced user management
-
-### Security Implementation
-
-**Password Security:**
-
-- bcryptjs with salt rounds of 12
-- Password strength validation in DTOs
-- Secure password reset flow with time-limited tokens
-
-**JWT Security:**
-
-- Separate secrets for access, refresh, and reset tokens
-- Access tokens: 7 days expiration by default
-- Refresh tokens: 30 days expiration by default
-- Token refresh endpoint for seamless renewal
-- Payload includes user ID, email, and role only
-
-**Route Protection:**
-
-- `JwtAuthGuard`: Validates JWT tokens globally
-- `JwtRefreshGuard`: Validates refresh tokens for token renewal
-- `LocalAuthGuard`: Validates username/password for login
-- `RolesGuard`: Enforces role-based access control
-- `@Public()` decorator: Bypasses auth for public routes
-- `@Roles()` decorator: Specifies required roles for endpoints
-
-**Advanced Security Features:**
-
-- Rate limiting: 100 requests per minute per IP
-- CORS configuration for frontend domains
-- Helmet middleware for security headers
-- Compression middleware for performance
-- Input validation and sanitization via class-validator
-- SQL injection prevention through Prisma ORM
-- Global exception handling with custom filters
-- Request/response transformation and logging
+- Passwords: bcryptjs with salt rounds configured (production: >= 12)
+- Separate secrets for access/refresh/reset tokens stored in environment
+- Route protection uses: `JwtAuthGuard`, `JwtRefreshGuard`, `LocalAuthGuard`, and a `RolesGuard` for role-based checks
+- The `@Public()` decorator is used for explicitly public endpoints
+- Advanced protections: rate limiting, Helmet headers, input validation via class-validator, Prisma ORM to prevent injection, and centralized exception handling
 
 ## 7. Setup & Local Development
 
@@ -504,6 +482,20 @@ NODE_ENV="development"
 PORT="3000"
 FRONTEND_URL="http://localhost:4321"
 ```
+
+### Middleware & CORS (important for local dev)
+
+- `cookie-parser` is required and must be registered in `apps/backend/src/main.ts` as middleware so the server can read HTTP-only auth cookies set by the `auth.controller`.
+- CORS must be configured to allow credentials from the frontend origin. Example:
+
+```ts
+app.enableCors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:4321',
+  credentials: true,
+});
+```
+
+This ensures cookies are set and sent by the browser during local development.
 
 ### Database Setup
 
@@ -605,6 +597,8 @@ The application is designed for deployment on platforms like Railway, Render, or
 - Set up proper database connection pooling
 - Enable logging and monitoring
 - Configure rate limiting appropriate for production load
+
+- Build note: If you encounter `MODULE_NOT_FOUND` during CI or production builds, ensure TypeScript incremental build settings don't emit a broken .tsbuildinfo across packages. The project uses a fix that disables `incremental` in `tsconfig.json` for production builds or configures a unique `tsBuildInfoFile` per package (see `apps/backend/tsconfig.build.json`) to avoid stale build-info issues.
 
 ---
 

@@ -46,153 +46,63 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 - **Framework**: Astro 5.x (Static Site Generator with hybrid rendering)
 - **UI Library**: React 19.x for interactive components (Islands Architecture)
 - **UI Components**: Radix UI primitives for accessible, unstyled components
-- **Styling**: Tailwind CSS v4 with utility-first approach
-- **Type Safety**: TypeScript with strict mode and `@questlog/shared-types` integration
-- **State Management**: Nanostores for global state, React state for local component state
-- **Build Tool**: Vite (integrated with Astro) for fast development and optimized builds
-- **Package Manager**: PNPM with monorepo workspace support
 
-### Key Dependencies
+## 4. Page Types & Rendering Strategy
 
-- **@astrojs/react**: React 19.x integration for Astro Islands
-- **@astrojs/node**: Node.js adapter for server-side rendering
-- **@radix-ui/react-avatar**: Accessible avatar component primitives
-- **@radix-ui/react-dialog**: Accessible modal dialog primitives
-- **@radix-ui/react-tabs**: Accessible tabs component primitives
-- **@nanostores/react**: React bindings for Nanostores state management
-- **@questlog/shared-types**: Type-safe API contracts from backend
-- **@questlog/ui-components**: Shared component library
-- **@questlog/utils**: Shared utility functions
-- **@tailwindcss/vite**: Tailwind CSS v4 Vite plugin
-- **react**: React 19.x library for interactive components
-- **react-dom**: React DOM rendering
-- **tailwindcss**: Utility-first CSS framework v4
-- **lucide-react**: Modern SVG icon library
-- **nanostores**: Lightweight state management
+The project settled on a hybrid rendering strategy with explicit decisions per route to balance performance, SEO, and interactive needs. Astro is configured for server output but critical pages were chosen to be pre-rendered (SSG) or served via SSR depending on UX requirements.
 
-### Framework Choice Rationale
+### Rendering configuration (as-built)
 
-**Astro** was chosen for its:
+- Astro is configured for server output (SSR-capable) but many routes opt into SSG using `export const prerender = true` on a per-page basis.
 
-- **Hybrid Architecture**: Perfect balance between static generation and dynamic interactivity
-- **Islands Architecture**: Ship minimal JavaScript, only for components that need interactivity
-- **SEO Optimization**: Server-side rendering for excellent search engine visibility and dynamic content
-- **Performance**: Zero JavaScript by default, progressive enhancement approach
-- **Framework Agnostic**: Can integrate React, Vue, Svelte, or other frameworks as needed
-- **Developer Experience**: Modern tooling with TypeScript, Vite, and hot module replacement
+### Route-level decisions (final)
 
-**React Islands** provide:
+- `/` (Home)
+  - Strategy: SSG (Static)
+  - Notes: Home is static at build-time and includes a small client-side script (`scripts/client-redirect.ts`) that performs the auth redirect logic that previously lived in `ClientAuthRedirect.tsx` (that component was removed).
 
-- **Selective Hydration**: Only interactive components are hydrated on the client
-- **Framework Flexibility**: Can mix with other frameworks if needed in the future
-- **Component Reusability**: Shared components across different parts of the application
-- **Ecosystem**: Large ecosystem of libraries and tools
+- `/feed`
+  - Strategy: SSG Shell (Static)
+  - Notes: The route renders a static shell at build time. All auth checks and runtime data fetching for the feed are handled entirely client-side by `components/social/ActivityFeedPage.tsx` (client-only data fetching/hydration).
 
-**Tailwind CSS v4** offers:
+- `/games` (Explore)
+  - Strategy: SSR (dynamic) — `export const prerender = false`
+  - Notes: Explore uses server rendering to support dynamic filtering, server-side pagination, and query parameters.
 
-- **Utility-First**: Rapid UI development with consistent design system
-- **Performance**: Purged CSS with only used utilities in production
-- **Customization**: Extensive theming and customization capabilities
-- **Responsive Design**: Mobile-first responsive design out of the box
-- **Developer Experience**: IntelliSense support and consistent class naming
+- `/games/[slug]`
+  - Strategy: SSG (getStaticPaths)
+  - Notes: Individual game pages are pre-generated with `getStaticPaths` to maximize SEO and CDN caching for stable game slugs.
 
-**Radix UI** provides:
+- `/reviews`
+  - Strategy: SSG (first page fetched at build time)
+  - Notes: The first page is built at compile time for SEO; subsequent pages are client-fetched or paginated.
 
-- **Accessibility**: WCAG compliant components with proper ARIA attributes
-- **Unstyled**: Complete styling control with Tailwind CSS
-- **Composable**: Flexible primitives that compose into complex components
-- **Type-Safe**: Full TypeScript support with excellent type definitions
-- **Battle-Tested**: Production-ready components used by major companies
-- **Focus Management**: Automatic focus handling and keyboard navigation
+- `/reviews/[id]`
+  - Strategy: SSR (dynamic) — `export const prerender = false`
+  - Notes: Review detail pages are served via SSR to ensure up-to-date interactions and social data.
 
-## 3. Architecture & Design Patterns
+### Practical patterns used
 
-### Overall Architecture
+- SSG Shells: used for routes like `/feed` where the HTML shell is static but the client populates user-specific data after load.
+- Client-only data fetching: Interactive, auth-protected data is fetched from the browser (e.g., Activity feed, follow lists) to keep SSG pages cacheable while preserving per-user privacy.
+- Explicit prerender control: Routes that must be dynamic set `export const prerender = false`.
 
-The frontend follows a **hybrid static/dynamic architecture** with clear separation between static content and interactive features:
+### Example: static shell pattern
 
-```tree
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Static Pages  │    │ React Islands   │    │   API Client    │
-│   (Astro SSG)   │───▶│ (Interactive    │───▶│   (Type-Safe    │
-│                 │    │  Components)    │    │   Backend)      │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+```astro
+---
+export const prerender = true; // build-time shell
+import ActivityFeedPage from '@/components/social/ActivityFeedPage';
+---
+
+<MainLayout>
+  <div id="feed-root">
+    <!-- Client component fetches and renders the feed -->
+    <ActivityFeedPage client:load />
+  </div>
+</MainLayout>
 ```
 
-### Directory Structure
-
-```tree
-src/
-├── pages/                    # Astro pages (SSR by default, opt-in SSG)
-│   ├── index.astro          # Home page (future)
-│   ├── games/               # Game catalog pages (future)
-│   │   ├── index.astro      # Games listing
-│   │   └── [slug].astro     # Individual game pages
-│   ├── profile/             # User profile pages (✅ IMPLEMENTED)
-│   │   └── [username].astro # User profile pages (SSR with dynamic data and SEO)
-│   ├── reviews/             # Review pages (future)
-│   │   └── [id].astro       # Individual review pages
-│   ├── auth/                # Authentication pages (✅ STATIC with prerender)
-│   │   ├── login.astro      # Login page (export const prerender = true)
-│   │   ├── register.astro   # Registration page (export const prerender = true)
-│   │   └── reset.astro      # Password reset page (future)
-│   ├── feed/                # Social feed (future)
-│   │   └── index.astro      # Activity feed page
-│   ├── admin/               # Admin panel (protected) (future)
-│   │   └── index.astro      # Admin dashboard
-│   └── indie/               # Indie games showcase (future)
-│       └── index.astro      # Indie showcase page
-├── components/              # React components (Islands)
-│   ├── ui/                  # Base UI components
-│   │   ├── Button.tsx       # Button component variants
-│   │   ├── Input.tsx        # Form input components
-│   │   ├── Modal.tsx        # Modal dialog components
-│   │   ├── Card.tsx         # Card layout components
-│   │   └── index.ts         # UI components barrel export
-│   ├── auth/                # Authentication components
-│   │   ├── LoginForm.tsx    # Login form with validation
-│   │   ├── RegisterForm.tsx # Registration form
-│   │   ├── PasswordReset.tsx# Password reset form
-│   │   └── AuthProvider.tsx # Authentication context
-│   ├── games/               # Game-related components
-│   │   ├── GameCard.tsx     # Game display card
-│   │   ├── GameList.tsx     # Game listing with pagination
-│   │   ├── GameSearch.tsx   # Game search and filtering
-│   │   ├── GameDetails.tsx  # Detailed game information
-│   │   └── SimilarGames.tsx # Similar games recommendations
-│   ├── reviews/             # Review components
-│   │   ├── ReviewForm.tsx   # Review creation/editing
-│   │   ├── ReviewCard.tsx   # Review display component
-│   │   ├── RatingStars.tsx  # Star rating component
-│   │   └── ReviewFilters.tsx# Review filtering controls
-│   ├── social/              # Social features
-│   │   ├── FeedItem.tsx     # Activity feed item
-│   │   ├── ActivityFeed.tsx # Social activity feed
-│   │   ├── UserCard.tsx     # User profile card
-│   │   └── SocialStats.tsx  # Social statistics display
-│   ├── profile/             # User profile components (✅ IMPLEMENTED)
-│   │   ├── ProfilePage.tsx  # Main profile page component with SSR data initialization
-│   │   ├── ProfileHeader.tsx# Profile header with avatar (Radix Avatar), bio, stats, and actions
-│   │   ├── ProfileTabs.tsx  # Tab navigation (Radix Tabs) for Reviews/Followers/Following
-│   │   ├── ReviewList.tsx   # User's reviews list with infinite scroll and responsive grid
-│   │   ├── FollowList.tsx   # Followers/following lists with pagination and responsive grid
-│   │   ├── FollowButton.tsx # Follow/unfollow button with optimistic updates
-│   │   └── EditProfileDialog.tsx # Profile editing modal (Radix Dialog)
-│   ├── search/              # Search components
-│   │   ├── SearchBar.tsx    # Global search component
-│   │   ├── SearchFilters.tsx# Advanced search filters
-│   │   └── SearchResults.tsx# Search results display
-│   └── layout/              # Layout components
-│       ├── Header.tsx       # Site header with navigation
-│       ├── Footer.tsx       # Site footer
-│       ├── Navigation.tsx   # Main navigation menu
-│       └── Sidebar.tsx      # Sidebar for filters/info
-├── layouts/                 # Astro layout components
-│   ├── BaseLayout.astro     # Base HTML layout
-│   ├── MainLayout.astro     # Main site layout
-│   ├── AuthLayout.astro     # Authentication pages layout
-│   └── AdminLayout.astro    # Admin panel layout
-├── stores/                  # State management (Nanostores)
 │   ├── auth.ts              # Authentication state with persistence
 │   ├── games.ts             # Games catalog and detail state
 │   ├── reviews.ts           # Reviews management state
@@ -239,6 +149,7 @@ src/
 └── styles/                  # Global styles and Tailwind
     ├── global.css           # Global CSS with Tailwind imports
     └── components.css       # Component-specific styles (if needed)
+
 ```
 
 ### Key Design Patterns
@@ -412,6 +323,15 @@ const ReviewList = ({ gameId }: { gameId: string }) => {
 ## 5. State Management Architecture
 
 ### Global State (Nanostores)
+
+**Explore State** (`stores/explore.ts`):
+
+```typescript
+// Manages explore page filters, selected facets and query params
+// Persisted in memory and syncs with querystring for server requests
+export const $exploreFilters = atom<ExploreFilters | null>(null);
+export const $exploreLoading = atom<boolean>(false);
+```
 
 **Authentication State** (`stores/auth.ts`):
 
@@ -874,6 +794,10 @@ pnpm build:analyze          # Analyze bundle size
 - Background sync for user actions
 - Image lazy loading with intersection observer
 - Bundle optimization and tree shaking
+
+### Auth Form Revert
+
+Note: a previous refactor that replaced `LoginForm.tsx` and `RegisterForm.tsx` with `@radix-ui/react-form`-based implementations was reverted after discovering client hydration errors in production-like builds. The forms remain implemented with the project's stable form approach to preserve reliable hydration; revisiting a Radix-form implementation will require a controlled migration and hydration testing.
 
 ### Medium-Term Features (3-6 months)
 

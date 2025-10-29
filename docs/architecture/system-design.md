@@ -178,6 +178,35 @@ Use fluid typography and consistent spacing:
 
 This design system complements Tailwind CSS v4. Custom properties are available for Tailwind configuration and can be used alongside utility classes for rapid development while maintaining design consistency.
 
+## Component Primitives: Radix UI
+
+We use **Radix UI** as the project's headless, accessible primitive component library. Radix provides unstyled components with robust accessibility and focus management. All visual styling is applied via Tailwind CSS and our design tokens, keeping the primitives decoupled from presentation.
+
+Philosophy:
+
+- Use Radix for behavior and accessibility (focus traps, keyboard navigation, ARIA attributes).
+- Apply styles with Tailwind and design tokens so components remain visually consistent and themeable.
+- Keep Radix primitives wrapped in thin, project-specific presentational components to centralize styling and behavior.
+
+Example — styling a `Tabs.Trigger` with Tailwind and design tokens:
+
+```tsx
+import { Tabs } from '@radix-ui/react-tabs';
+
+function StyledTabTrigger({ children, ...props }) {
+  return (
+    <Tabs.Trigger
+      {...props}
+      className="px-4 py-2 rounded-md text-sm bg-[var(--bg-secondary)] text-[var(--text-primary)] data-[state=active]:bg-[var(--brand-primary)] data-[state=active]:text-white"
+    >
+      {children}
+    </Tabs.Trigger>
+  );
+}
+```
+
+This keeps the accessibility benefits of Radix while giving the team full control over visuals via the design system.
+
 ## Radix UI Integration
 
 All interactive components use Radix UI primitives for maximum accessibility:

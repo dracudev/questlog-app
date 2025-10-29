@@ -161,14 +161,14 @@ The frontend will be built with **Astro** for static rendering (fast and SEO-fri
 
 #### 🔹 Static Pages (SSG / Hybrid)
 
-Astro will pre-render and serve these sections:
+Astro is used with a hybrid rendering model. The implemented route-level decisions are:
 
-- **Home / Landing page** → introduction to Questlog, call to action for sign-up.
-- **Game profiles** → game description, cover art, aggregated reviews.
-- **User profiles** → user bio, reviews list, following/followers.
-- **Indie showcase section** → curated list of indie games (future roadmap: indie dev uploads).
-- **About / FAQ / Contact** → static informational pages.
-- **Authentication pages** (login, register, reset password) → partially static, form handled by React.
+- `/` (Home): SSG (static). Home includes a tiny client-side script (`scripts/client-redirect.ts`) that performs auth redirect logic previously implemented in a React fallback component.
+- `/feed`: SSG Shell (static). The page shell is static; the client (ActivityFeedPage) performs auth checks and fetches feed data.
+- `/games` (Explore): SSR (dynamic, `prerender = false`) to support query-based filtering and dynamic results.
+- `/games/[slug]`: SSG using `getStaticPaths` to prerender game pages for SEO and caching.
+- `/reviews`: SSG for the first page (built at compile time); further pages are client-fetched.
+- `/reviews/[id]`: SSR (dynamic) to ensure up-to-date interactions and social data.
 
 #### 🔹 React Islands (Dynamic Components)
 
@@ -184,7 +184,7 @@ React will be used selectively for components that need interactivity:
 #### 🔹 Styles & UI
 
 - **TailwindCSS** → utility-first, responsive, mobile-first design.
-- **Component library** → shadcn/ui (or Headless UI) for accessible modals, dropdowns, etc.
+- **Component library** → Radix UI primitives for unstyled, accessible component primitives (Dialog, Tabs, Avatar). Styling is applied via Tailwind and design tokens.
 - **Dark mode** → toggle support via Tailwind.
 
 ---
