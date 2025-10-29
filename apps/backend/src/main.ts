@@ -16,12 +16,14 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // Enable CORS
+  const frontendUrl = configService.get<string>('FRONTEND_URL');
+
+  if (!frontendUrl) {
+    logger.warn('FRONTEND_URL environment variable not set. CORS might fail in production.');
+  }
+
   app.enableCors({
-    origin: [
-      'http://localhost:4321',
-      'http://127.0.0.1:4321',
-      configService.get('FRONTEND_URL', 'http://localhost:4321'),
-    ],
+    origin: frontendUrl || 'http://localhost:4321',
     credentials: true,
   });
 
