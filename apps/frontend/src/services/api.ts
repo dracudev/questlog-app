@@ -207,11 +207,18 @@ class ApiClient {
       throw new ApiClientError('Authentication required', 401);
     }
 
+    // Handle no-content responses (204/205) gracefully — some endpoints return 204 with no body
+    if (response.status === 204 || response.status === 205) {
+      // Return undefined for callers expecting no data
+      return undefined as unknown as T;
+    }
+
     // Parse response body
     let responseData: ApiResponse<T> | ApiError;
     try {
       responseData = await response.json();
     } catch {
+      // If response has no JSON body but isn't a no-content status, surface a helpful error
       throw new ApiClientError(`HTTP ${response.status}: ${response.statusText}`, response.status);
     }
 
