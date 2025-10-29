@@ -22,6 +22,7 @@ import {
 } from './dto';
 import { AuthResponse } from './interfaces';
 import { GetUser, Public } from './decorators';
+import { max } from 'class-validator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -53,16 +54,20 @@ export class AuthController {
     const authResponse = await this.authService.login(loginDto);
 
     const isProd = process.env.NODE_ENV === 'production';
+    const sameSiteOption: 'none' | 'lax' = isProd ? 'none' : 'lax';
     const accessTokenOptions = {
       httpOnly: true,
+      // Secure MUST be true if SameSite=None. Use secure in prod only.
       secure: isProd,
-      sameSite: 'lax' as const,
+      // SameSite=None is required for cross-site cookies (Vercel - Render).
+      // In development keep Lax for convenience.
+      sameSite: sameSiteOption,
       path: '/',
-      // TODO: set maxAge here to match access token expiry
+      maxAge: 15 * 60 * 1000, // 15 minutes
     };
     const refreshTokenOptions = {
       ...accessTokenOptions,
-      // TODO: set a longer maxAge for refresh token
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
 
     res.cookie('authToken', authResponse.accessToken, accessTokenOptions);
@@ -82,10 +87,11 @@ export class AuthController {
     const tokens = await this.authService.refreshToken(userId);
 
     const isProd = process.env.NODE_ENV === 'production';
+    const sameSiteOption: 'none' | 'lax' = isProd ? 'none' : 'lax';
     const accessTokenOptions = {
       httpOnly: true,
       secure: isProd,
-      sameSite: 'lax' as const,
+      sameSite: sameSiteOption,
       path: '/',
     };
     const refreshTokenOptions = {
@@ -107,10 +113,11 @@ export class AuthController {
     // Optional: Invalidate tokens server-side (blacklist) here if implemented
 
     const isProd = process.env.NODE_ENV === 'production';
+    const sameSiteOption: 'none' | 'lax' = isProd ? 'none' : 'lax';
     const cookieOptions = {
       httpOnly: true,
       secure: isProd,
-      sameSite: 'lax' as const,
+      sameSite: sameSiteOption,
       path: '/',
       // domain: add if your cookie was set with a specific domain
     };
