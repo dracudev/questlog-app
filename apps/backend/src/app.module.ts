@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { HealthController } from './health/health.controller';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -38,6 +39,7 @@ import { GamesModule } from '@/games/games.module';
     ReviewsModule,
     SocialModule,
   ],
+  controllers: [HealthController],
   providers: [
     // Global guards
     {
