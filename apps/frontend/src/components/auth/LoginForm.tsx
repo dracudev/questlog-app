@@ -4,6 +4,7 @@ import type { LoginRequest } from '@questlog/shared-types';
 import { useAuth } from '@/hooks/useAuth';
 import Card from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginFormProps {
   redirectTo?: string;
@@ -108,43 +109,21 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
                 autoComplete="current-password"
                 required
                 onBlur={() => handleBlur('password')}
-                className="appearance-none block w-full px-3 py-2 pr-10 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="appearance-none block w-full px-3 py-2 pr-11 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Enter your password"
               />
             </Form.Control>
 
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center transition-colors text-muted hover:text-secondary"
+              className="absolute top-1/2 -translate-y-1/2 right-1 h-8 w-8"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? (
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
-                  />
-                </svg>
-              ) : (
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-              )}
-            </button>
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
           </div>
 
           {touched.password && (
