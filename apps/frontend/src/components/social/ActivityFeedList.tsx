@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useActivityFeed } from '@/hooks/useSocial';
 import FeedItem from './FeedItem';
 import FeedItemSkeleton from './FeedItemSkeleton';
+import { Button } from '@/components/ui/Button';
 
 interface ActivityFeedListProps {
   initialError?: string | null;
@@ -85,18 +86,9 @@ export default function ActivityFeedList({ initialError }: ActivityFeedListProps
         >
           {error || initialError || 'An unexpected error occurred'}
         </p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 rounded-md font-medium transition-colors"
-          style={{
-            background: 'var(--brand-primary)',
-            color: 'var(--text-primary)',
-            borderRadius: 'var(--radius-md)',
-            fontSize: 'var(--font-size-base)',
-          }}
-        >
+        <Button variant="primary" size="sm" onClick={() => window.location.reload()}>
           Try Again
-        </button>
+        </Button>
       </div>
     );
   }

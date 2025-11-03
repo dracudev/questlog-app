@@ -6,6 +6,7 @@ import { $viewedProfile } from '@/stores/users';
 import FollowButton from './FollowButton';
 import { useState } from 'react';
 import EditProfileDialog from './EditProfileDialog';
+import { Button } from '@/components/ui/Button';
 
 // ============================================================================
 // Props Interface
@@ -182,12 +183,13 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
           {/* Column 3: Action Buttons */}
           <div className="mt-6 lg:mt-0 flex flex-col items-stretch lg:items-end lg:justify-start">
             {isOwnProfile ? (
-              <button
+              <Button
                 onClick={() => setIsEditDialogOpen(true)}
-                className="w-full lg:w-auto px-6 py-2 rounded-lg font-semibold bg-brand-primary text-white hover:bg-brand-accent transition-colors"
+                variant="primary"
+                className="w-full lg:w-auto"
               >
                 Edit Profile
-              </button>
+              </Button>
             ) : (
               <div className="w-full lg:w-auto">
                 <FollowButton

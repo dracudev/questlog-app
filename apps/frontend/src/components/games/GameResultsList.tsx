@@ -4,6 +4,7 @@ import { useGames } from '@/hooks/useGames';
 import { $selectedFilters, clearFilters } from '@/stores/explore';
 import GameCard from './GameCard.tsx';
 import { Loader2, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import type { GameResponse } from '@questlog/shared-types';
 
 export default function GameResultsList() {
@@ -69,12 +70,9 @@ export default function GameResultsList() {
         <AlertCircle className="mx-auto h-12 w-12 text-destructive mb-4" />
         <h3 className="text-lg font-semibold text-destructive mb-2">Failed to Load Games</h3>
         <p className="text-sm text-muted-foreground mb-4">{error}</p>
-        <button
-          onClick={() => fetchGames(selectedFilters)}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
+        <Button onClick={() => fetchGames(selectedFilters)} size="sm">
           Try Again
-        </button>
+        </Button>
       </div>
     );
   }
@@ -90,7 +88,7 @@ export default function GameResultsList() {
         <p className="text-sm text-muted-foreground mb-6">
           Try adjusting your filters or search terms
         </p>
-        <button
+        <Button
           onClick={() => {
             clearFilters();
             setTimeout(() => {
@@ -99,10 +97,10 @@ export default function GameResultsList() {
               });
             }, 0);
           }}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          size="sm"
         >
           Clear All Filters
-        </button>
+        </Button>
       </div>
     );
   }
@@ -177,7 +175,7 @@ function ResultsHeader({
       {/* Optional: Quick pagination */}
       {totalPages && totalPages > 1 && (
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => {
               const { setPage, $selectedFilters } = require('@/stores/explore');
               const current = $selectedFilters.get();
@@ -187,14 +185,15 @@ function ResultsHeader({
               }
             }}
             disabled={page === 1}
-            className="rounded-lg border border-border bg-background px-3 py-1 text-xs font-medium hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+            size="sm"
+            variant="outline"
           >
             Previous
-          </button>
+          </Button>
           <span className="text-xs text-muted-foreground">
             {page} / {totalPages}
           </span>
-          <button
+          <Button
             onClick={() => {
               const { setPage, $selectedFilters } = require('@/stores/explore');
               const current = $selectedFilters.get();
@@ -204,10 +203,11 @@ function ResultsHeader({
               }
             }}
             disabled={page === totalPages}
-            className="rounded-lg border border-border bg-background px-3 py-1 text-xs font-medium hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+            size="sm"
+            variant="outline"
           >
             Next
-          </button>
+          </Button>
         </div>
       )}
     </div>

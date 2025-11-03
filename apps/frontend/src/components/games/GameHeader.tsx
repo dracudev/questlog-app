@@ -3,6 +3,7 @@ import { Calendar, Users, Building2 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useGameDetail } from '@/hooks/useGames';
 import ReviewFormDialog from './ReviewFormDialog';
+import { Button } from '@/components/ui/Button';
 
 export default function GameHeader() {
   const { game, isLoading } = useGameDetail();
@@ -136,18 +137,15 @@ export default function GameHeader() {
 function ActionButtons({ onWriteReview }: { onWriteReview: () => void }) {
   return (
     <div className="flex gap-3">
-      <button
-        onClick={onWriteReview}
-        className="flex-1 lg:flex-initial px-6 py-3 bg-brand-primary text-text-primary font-semibold rounded-md hover:bg-opacity-90 transition-colors"
-      >
+      <Button onClick={onWriteReview} className="flex-1 lg:flex-initial">
         Write Review
-      </button>
+      </Button>
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <button className="flex-1 lg:flex-initial px-6 py-3 bg-bg-secondary text-text-primary font-semibold rounded-md hover:bg-bg-tertiary transition-colors">
+          <Button variant="secondary" className="flex-1 lg:flex-initial">
             Add to List
-          </button>
+          </Button>
         </DropdownMenu.Trigger>
 
         <DropdownMenu.Portal>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 // TODO: This component will be replaced with a better review modal implementation acrsoss the app
 
@@ -31,7 +32,10 @@ export default function ReviewFormDialog({ gameId, isOpen, onClose }: ReviewForm
               Write a Review
             </Dialog.Title>
             <Dialog.Close asChild>
-              <button className="text-text-secondary hover:text-text-primary transition-colors">
+              <button
+                type="button"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
                 <X size={24} />
               </button>
             </Dialog.Close>
@@ -67,19 +71,11 @@ export default function ReviewFormDialog({ gameId, isOpen, onClose }: ReviewForm
 
             <div className="flex gap-3 justify-end">
               <Dialog.Close asChild>
-                <button
-                  type="button"
-                  className="px-6 py-2 bg-bg-tertiary text-text-primary rounded-md hover:bg-opacity-80 transition-colors"
-                >
+                <Button type="button" variant="secondary">
                   Cancel
-                </button>
+                </Button>
               </Dialog.Close>
-              <button
-                type="submit"
-                className="px-6 py-2 bg-brand-primary text-text-primary font-semibold rounded-md hover:bg-opacity-90 transition-colors"
-              >
-                Submit Review
-              </button>
+              <Button type="submit">Submit Review</Button>
             </div>
           </form>
         </Dialog.Content>

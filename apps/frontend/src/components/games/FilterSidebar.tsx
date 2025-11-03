@@ -4,6 +4,7 @@ import * as Collapsible from '@radix-ui/react-collapsible';
 import * as Checkbox from '@radix-ui/react-checkbox';
 import * as Select from '@radix-ui/react-select';
 import { X, ChevronDown, Check, Filter } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import {
   $filterOptions,
   $filterOptionsLoading,
@@ -43,13 +44,15 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
       </div>
 
       {/* Clear Filters Button */}
-      <button
+      <Button
         onClick={clearFilters}
-        className="w-full rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
+        variant="outline"
+        fullWidth
+        size="sm"
         disabled={isDefaultFilters(selectedFilters)}
       >
         Clear All Filters
-      </button>
+      </Button>
 
       {loading ? (
         <FilterSkeleton />

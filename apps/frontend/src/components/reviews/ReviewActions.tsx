@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ReviewResponse } from '@questlog/shared-types';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Heart } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 // Hooks
 import { useReviewActions } from '@/hooks/useReviews';
@@ -109,30 +110,22 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
           {/* Like Button with Tooltip */}
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
-              <button
+              <Button
                 onClick={handleLikeToggle}
                 disabled={isLiking || isLoading}
-                className={`
-                  inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                  border transition-all duration-200
-                  focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  ${
-                    currentReview.isLiked
-                      ? 'bg-brand-accent border-brand-accent text-white hover:bg-brand-accent/90'
-                      : 'bg-transparent border-tertiary text-secondary hover:border-brand-accent hover:text-brand-accent'
-                  }
-                `}
+                variant={currentReview.isLiked ? 'primary' : 'outline'}
+                leftIcon={
+                  <Heart
+                    className={`w-5 h-5 transition-transform ${isLiking ? 'scale-110' : ''}`}
+                    fill={currentReview.isLiked ? 'currentColor' : 'none'}
+                    aria-hidden="true"
+                  />
+                }
                 aria-label={currentReview.isLiked ? 'Unlike this review' : 'Like this review'}
                 aria-pressed={currentReview.isLiked}
               >
-                <Heart
-                  className={`w-5 h-5 transition-transform ${isLiking ? 'scale-110' : ''}`}
-                  fill={currentReview.isLiked ? 'currentColor' : 'none'}
-                  aria-hidden="true"
-                />
-                <span className="font-medium">{currentReview.isLiked ? 'Liked' : 'Like'}</span>
-              </button>
+                {currentReview.isLiked ? 'Liked' : 'Like'}
+              </Button>
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content

@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useCurrentUserProfile } from '@/hooks/useUsers';
 import type { UserProfile } from '@questlog/shared-types';
 import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/Button';
 
 // ============================================================================
 // Props Interface
@@ -198,47 +199,24 @@ export default function EditProfileDialog({ profile, isOpen, onClose }: EditProf
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
                 disabled={updateLoading}
-                className="flex-1 px-4 py-2 bg-tertiary text-primary rounded-lg font-semibold hover:bg-tertiary/80 transition-colors disabled:opacity-50"
+                variant="secondary"
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={updateLoading}
-                className="flex-1 px-4 py-2 bg-brand-primary text-white rounded-lg font-semibold hover:bg-brand-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="primary"
+                isLoading={updateLoading}
+                className="flex-1"
               >
-                {updateLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg
-                      className="animate-spin h-4 w-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Saving...
-                  </span>
-                ) : (
-                  'Save Changes'
-                )}
-              </button>
+                Save Changes
+              </Button>
             </div>
           </form>
 

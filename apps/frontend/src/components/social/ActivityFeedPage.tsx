@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useActivityFeed } from '@/hooks/useSocial';
 import ActivityFeedList from './ActivityFeedList';
 import FeedItemSkeleton from './FeedItemSkeleton';
+import { Button } from '@/components/ui/Button';
 
 export default function ActivityFeedPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
@@ -62,12 +63,14 @@ export default function ActivityFeedPage() {
         <div className="text-center py-10 bg-destructive/10 border border-destructive/20 rounded-lg">
           <p className="text-destructive font-semibold">Failed to Load Feed</p>
           <p className="text-sm text-destructive/80 mt-1">{feedError}</p>
-          <button
+          <Button
             onClick={() => fetchFeed({ page: 1, limit: 15 })}
-            className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-sm"
+            variant="primary"
+            size="sm"
+            className="mt-4"
           >
             Try Again
-          </button>
+          </Button>
         </div>
       </div>
     );

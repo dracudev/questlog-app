@@ -1,4 +1,5 @@
 import { Filter } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 interface MobileFilterButtonProps {
   onClick: () => void;
@@ -10,18 +11,20 @@ export default function MobileFilterButton({
   activeFilterCount,
 }: MobileFilterButtonProps) {
   return (
-    <button
+    <Button
       onClick={onClick}
-      className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-3 text-sm font-medium hover:bg-accent"
+      variant="outline"
+      fullWidth
+      className="justify-center"
       aria-label={`Open filters ${activeFilterCount > 0 ? `(${activeFilterCount} active)` : ''}`}
     >
       <Filter className="h-4 w-4" aria-hidden="true" />
       <span>Filters</span>
       {activeFilterCount > 0 && (
-        <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+        <span className="rounded-full bg-[var(--brand-primary)] px-2 py-0.5 text-xs font-semibold text-white">
           {activeFilterCount}
         </span>
       )}
-    </button>
+    </Button>
   );
 }

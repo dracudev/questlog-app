@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, User, LogOut, Settings } from 'lucide-react';
 import { useStore } from '@nanostores/react';
-import { $currentUser, $isAuthenticated, initializeAuthState } from '@/stores/auth';
+import {
+  $currentUser,
+  $isAuthenticated,
+  initializeAuthState,
+  getUserAvatarUrl,
+} from '@/stores/auth';
 import { logout } from '@/services/auth';
 import ThemeToggle from './ThemeToggle';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -120,7 +125,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
           </div>
 
           {/* Desktop Right Side */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center gap-4">
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -131,21 +136,14 @@ export default function Navbar({ currentPath }: NavbarProps) {
                   <DropdownMenu.Trigger asChild>
                     <button
                       type="button"
-                      className="flex items-center text-secondary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary "
-                      aria-label="User menu"
+                      className="flex items-center justify-center rounded-full hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
                     >
-                      <Avatar.Root className="w-6 h-6 rounded-full overflow-hidden">
+                      <Avatar.Root className="w-8 h-8 rounded-full overflow-hidden">
                         <Avatar.Image
-                          src={user.avatar || undefined}
+                          src={getUserAvatarUrl(40)}
                           alt={user.username}
                           className="w-full h-full object-cover"
                         />
-                        <Avatar.Fallback
-                          className="w-full h-full bg-brand-primary/20 text-brand-primary flex items-center justify-center text-sm font-medium"
-                          delayMs={600}
-                        >
-                          {user.username.charAt(0).toUpperCase()}
-                        </Avatar.Fallback>
                       </Avatar.Root>
                     </button>
                   </DropdownMenu.Trigger>
@@ -276,13 +274,10 @@ export default function Navbar({ currentPath }: NavbarProps) {
                             <div className="flex items-center space-x-3 px-3 py-2">
                               <Avatar.Root className="w-10 h-10 rounded-full overflow-hidden">
                                 <Avatar.Image
-                                  src={user.avatar || undefined}
+                                  src={getUserAvatarUrl(64)}
                                   alt={user.username}
                                   className="w-full h-full object-cover"
                                 />
-                                <Avatar.Fallback className="w-full h-full bg-brand-primary/20 text-brand-primary flex items-center justify-center text-base font-medium">
-                                  {user.username.charAt(0).toUpperCase()}
-                                </Avatar.Fallback>
                               </Avatar.Root>
                               <div>
                                 <div className="text-base font-medium text-primary">
