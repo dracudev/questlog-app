@@ -13,9 +13,21 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
   const { register, isLoading, error, clearError } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({
+    email: false,
+    username: false,
+    password: false,
+  });
+
+  const handleBlur = (field: 'email' | 'username' | 'password') => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Mark all fields as touched on submit
+    setTouched({ email: true, username: true, password: true });
 
     clearError();
 
@@ -65,18 +77,23 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
               type="email"
               autoComplete="email"
               required
+              onBlur={() => handleBlur('email')}
               className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="Enter your email"
             />
           </Form.Control>
 
-          <Form.Message match="valueMissing" className="text-sm text-state-error">
-            Email is required
-          </Form.Message>
+          {touched.email && (
+            <>
+              <Form.Message match="valueMissing" className="text-sm text-state-error">
+                Email is required
+              </Form.Message>
 
-          <Form.Message match="typeMismatch" className="text-sm text-state-error">
-            Please provide a valid email address
-          </Form.Message>
+              <Form.Message match="typeMismatch" className="text-sm text-state-error">
+                Please provide a valid email address
+              </Form.Message>
+            </>
+          )}
         </Form.Field>
 
         {/* Username field */}
@@ -90,27 +107,32 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
               required
               minLength={3}
               maxLength={30}
-              pattern="^[a-zA-Z0-9_-]+$"
+              pattern="^[a-zA-Z0-9_\-]+$"
+              onBlur={() => handleBlur('username')}
               className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="Choose a username"
             />
           </Form.Control>
 
-          <Form.Message match="valueMissing" className="text-sm text-state-error">
-            Username is required
-          </Form.Message>
+          {touched.username && (
+            <>
+              <Form.Message match="valueMissing" className="text-sm text-state-error">
+                Username is required
+              </Form.Message>
 
-          <Form.Message match="tooShort" className="text-sm text-state-error">
-            Username must be at least 3 characters
-          </Form.Message>
+              <Form.Message match="tooShort" className="text-sm text-state-error">
+                Username must be at least 3 characters
+              </Form.Message>
 
-          <Form.Message match="tooLong" className="text-sm text-state-error">
-            Username must not exceed 30 characters
-          </Form.Message>
+              <Form.Message match="tooLong" className="text-sm text-state-error">
+                Username must not exceed 30 characters
+              </Form.Message>
 
-          <Form.Message match="patternMismatch" className="text-sm text-state-error">
-            Username can only contain letters, numbers, underscores, and hyphens
-          </Form.Message>
+              <Form.Message match="patternMismatch" className="text-sm text-state-error">
+                Username can only contain letters, numbers, underscores, and hyphens
+              </Form.Message>
+            </>
+          )}
 
           <p className="text-xs text-muted">
             3-30 characters. Letters, numbers, underscores, and hyphens only.
@@ -128,7 +150,8 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
                 autoComplete="new-password"
                 required
                 minLength={8}
-                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]+$"
+                onBlur={() => handleBlur('password')}
                 className="appearance-none block w-full px-3 py-2 pr-10 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Create a strong password"
               />
@@ -168,28 +191,35 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
             </button>
           </div>
 
-          <Form.Message match="valueMissing" className="text-sm text-state-error">
-            Password is required
-          </Form.Message>
+          {touched.password && (
+            <>
+              <Form.Message match="valueMissing" className="text-sm text-state-error">
+                Password is required
+              </Form.Message>
 
-          <Form.Message match="tooShort" className="text-sm text-state-error">
-            Password must be at least 8 characters
-          </Form.Message>
+              <Form.Message match="tooShort" className="text-sm text-state-error">
+                Password must be at least 8 characters
+              </Form.Message>
 
-          <Form.Message match="patternMismatch" className="text-sm text-state-error">
-            Password must contain uppercase, lowercase, number, and special character
-          </Form.Message>
+              <Form.Message match="patternMismatch" className="text-sm text-state-error">
+                Password must contain at least one uppercase letter, one lowercase letter, one
+                number and one special character
+              </Form.Message>
+            </>
+          )}
 
-          <div className="text-xs text-muted space-y-1">
-            <p>Password must contain:</p>
-            <ul className="list-disc list-inside ml-2 space-y-0.5">
-              <li>At least 8 characters</li>
-              <li>One uppercase letter</li>
-              <li>One lowercase letter</li>
-              <li>One number</li>
-              <li>One special character</li>
-            </ul>
-          </div>
+          {!touched.password && (
+            <div className="text-xs text-muted space-y-1">
+              <p>Password must contain:</p>
+              <ul className="list-disc list-inside ml-2 space-y-0.5">
+                <li>At least 8 characters</li>
+                <li>One uppercase letter</li>
+                <li>One lowercase letter</li>
+                <li>One number</li>
+                <li>One special character</li>
+              </ul>
+            </div>
+          )}
         </Form.Field>
 
         {/* Terms and Privacy Policy */}

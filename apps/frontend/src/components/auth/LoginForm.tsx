@@ -13,9 +13,20 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
   const { login, isLoading, error, clearError } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({
+    email: false,
+    password: false,
+  });
+
+  const handleBlur = (field: 'email' | 'password') => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Mark all fields as touched on submit
+    setTouched({ email: true, password: true });
 
     clearError();
 
@@ -64,18 +75,23 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
               type="email"
               autoComplete="email"
               required
+              onBlur={() => handleBlur('email')}
               className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="Enter your email"
             />
           </Form.Control>
 
-          <Form.Message match="valueMissing" className="text-sm text-state-error">
-            Email is required
-          </Form.Message>
+          {touched.email && (
+            <>
+              <Form.Message match="valueMissing" className="text-sm text-state-error">
+                Email is required
+              </Form.Message>
 
-          <Form.Message match="typeMismatch" className="text-sm text-state-error">
-            Please provide a valid email address
-          </Form.Message>
+              <Form.Message match="typeMismatch" className="text-sm text-state-error">
+                Please provide a valid email address
+              </Form.Message>
+            </>
+          )}
         </Form.Field>
 
         {/* Password field */}
@@ -88,6 +104,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 required
+                onBlur={() => handleBlur('password')}
                 className="appearance-none block w-full px-3 py-2 pr-10 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Enter your password"
               />
@@ -127,9 +144,11 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
             </button>
           </div>
 
-          <Form.Message match="valueMissing" className="text-sm text-state-error">
-            Password is required
-          </Form.Message>
+          {touched.password && (
+            <Form.Message match="valueMissing" className="text-sm text-state-error">
+              Password is required
+            </Form.Message>
+          )}
         </Form.Field>
 
         {/* Remember me and Forgot password */}
