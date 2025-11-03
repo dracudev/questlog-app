@@ -59,10 +59,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isDisabled = disabled || isLoading;
 
     const baseClasses =
-      'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200';
+      'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 cursor-pointer';
     const focusClasses =
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2';
-    const disabledClasses = 'disabled:pointer-events-none disabled:opacity-50';
+    const disabledClasses =
+      'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed';
     const variantClass = variantStyles[variant];
     const sizeClass = sizeStyles[size];
     const widthClass = fullWidth ? 'w-full' : '';

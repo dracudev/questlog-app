@@ -14,19 +14,19 @@ export default function GameTabs() {
       <Tabs.List className="flex gap-4 border-b border-bg-tertiary mb-6 overflow-x-auto">
         <Tabs.Trigger
           value="about"
-          className="px-4 py-3 text-text-secondary font-medium border-b-2 border-transparent data-[state=active]:text-brand-primary data-[state=active]:border-brand-primary hover:text-text-primary transition-colors whitespace-nowrap"
+          className="px-4 py-3 text-text-secondary font-medium border-b-2 border-transparent data-[state=active]:text-brand-primary data-[state=active]:border-brand-primary hover:text-text-primary transition-colors whitespace-nowrap cursor-pointer"
         >
           About
         </Tabs.Trigger>
         <Tabs.Trigger
           value="reviews"
-          className="px-4 py-3 text-text-secondary font-medium border-b-2 border-transparent data-[state=active]:text-brand-primary data-[state=active]:border-brand-primary hover:text-text-primary transition-colors whitespace-nowrap"
+          className="px-4 py-3 text-text-secondary font-medium border-b-2 border-transparent data-[state=active]:text-brand-primary data-[state=active]:border-brand-primary hover:text-text-primary transition-colors whitespace-nowrap cursor-pointer"
         >
           Reviews
         </Tabs.Trigger>
         <Tabs.Trigger
           value="details"
-          className="px-4 py-3 text-text-secondary font-medium border-b-2 border-transparent data-[state=active]:text-brand-primary data-[state=active]:border-brand-primary hover:text-text-primary transition-colors whitespace-nowrap"
+          className="px-4 py-3 text-text-secondary font-medium border-b-2 border-transparent data-[state=active]:text-brand-primary data-[state=active]:border-brand-primary hover:text-text-primary transition-colors whitespace-nowrap cursor-pointer"
         >
           Details
         </Tabs.Trigger>

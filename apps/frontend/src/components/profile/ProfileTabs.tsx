@@ -33,7 +33,7 @@ export default function ProfileTabs({ profile }: ProfileTabsProps) {
       >
         <Tabs.Trigger
           value="reviews"
-          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
         >
           Reviews
           <span className="ml-2 text-xs bg-tertiary px-2 py-0.5 rounded-full">
@@ -43,7 +43,7 @@ export default function ProfileTabs({ profile }: ProfileTabsProps) {
 
         <Tabs.Trigger
           value="followers"
-          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
         >
           Followers
           <span className="ml-2 text-xs bg-tertiary px-2 py-0.5 rounded-full">
@@ -53,7 +53,7 @@ export default function ProfileTabs({ profile }: ProfileTabsProps) {
 
         <Tabs.Trigger
           value="following"
-          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
         >
           Following
           <span className="ml-2 text-xs bg-tertiary px-2 py-0.5 rounded-full">
