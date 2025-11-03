@@ -1,5 +1,6 @@
 import { useFollowActions } from '@/hooks/useSocial';
-import { useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { setFollowingStatus } from '@/stores/social';
 
 // ============================================================================
 // Props Interface
@@ -23,8 +24,27 @@ interface FollowButtonProps {
  * ```
  */
 export default function FollowButton({ userId, initialIsFollowing = false }: FollowButtonProps) {
-  const { followUser, unfollowUser, followingStatus, loadingActions } = useFollowActions();
+  const { followUser, unfollowUser, followingStatus, loadingActions, checkFollowingStatus } =
+    useFollowActions();
   const [error, setError] = useState<string | null>(null);
+  const isInitializedRef = useRef(false);
+
+  // Initialize follow status from the server and verify with API
+  useEffect(() => {
+    // Only initialize once per userId
+    if (!isInitializedRef.current) {
+      isInitializedRef.current = true;
+
+      // First, set the initial value from server
+      setFollowingStatus(userId, initialIsFollowing);
+
+      // Then, verify the actual status from the API (this handles server-side auth context issues)
+      checkFollowingStatus(userId).catch((err) => {
+        console.error('Failed to check following status:', err);
+        // Keep the initial value if check fails
+      });
+    }
+  }, [userId, initialIsFollowing, checkFollowingStatus]);
 
   // Determine current following status
   const isFollowing = followingStatus[userId] ?? initialIsFollowing;
