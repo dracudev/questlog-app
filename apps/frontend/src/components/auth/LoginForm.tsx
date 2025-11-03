@@ -160,7 +160,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
         {/* Submit button */}
         <Form.Submit asChild>
           <Button type="submit" isLoading={isLoading} fullWidth variant={'primary'}>
-            Sign in
+            Log in
           </Button>
         </Form.Submit>
       </Form.Root>
