@@ -247,7 +247,6 @@ button {
 
 button:hover {
   background-color: color-mix(in srgb, var(--brand-primary) 85%, white);
-  transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
 
