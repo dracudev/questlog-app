@@ -164,18 +164,18 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
                 </div>
                 <div className="text-sm text-muted">Reviews</div>
               </div>
-              <button className="text-center lg:text-left hover:bg-tertiary rounded-lg px-3 transition-colors">
+              <div className="text-center lg:text-left">
                 <div className="text-2xl font-bold text-primary">
                   {displayProfile.stats.followersCount}
                 </div>
                 <div className="text-sm text-muted">Followers</div>
-              </button>
-              <button className="text-center lg:text-left hover:bg-tertiary rounded-lg px-3 transition-colors">
+              </div>
+              <div className="text-center lg:text-left">
                 <div className="text-2xl font-bold text-primary">
                   {displayProfile.stats.followingCount}
                 </div>
                 <div className="text-sm text-muted">Following</div>
-              </button>
+              </div>
             </div>
           </div>
 
