@@ -14,7 +14,7 @@ export default function SimilarGamesSection() {
 
   return (
     <section className="mb-12">
-      <h2 className="text-2xl font-bold text-text-primary mb-6">Similar Games</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">Similar Games</h2>
 
       {/* Mobile: Horizontal Scroll */}
       <div className="lg:hidden flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
@@ -38,12 +38,12 @@ export default function SimilarGamesSection() {
 function SimilarGamesSkeleton() {
   return (
     <section className="mb-12 animate-pulse">
-      <div className="h-8 bg-bg-secondary rounded w-48 mb-6" />
+      <div className="h-8 bg-secondary rounded w-48 mb-6" />
       <div className="flex gap-4 overflow-x-auto lg:grid lg:grid-cols-6">
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div key={i} className="shrink-0 w-48 lg:w-auto">
-            <div className="aspect-[3/4] bg-bg-secondary rounded-lg mb-2" />
-            <div className="h-4 bg-bg-secondary rounded w-3/4" />
+            <div className="aspect-[3/4] bg-secondary rounded-lg mb-2" />
+            <div className="h-4 bg-secondary rounded w-3/4" />
           </div>
         ))}
       </div>

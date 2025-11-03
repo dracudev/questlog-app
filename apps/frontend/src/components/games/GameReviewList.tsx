@@ -51,7 +51,7 @@ export default function GameReviewList({ gameId }: GameReviewListProps) {
   if (!reviews || reviews.items.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-text-secondary text-lg">
+        <p className="text-secondary-foreground text-lg">
           No reviews yet. Be the first to review this game!
         </p>
       </div>
@@ -67,8 +67,8 @@ export default function GameReviewList({ gameId }: GameReviewListProps) {
       {/* Infinite Scroll Trigger */}
       <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
         {isLoading && (reviews?.meta.page ?? 1) < (reviews?.meta.totalPages ?? 1) && (
-          <div className="flex items-center gap-2 text-text-secondary">
-            <div className="w-5 h-5 border-2 border-brand-primary border-t-transparent rounded-full animate-spin" />
+          <div className="flex items-center gap-2 text-secondary-foreground">
+            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <span>Loading more reviews...</span>
           </div>
         )}
@@ -81,18 +81,18 @@ function ReviewListSkeleton() {
   return (
     <div className="space-y-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-bg-secondary rounded-lg p-6 animate-pulse">
+        <div key={i} className="bg-secondary rounded-lg p-6 animate-pulse">
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-12 h-12 bg-bg-tertiary rounded-full" />
+            <div className="w-12 h-12 bg-muted rounded-full" />
             <div className="flex-1">
-              <div className="h-5 bg-bg-tertiary rounded w-1/4 mb-2" />
-              <div className="h-4 bg-bg-tertiary rounded w-1/6" />
+              <div className="h-5 bg-muted rounded w-1/4 mb-2" />
+              <div className="h-4 bg-muted rounded w-1/6" />
             </div>
           </div>
           <div className="space-y-2">
-            <div className="h-4 bg-bg-tertiary rounded w-full" />
-            <div className="h-4 bg-bg-tertiary rounded w-5/6" />
-            <div className="h-4 bg-bg-tertiary rounded w-4/6" />
+            <div className="h-4 bg-muted rounded w-full" />
+            <div className="h-4 bg-muted rounded w-5/6" />
+            <div className="h-4 bg-muted rounded w-4/6" />
           </div>
         </div>
       ))}

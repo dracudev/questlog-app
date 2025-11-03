@@ -137,7 +137,7 @@ export default function ReviewList({ userId }: ReviewListProps) {
       {isLoading && reviewItems.length > 0 && (
         <div className="flex justify-center py-4">
           <svg
-            className="animate-spin h-6 w-6 text-brand-primary"
+            className="animate-spin h-6 w-6 text-primary"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -183,7 +183,7 @@ function ReviewCard({ review }: ReviewCardProps) {
   return (
     <a
       href={`/reviews/${review.id}`}
-      className="block bg-secondary rounded-lg border border-tertiary p-4 hover:border-brand-primary transition-colors"
+      className="block bg-secondary rounded-lg border border-tertiary p-4 hover:border-primary transition-colors"
     >
       <div className="flex gap-4">
         {/* Game Cover */}
@@ -204,7 +204,7 @@ function ReviewCard({ review }: ReviewCardProps) {
                 <svg
                   key={star}
                   className={`w-4 h-4 ${
-                    star <= review.rating ? 'text-brand-primary' : 'text-tertiary'
+                    star <= review.rating ? 'text-primary' : 'text-tertiary'
                   }`}
                   fill="currentColor"
                   viewBox="0 0 20 20"

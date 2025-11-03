@@ -162,7 +162,7 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg
                   bg-transparent border border-tertiary text-secondary
-                  hover:border-brand-primary hover:text-brand-primary
+                  hover:border-primary hover:text-primary
                   transition-all duration-200
                   focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2"
                 aria-label="Share this review"

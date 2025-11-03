@@ -28,7 +28,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
+        <h2 className="text-sm font-semibold flex items-center gap-2">
           <Filter className="h-5 w-5" aria-hidden="true" />
           Filters
         </h2>
@@ -94,7 +94,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
                 </Select.Trigger>
 
                 <Select.Portal>
-                  <Select.Content className="rounded-lg border border-border bg-popover bg-zinc-900 text-[var(--brand-accent)] shadow-lg">
+                  <Select.Content className="rounded-lg border border-border bg-popover shadow-lg">
                     <Select.Viewport className="p-1">
                       <SelectItem value="averageRating-desc">Highest Rated</SelectItem>
                       <SelectItem value="averageRating-asc">Lowest Rated</SelectItem>
@@ -125,7 +125,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
                 </Select.Trigger>
 
                 <Select.Portal>
-                  <Select.Content className="rounded-lg border border-border bg-zinc-900 text-[var(--brand-accent)] shadow-lg">
+                  <Select.Content className="rounded-lg border border-border bg-popover shadow-lg">
                     <Select.Viewport className="p-1">
                       <SelectItem value="all">All Games</SelectItem>
                       <SelectItem value="RELEASED">Released</SelectItem>
@@ -271,7 +271,7 @@ function CollapsibleSection({
               role="status"
               aria-label={`${countNum} selected`}
               title={`${countNum} selected`}
-              className="inline-flex items-center rounded-full bg-zinc-600 px-2 py-0.5 text-xs font-semibold text-primary"
+              className="inline-flex items-center rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-white"
             >
               <span className="sr-only">{`${countNum} selected`}</span>
               <span aria-hidden>{countNum}</span>

@@ -57,7 +57,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
   // ============================================================================
 
   return (
-    <article className="bg-secondary rounded-lg border border-tertiary overflow-hidden hover:border-brand-primary transition-all duration-200 hover:shadow-lg group flex flex-col md:flex-row">
+    <article className="bg-secondary rounded-lg border border-tertiary overflow-hidden hover:border-primary transition-all duration-200 hover:shadow-lg group flex flex-col md:flex-row">
       {/* Game Cover Image */}
       <a
         href={`/games/${review.game.slug}`}
@@ -89,7 +89,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         {/* Game Title - Link to Game */}
         <a
           href={`/games/${review.game.slug}`}
-          className="block mb-3 hover:text-brand-primary transition-colors"
+          className="block mb-3 hover:text-primary transition-colors"
         >
           <h3 className="font-semibold text-primary line-clamp-2">{review.game.title}</h3>
         </a>
@@ -137,7 +137,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         {review.title && (
           <a
             href={`/reviews/${review.id}`}
-            className="block mb-2 hover:text-brand-primary transition-colors"
+            className="block mb-2 hover:text-primary transition-colors"
           >
             <h4 className="font-medium text-secondary line-clamp-1">{review.title}</h4>
           </a>
@@ -146,7 +146,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         {/* Content Preview - Link to Review */}
         <a
           href={`/reviews/${review.id}`}
-          className="block mb-3 hover:text-brand-primary transition-colors"
+          className="block mb-3 hover:text-primary transition-colors"
         >
           <p className="text-sm text-muted line-clamp-3">{truncateContent(review.content)}</p>
         </a>

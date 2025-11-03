@@ -25,7 +25,7 @@ export default function GameDetailPage({
   }, [initialGame, initialReviews, initialSimilarGames]);
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6 lg:py-8">
         <GameHeader />
         <GameTabs />

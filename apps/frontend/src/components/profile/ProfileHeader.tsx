@@ -126,7 +126,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
                   href={displayProfile.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-brand-primary transition-colors"
+                  className="flex items-center gap-1 hover:text-primary transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

@@ -150,7 +150,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
             className="block group mb-4"
             aria-label={`View ${review.game.title}`}
           >
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary group-hover:text-brand-primary transition-colors">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary group-hover:text-primary transition-colors">
               {review.game.title}
             </h1>
           </a>
@@ -164,7 +164,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
             <img
               src={avatarUrl}
               alt={review.user.displayName}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-tertiary group-hover:border-brand-primary transition-colors"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-tertiary group-hover:border-primary transition-colors"
             />
             <div className="flex flex-col min-w-0">
               <span className="text-base md:text-lg font-semibold text-primary truncate">

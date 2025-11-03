@@ -108,7 +108,7 @@ export default function ReviewFilters() {
           value={selectedSort}
           onChange={(e) => handleSortChange(e.target.value)}
           disabled={isLoading}
-          className="w-full sm:w-auto px-4 py-2 bg-primary border border-tertiary rounded-md text-sm text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-4 py-2 bg-primary border border-tertiary rounded-md text-sm text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>

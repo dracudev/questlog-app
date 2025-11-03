@@ -10,12 +10,12 @@ import { Plus, Settings, Trash2, ExternalLink, Download } from 'lucide-react';
 
 export default function ButtonExamples() {
   return (
-    <div className="p-8 space-y-12 bg-bg-primary min-h-screen">
-      <h1 className="text-3xl font-bold text-text-primary">Button Component Examples</h1>
+    <div className="p-8 space-y-12 bg-background min-h-screen">
+      <h1 className="text-3xl font-bold text-foreground">Button Component Examples</h1>
 
       {/* Variants */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Variants</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Variants</h2>
         <div className="flex flex-wrap gap-4">
           <Button variant="primary">Primary Button</Button>
           <Button variant="secondary">Secondary Button</Button>
@@ -28,7 +28,7 @@ export default function ButtonExamples() {
 
       {/* Sizes */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Sizes</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Sizes</h2>
         <div className="flex flex-wrap items-end gap-4">
           <Button size="sm">Small</Button>
           <Button size="md">Medium (Default)</Button>
@@ -38,7 +38,7 @@ export default function ButtonExamples() {
 
       {/* Icon Buttons */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Icon Buttons</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Icon Buttons</h2>
         <div className="flex flex-wrap gap-4">
           <Button size="icon" variant="primary">
             <Settings />
@@ -57,7 +57,7 @@ export default function ButtonExamples() {
 
       {/* Buttons with Icons */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Buttons with Icons</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Buttons with Icons</h2>
         <div className="flex flex-wrap gap-4">
           <Button leftIcon={<Plus />}>Add Item</Button>
           <Button variant="secondary" rightIcon={<ExternalLink />}>
@@ -74,7 +74,7 @@ export default function ButtonExamples() {
 
       {/* Loading States */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Loading States</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Loading States</h2>
         <div className="flex flex-wrap gap-4">
           <Button isLoading>Loading...</Button>
           <Button variant="secondary" isLoading>
@@ -88,7 +88,7 @@ export default function ButtonExamples() {
 
       {/* Disabled States */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Disabled States</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Disabled States</h2>
         <div className="flex flex-wrap gap-4">
           <Button disabled>Disabled Primary</Button>
           <Button variant="secondary" disabled>
@@ -102,7 +102,7 @@ export default function ButtonExamples() {
 
       {/* Full Width */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Full Width</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Full Width</h2>
         <div className="max-w-md space-y-3">
           <Button fullWidth>Full Width Primary</Button>
           <Button fullWidth variant="secondary">
@@ -116,7 +116,7 @@ export default function ButtonExamples() {
 
       {/* As Link (using asChild with Radix Slot) */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">As Link (asChild)</h2>
+        <h2 className="text-2xl font-semibold text-foreground">As Link (asChild)</h2>
         <div className="flex flex-wrap gap-4">
           <Button asChild variant="primary">
             <a href="/profile">Go to Profile</a>
@@ -131,11 +131,11 @@ export default function ButtonExamples() {
 
       {/* Real-world Examples */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Real-world Examples</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Real-world Examples</h2>
 
         {/* Form Actions */}
-        <div className="max-w-md p-6 bg-bg-secondary rounded-lg space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">Form Actions</h3>
+        <div className="max-w-md p-6 bg-secondary rounded-lg space-y-4">
+          <h3 className="text-lg font-semibold text-foreground">Form Actions</h3>
           <div className="flex gap-3 justify-end">
             <Button variant="ghost">Cancel</Button>
             <Button type="submit">Save Changes</Button>
@@ -143,9 +143,9 @@ export default function ButtonExamples() {
         </div>
 
         {/* Card Actions */}
-        <div className="max-w-md p-6 bg-bg-secondary rounded-lg space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">Card Actions</h3>
-          <p className="text-text-secondary text-sm">This is a card with multiple action buttons</p>
+        <div className="max-w-md p-6 bg-secondary rounded-lg space-y-4">
+          <h3 className="text-lg font-semibold text-foreground">Card Actions</h3>
+          <p className="text-secondary-foreground text-sm">This is a card with multiple action buttons</p>
           <div className="flex gap-2">
             <Button size="sm" leftIcon={<Plus />}>
               Add
@@ -160,9 +160,9 @@ export default function ButtonExamples() {
         </div>
 
         {/* Dialog Actions */}
-        <div className="max-w-md p-6 bg-bg-secondary rounded-lg space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">Dialog Actions</h3>
-          <p className="text-text-secondary text-sm">Are you sure you want to delete this item?</p>
+        <div className="max-w-md p-6 bg-secondary rounded-lg space-y-4">
+          <h3 className="text-lg font-semibold text-foreground">Dialog Actions</h3>
+          <p className="text-secondary-foreground text-sm">Are you sure you want to delete this item?</p>
           <div className="flex gap-3 justify-end">
             <Button variant="outline">Cancel</Button>
             <Button variant="destructive" leftIcon={<Trash2 />}>
@@ -174,30 +174,30 @@ export default function ButtonExamples() {
 
       {/* Code Examples */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold text-text-primary">Code Examples</h2>
-        <div className="bg-bg-secondary p-6 rounded-lg space-y-4 font-mono text-sm">
+        <h2 className="text-2xl font-semibold text-foreground">Code Examples</h2>
+        <div className="bg-secondary p-6 rounded-lg space-y-4 font-mono text-sm">
           <div>
-            <p className="text-text-muted mb-2">// Basic usage</p>
+            <p className="text-muted-foreground mb-2">// Basic usage</p>
             <code className="text-brand-accent">{'<Button>Click me</Button>'}</code>
           </div>
           <div>
-            <p className="text-text-muted mb-2">// With variants and sizes</p>
+            <p className="text-muted-foreground mb-2">// With variants and sizes</p>
             <code className="text-brand-accent">
               {'<Button variant="outline" size="lg">Large Outline</Button>'}
             </code>
           </div>
           <div>
-            <p className="text-text-muted mb-2">// With icons</p>
+            <p className="text-muted-foreground mb-2">// With icons</p>
             <code className="text-brand-accent">
               {'<Button leftIcon={<Plus />}>Add Item</Button>'}
             </code>
           </div>
           <div>
-            <p className="text-text-muted mb-2">// Loading state</p>
+            <p className="text-muted-foreground mb-2">// Loading state</p>
             <code className="text-brand-accent">{'<Button isLoading>Submitting...</Button>'}</code>
           </div>
           <div>
-            <p className="text-text-muted mb-2">// As a link (Radix Slot)</p>
+            <p className="text-muted-foreground mb-2">// As a link (Radix Slot)</p>
             <code className="text-brand-accent">
               {'<Button asChild><a href="/profile">Profile</a></Button>'}
             </code>

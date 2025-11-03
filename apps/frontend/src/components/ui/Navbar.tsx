@@ -89,12 +89,14 @@ export default function Navbar({ currentPath }: NavbarProps) {
           <div className="flex-shrink-0">
             <a
               href="/"
-              className="flex items-center space-x-2 text-primary hover:text-brand-primary transition-colors"
+              className="flex items-center space-x-2 text-primary hover:text-primary transition-colors"
             >
-              <div className="w-8 h-8 bg-brand-primary rounded-md flex items-center justify-center">
-                <span className="text-primary font-bold text-sm">Q</span>
+              <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                <span className="text-accent-foreground font-bold text-sm">Q</span>
               </div>
-              <span className="font-bold text-xl hidden sm:block">Questlog</span>
+              <span className="font-bold text-accent-foreground text-xl hidden sm:block">
+                Questlog
+              </span>
             </a>
           </div>
 
@@ -110,7 +112,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
                         href={item.href}
                         className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                           isActive
-                            ? 'bg-brand-primary/10 text-brand-primary'
+                            ? 'bg-primary/10 text-primary'
                             : 'text-secondary hover:text-primary hover:bg-tertiary'
                         }`}
                         aria-current={isActive ? 'page' : undefined}
@@ -150,7 +152,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
 
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
-                      className="min-w-[200px] bg-secondary border border-tertiary rounded-md shadow-lg p-1 z-[100] bg-zinc-900 text-[var(--brand-accent)]"
+                      className="min-w-[200px] bg-secondary border border-tertiary rounded-md shadow-lg p-1 z-[100] text-[var(--brand-accent)]"
                       sideOffset={8}
                       align="end"
                     >
@@ -196,7 +198,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
                   </a>
                   <a
                     href="/auth/register"
-                    className="px-4 py-2 text-sm font-medium bg-brand-primary text-primary rounded-md hover:bg-brand-primary/90 transition-colors"
+                    className="px-4 py-2 text-sm font-medium bg-primary text-primary rounded-md hover:bg-primary/90 transition-colors"
                   >
                     Register
                   </a>
@@ -214,7 +216,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
               <Dialog.Trigger asChild>
                 <button
                   type="button"
-                  className="p-1 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+                  className="p-1 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
                   aria-label="Toggle navigation menu"
                 >
                   {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
@@ -224,7 +226,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
               <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-primary/80 backdrop-blur-sm z-[60]" />
                 <Dialog.Content
-                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-zinc-900 border-l border-tertiary shadow-lg z-[60] focus:outline-none"
+                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-secondary border-l border-tertiary shadow-lg z-[60] focus:outline-none"
                   aria-describedby={undefined}
                 >
                   {/* Mobile Menu Header */}
@@ -253,7 +255,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
                             href={item.href}
                             className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                               isActive
-                                ? 'bg-brand-primary/10 text-brand-primary'
+                                ? 'bg-primary/10 text-primary'
                                 : 'text-secondary hover:text-primary hover:bg-tertiary'
                             }`}
                             aria-current={isActive ? 'page' : undefined}
@@ -323,7 +325,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
                             </a>
                             <a
                               href="/auth/register"
-                              className="block w-full text-center px-4 py-2 text-sm font-medium bg-brand-primary text-primary rounded-md hover:bg-brand-primary/90 transition-colors"
+                              className="block w-full text-center px-4 py-2 text-sm font-medium bg-primary text-primary rounded-md hover:bg-primary/90 transition-colors"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
                               Register

@@ -32,9 +32,9 @@ export default function ActivityFeedPage() {
     return (
       <div className="container mx-auto px-4 py-6 lg:py-8 text-center">
         <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
-        <p className="text-text-secondary">
+        <p className="text-secondary-foreground">
           Please{' '}
-          <a href="/auth/login?redirect=/feed" className="text-brand-primary underline">
+          <a href="/auth/login?redirect=/feed" className="text-primary underline">
             log in
           </a>{' '}
           to view your feed.

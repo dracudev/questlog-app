@@ -26,15 +26,15 @@ export default function ReviewFormDialog({ gameId, isOpen, onClose }: ReviewForm
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-50 z-40" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-bg-secondary rounded-lg p-6 w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto z-50 shadow-xl">
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-secondary rounded-lg p-6 w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto z-50 shadow-xl">
           <div className="flex items-center justify-between mb-6">
-            <Dialog.Title className="text-2xl font-bold text-text-primary">
+            <Dialog.Title className="text-2xl font-bold text-foreground">
               Write a Review
             </Dialog.Title>
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="text-text-secondary hover:text-text-primary transition-colors"
+                className="text-secondary-foreground hover:text-foreground transition-colors"
               >
                 <X size={24} />
               </button>
@@ -43,7 +43,7 @@ export default function ReviewFormDialog({ gameId, isOpen, onClose }: ReviewForm
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-text-primary font-semibold mb-2">
+              <label className="block text-foreground font-semibold mb-2">
                 Rating: {rating}/10
               </label>
               <input
@@ -58,12 +58,12 @@ export default function ReviewFormDialog({ gameId, isOpen, onClose }: ReviewForm
             </div>
 
             <div>
-              <label className="block text-text-primary font-semibold mb-2">Your Review</label>
+              <label className="block text-foreground font-semibold mb-2">Your Review</label>
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 rows={8}
-                className="w-full px-4 py-3 bg-bg-primary text-text-primary border border-bg-tertiary rounded-md focus:outline-none focus:border-brand-primary"
+                className="w-full px-4 py-3 bg-background text-foreground border border-border rounded-md focus:outline-none focus:border-primary"
                 placeholder="Share your thoughts about this game..."
                 required
               />

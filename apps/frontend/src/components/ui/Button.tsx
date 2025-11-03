@@ -8,14 +8,12 @@ function cn(...classes: (string | undefined | null | false)[]) {
 }
 
 const variantStyles = {
-  primary: 'bg-[var(--brand-primary)] text-white hover:opacity-90 active:opacity-80',
-  secondary:
-    'bg-[var(--bg-secondary)] text-[var(--text-primary)] border border-[var(--bg-tertiary)] hover:bg-[var(--bg-tertiary)]',
-  outline:
-    'border border-[var(--brand-primary)] bg-transparent text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10',
-  ghost: 'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]',
-  destructive: 'bg-[var(--state-error)] text-white hover:opacity-90',
-  link: 'bg-transparent text-[var(--brand-primary)] underline-offset-4 hover:underline p-0',
+  primary: 'bg-primary text-primary-foreground hover:opacity-90 active:opacity-80',
+  secondary: 'bg-secondary text-secondary-foreground border border-border hover:bg-muted',
+  outline: 'border border-primary bg-transparent text-primary hover:bg-primary/10',
+  ghost: 'bg-transparent text-muted-foreground hover:bg-secondary',
+  destructive: 'bg-destructive text-destructive-foreground hover:opacity-90',
+  link: 'bg-transparent text-primary underline-offset-4 hover:underline p-0',
 };
 
 const sizeStyles = {
@@ -61,7 +59,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const baseClasses =
       'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 cursor-pointer';
     const focusClasses =
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2';
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2';
     const disabledClasses =
       'disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed';
     const variantClass = variantStyles[variant];

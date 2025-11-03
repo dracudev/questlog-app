@@ -37,12 +37,12 @@ export default function GameHeader() {
 
         {/* Title and Meta */}
         <div>
-          <h1 className="text-3xl font-bold text-text-primary mb-2">{game.game.title}</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{game.game.title}</h1>
 
           {game.developer && (
             <a
               href={`/developers/${game.developer.slug}`}
-              className="text-brand-primary hover:underline flex items-center gap-2 mb-1"
+              className="text-primary hover:underline flex items-center gap-2 mb-1"
             >
               <Users size={16} />
               {game.developer.name}
@@ -52,7 +52,7 @@ export default function GameHeader() {
           {game.publisher && (
             <a
               href={`/publishers/${game.publisher.slug}`}
-              className="text-text-secondary hover:text-brand-primary flex items-center gap-2"
+              className="text-secondary-foreground hover:text-primary flex items-center gap-2"
             >
               <Building2 size={16} />
               {game.publisher.name}
@@ -76,13 +76,13 @@ export default function GameHeader() {
         {/* Info and Actions */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
-            <h1 className="text-5xl font-bold text-text-primary mb-4">{game.game.title}</h1>
+            <h1 className="text-5xl font-bold text-foreground mb-4">{game.game.title}</h1>
 
-            <div className="space-y-2 text-text-secondary mb-6">
+            <div className="space-y-2 text-secondary-foreground mb-6">
               {game.developer && (
                 <a
                   href={`/developers/${game.developer.slug}`}
-                  className="text-brand-primary hover:underline flex items-center gap-2"
+                  className="text-primary hover:underline flex items-center gap-2"
                 >
                   <Users size={18} />
                   <span className="text-lg">{game.developer.name}</span>
@@ -92,7 +92,7 @@ export default function GameHeader() {
               {game.publisher && (
                 <a
                   href={`/publishers/${game.publisher.slug}`}
-                  className="hover:text-brand-primary flex items-center gap-2"
+                  className="hover:text-primary flex items-center gap-2"
                 >
                   <Building2 size={18} />
                   <span className="text-lg">{game.publisher.name}</span>
@@ -111,7 +111,7 @@ export default function GameHeader() {
                 {game.platforms.map((platform) => (
                   <span
                     key={platform.id}
-                    className="px-3 py-1 bg-bg-secondary text-text-primary text-sm rounded-md"
+                    className="px-3 py-1 bg-secondary text-foreground text-sm rounded-md"
                   >
                     {platform.name}
                   </span>
@@ -153,16 +153,16 @@ function ActionButtons({ onWriteReview }: { onWriteReview: () => void }) {
             className="min-w-[220px] bg-zinc-800 text-[var(--brand-accent)] rounded-md p-2 shadow-lg"
             sideOffset={5}
           >
-            <DropdownMenu.Item className="px-3 py-2 text-text-primary rounded hover:bg-bg-tertiary cursor-pointer outline-none">
+            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
               Favorites
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="px-3 py-2 text-text-primary rounded hover:bg-bg-tertiary cursor-pointer outline-none">
+            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
               Playing
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="px-3 py-2 text-text-primary rounded hover:bg-bg-tertiary cursor-pointer outline-none">
+            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
               Completed
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="px-3 py-2 text-text-primary rounded hover:bg-bg-tertiary cursor-pointer outline-none">
+            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
               Want to Play
             </DropdownMenu.Item>
           </DropdownMenu.Content>
@@ -176,9 +176,9 @@ function GameHeaderSkeleton() {
   return (
     <div className="mb-8 animate-pulse">
       <div className="flex flex-col gap-6 lg:hidden">
-        <div className="w-full h-64 bg-bg-secondary rounded-lg" />
-        <div className="h-8 bg-bg-secondary rounded w-3/4" />
-        <div className="h-4 bg-bg-secondary rounded w-1/2" />
+        <div className="w-full h-64 bg-secondary rounded-lg" />
+        <div className="h-8 bg-secondary rounded w-3/4" />
+        <div className="h-4 bg-secondary rounded w-1/2" />
       </div>
     </div>
   );

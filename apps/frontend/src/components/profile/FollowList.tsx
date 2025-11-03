@@ -109,7 +109,7 @@ function UserCard({ user }: UserCardProps) {
   return (
     <a
       href={`/profile/${user.username}`}
-      className="flex items-center gap-4 bg-secondary rounded-lg border border-tertiary p-4 hover:border-brand-primary transition-colors"
+      className="flex items-center gap-4 bg-secondary rounded-lg border border-tertiary p-4 hover:border-primary transition-colors"
     >
       {/* Avatar with Radix UI */}
       <Avatar.Root className="inline-flex h-12 w-12 select-none items-center justify-center overflow-hidden rounded-full align-middle">

@@ -80,7 +80,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
               autoComplete="email"
               required
               onBlur={() => handleBlur('email')}
-              className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="Enter your email"
             />
           </Form.Control>
@@ -109,7 +109,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
                 autoComplete="current-password"
                 required
                 onBlur={() => handleBlur('password')}
-                className="appearance-none block w-full px-3 py-2 pr-11 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="appearance-none block w-full px-3 py-2 pr-11 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Enter your password"
               />
             </Form.Control>
@@ -140,7 +140,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
               id="remember-me"
               name="remember-me"
               type="checkbox"
-              className="h-4 w-4 rounded text-brand-primary border-tertiary bg-primary focus:ring-2 focus:ring-brand-primary/20 transition-colors"
+              className="h-4 w-4 rounded text-primary border-tertiary bg-primary focus:ring-2 focus:ring-primary/20 transition-colors"
             />
             <label htmlFor="remember-me" className="ml-2 block text-sm text-secondary">
               Remember me
@@ -150,7 +150,7 @@ export default function LoginForm({ redirectTo = '/feed', className = '' }: Logi
           <div className="text-sm">
             <a
               href="/auth/forgot-password"
-              className="font-medium transition-colors text-brand-primary hover:text-brand-accent"
+              className="font-medium transition-colors text-primary hover:text-brand-accent"
             >
               Forgot your password?
             </a>

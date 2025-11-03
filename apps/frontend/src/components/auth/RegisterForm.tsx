@@ -82,7 +82,7 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
               autoComplete="email"
               required
               onBlur={() => handleBlur('email')}
-              className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="Enter your email"
             />
           </Form.Control>
@@ -113,7 +113,7 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
               maxLength={30}
               pattern="^[a-zA-Z0-9_\-]+$"
               onBlur={() => handleBlur('username')}
-              className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className="appearance-none block w-full px-3 py-2 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="Choose a username"
             />
           </Form.Control>
@@ -156,7 +156,7 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
                 minLength={8}
                 pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?])[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]+$"
                 onBlur={() => handleBlur('password')}
-                className="appearance-none block w-full px-3 py-2 pr-11 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="appearance-none block w-full px-3 py-2 pr-11 border border-tertiary bg-primary rounded-md shadow-sm text-sm transition-all text-primary placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Create a strong password"
               />
             </Form.Control>
@@ -212,7 +212,7 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
               name="terms"
               type="checkbox"
               required
-              className="h-4 w-4 rounded text-brand-primary border-tertiary bg-primary focus:ring-2 focus:ring-brand-primary/20 transition-colors"
+              className="h-4 w-4 rounded text-primary border-tertiary bg-primary focus:ring-2 focus:ring-primary/20 transition-colors"
             />
           </div>
           <div className="text-sm">
@@ -222,7 +222,7 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
                 href="/terms"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-brand-primary hover:text-brand-accent transition-colors"
+                className="font-medium text-primary hover:text-brand-accent transition-colors"
               >
                 Terms of Service
               </a>{' '}
@@ -231,7 +231,7 @@ export default function RegisterForm({ redirectTo = '/feed', className = '' }: R
                 href="/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-brand-primary hover:text-brand-accent transition-colors"
+                className="font-medium text-primary hover:text-brand-accent transition-colors"
               >
                 Privacy Policy
               </a>
