@@ -200,14 +200,7 @@ export default function ActivityFeedList({ initialError }: ActivityFeedListProps
       {/* End of feed indicator */}
       {!feed.meta.hasNext && feed.items.length > 0 && (
         <div className="text-center py-8">
-          <p
-            style={{
-              fontSize: 'var(--font-size-sm)',
-              color: 'var(--text-muted)',
-            }}
-          >
-            You've reached the end of your feed
-          </p>
+          <p className="text-sm text-muted">You've reached the end of your feed</p>
         </div>
       )}
     </div>

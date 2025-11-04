@@ -20,7 +20,7 @@ export default function ActivityFeedPage() {
     return (
       <div className="container mx-auto px-4 py-6 lg:py-8">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
+          <h1 className="text-3xl font-bold mb-6 text-foreground">Your Feed</h1>
           <FeedItemSkeleton />
         </div>
       </div>
@@ -31,10 +31,10 @@ export default function ActivityFeedPage() {
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-6 lg:py-8 text-center">
-        <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
-        <p className="text-secondary-foreground">
+        <h1 className="text-3xl font-bold mb-6 text-foreground">Your Feed</h1>
+        <p className="text-muted-foreground">
           Please{' '}
-          <a href="/auth/login?redirect=/feed" className="text-primary underline">
+          <a href="/auth/login?redirect=/feed" className="text-accent underline">
             log in
           </a>{' '}
           to view your feed.
@@ -48,7 +48,7 @@ export default function ActivityFeedPage() {
     return (
       <div className="container mx-auto px-4 py-6 lg:py-8">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
+          <h1 className="text-3xl font-bold mb-6 text-foreground">Your Feed</h1>
           <FeedItemSkeleton />
         </div>
       </div>
@@ -59,7 +59,7 @@ export default function ActivityFeedPage() {
   if (feedError) {
     return (
       <div className="container mx-auto px-4 py-6 lg:py-8">
-        <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
+        <h1 className="text-3xl font-bold mb-6 text-foreground">Your Feed</h1>
         <div className="text-center py-10 bg-destructive/10 border border-destructive/20 rounded-lg">
           <p className="text-destructive font-semibold">Failed to Load Feed</p>
           <p className="text-sm text-destructive/80 mt-1">{feedError}</p>
@@ -80,7 +80,7 @@ export default function ActivityFeedPage() {
   return (
     <div className="container mx-auto px-4 py-6 lg:py-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-3xl font-bold mb-6 text-primary">Your Feed</h1>
+        <h1 className="text-3xl font-bold mb-6 text-foreground">Your Feed</h1>
         {/* ActivityFeedList will render the empty state if feed.items is empty */}
         <ActivityFeedList />
       </div>
