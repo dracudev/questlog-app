@@ -89,7 +89,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         {/* Game Title - Link to Game */}
         <a
           href={`/games/${review.game.slug}`}
-          className="block mb-3 hover:text-primary transition-colors"
+          className="block mb-3 hover:text-accent transition-colors"
         >
           <h3 className="font-semibold text-foreground line-clamp-2">{review.game.title}</h3>
         </a>
@@ -120,7 +120,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
             return (
               <svg
                 key={star}
-                className={`w-4 h-4 ${isFilled ? 'text-accent' : 'text-muted'}`}
+                className={`w-4 h-4 ${isFilled ? 'text-accent' : 'text-muted-foreground'}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -135,7 +135,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         {review.title && (
           <a
             href={`/reviews/${review.id}`}
-            className="block mb-2 hover:text-primary transition-colors"
+            className="block mb-2 hover:text-accent transition-colors"
           >
             <h4 className="font-medium text-foreground line-clamp-1">{review.title}</h4>
           </a>
@@ -144,7 +144,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         {/* Content Preview - Link to Review */}
         <a
           href={`/reviews/${review.id}`}
-          className="block mb-3 hover:text-primary transition-colors"
+          className="block mb-3 hover:text-accent transition-colors"
         >
           <p className="text-sm text-muted-foreground line-clamp-3">
             {truncateContent(review.content)}

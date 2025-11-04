@@ -57,7 +57,7 @@ export default function ReviewContent({ review }: ReviewContentProps) {
   // ============================================================================
 
   return (
-    <article className="bg-secondary rounded-lg border border-tertiary p-4 md:p-6 lg:p-8">
+    <article className="bg-card rounded-lg border border-border p-4 md:p-6 lg:p-8">
       {/* Spoiler Warning Banner */}
       {review.isSpoiler && (
         <div className="mb-6 p-4 bg-state-warning/10 border-l-4 border-state-warning rounded-md">
@@ -76,7 +76,7 @@ export default function ReviewContent({ review }: ReviewContentProps) {
             </svg>
             <div>
               <h3 className="text-sm font-semibold text-state-warning mb-1">Spoiler Warning</h3>
-              <p className="text-sm text-secondary">
+              <p className="text-sm text-muted-foreground">
                 This review contains spoilers for {review.game.title}. Read at your own discretion.
               </p>
             </div>
@@ -86,12 +86,12 @@ export default function ReviewContent({ review }: ReviewContentProps) {
 
       {/* Review Title */}
       {review.title && (
-        <h2 className="text-h2 font-bold text-primary mb-6 leading-tight">{review.title}</h2>
+        <h2 className="text-h2 font-bold text-foreground mb-6 leading-tight">{review.title}</h2>
       )}
 
       {/* Review Content */}
       <div className="prose prose-lg max-w-none">
-        <div className="text-base md:text-lg text-secondary leading-relaxed whitespace-pre-wrap">
+        <div className="text-base md:text-lg text-foreground leading-relaxed whitespace-pre-wrap">
           {formatContent(review.content)}
         </div>
       </div>

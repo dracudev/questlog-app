@@ -79,7 +79,7 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
     <Tooltip.Provider delayDuration={300}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         {/* Social Stats */}
-        <div className="flex items-center gap-6 text-sm text-muted">
+        <div className="flex items-center gap-6 text-sm text-muted-foreground">
           {/* Likes Count */}
           <div className="flex items-center gap-2">
             <Heart className="w-5 h-5" aria-hidden="true" />
@@ -129,11 +129,11 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content
-                className="bg-tertiary text-primary px-3 py-2 rounded-md text-sm font-medium shadow-lg z-tooltip"
+                className="bg-popover text-popover-foreground px-3 py-2 rounded-md text-sm font-medium shadow-lg z-tooltip"
                 sideOffset={5}
               >
                 {currentReview.isLiked ? 'Unlike this review' : 'Like this review'}
-                <Tooltip.Arrow className="fill-tertiary" />
+                <Tooltip.Arrow className="fill-popover" />
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>
@@ -161,10 +161,10 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
                   }
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg
-                  bg-transparent border border-tertiary text-secondary
-                  hover:border-primary hover:text-primary
+                  bg-transparent border border-border text-foreground
+                  hover:bg-accent
                   transition-all duration-200
-                  focus:outline-none focus:ring-2 focus:ring-brand-accent focus:ring-offset-2"
+                  focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 aria-label="Share this review"
               >
                 <svg
@@ -186,11 +186,11 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content
-                className="bg-tertiary text-primary px-3 py-2 rounded-md text-sm font-medium shadow-lg z-tooltip"
+                className="bg-popover text-popover-foreground px-3 py-2 rounded-md text-sm font-medium shadow-lg z-tooltip"
                 sideOffset={5}
               >
                 Share this review
-                <Tooltip.Arrow className="fill-tertiary" />
+                <Tooltip.Arrow className="fill-popover" />
               </Tooltip.Content>
             </Tooltip.Portal>
           </Tooltip.Root>

@@ -47,7 +47,7 @@ export default function ReviewDetailPage({ review }: ReviewDetailPageProps) {
   // ============================================================================
 
   return (
-    <div className="min-h-screen bg-primary">
+    <div className="min-h-screen bg-background">
       {/* Main Container - Mobile-First Responsive */}
       <div className="container mx-auto px-4 py-6 md:py-8 lg:py-12 max-w-4xl">
         {/* Review Header - Game, User, Rating */}
@@ -59,7 +59,7 @@ export default function ReviewDetailPage({ review }: ReviewDetailPageProps) {
         </div>
 
         {/* Review Actions - Like, Comment, Share */}
-        <div className="mt-6 md:mt-8 pt-6 border-t border-tertiary">
+        <div className="mt-6 md:mt-8 pt-6 border-t border-border">
           <ReviewActions review={review} />
         </div>
       </div>

@@ -77,7 +77,7 @@ export default function ReviewList() {
   if (error && reviewItems.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-full mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-card rounded-full mb-4">
           <svg className="w-8 h-8 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -88,7 +88,7 @@ export default function ReviewList() {
           </svg>
         </div>
         <p className="text-error mb-2 font-semibold">Failed to load reviews</p>
-        <p className="text-muted text-sm">{error}</p>
+        <p className="text-muted-foreground text-sm">{error}</p>
       </div>
     );
   }
@@ -97,8 +97,13 @@ export default function ReviewList() {
   if (reviewItems.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-full mb-4">
-          <svg className="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-card rounded-full mb-4">
+          <svg
+            className="w-8 h-8 text-muted-foreground"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -107,8 +112,8 @@ export default function ReviewList() {
             />
           </svg>
         </div>
-        <p className="text-secondary mb-2 font-semibold">No reviews found</p>
-        <p className="text-muted text-sm">Be the first to write a review!</p>
+        <p className="text-foreground mb-2 font-semibold">No reviews found</p>
+        <p className="text-muted-foreground text-sm">Be the first to write a review!</p>
       </div>
     );
   }
@@ -159,30 +164,30 @@ export default function ReviewList() {
  */
 function ReviewSkeleton() {
   return (
-    <div className="bg-secondary rounded-lg border border-tertiary p-4 animate-pulse">
+    <div className="bg-card rounded-lg border border-border p-4 animate-pulse">
       {/* Game Cover Skeleton */}
-      <div className="aspect-[3/4] bg-tertiary rounded-md mb-4" />
+      <div className="aspect-[3/4] bg-muted rounded-md mb-4" />
 
       {/* Game Title Skeleton */}
-      <div className="h-5 bg-tertiary rounded w-3/4 mb-3" />
+      <div className="h-5 bg-muted rounded w-3/4 mb-3" />
 
       {/* User Info Skeleton */}
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-8 h-8 bg-tertiary rounded-full" />
-        <div className="h-4 bg-tertiary rounded w-24" />
+        <div className="w-8 h-8 bg-muted rounded-full" />
+        <div className="h-4 bg-muted rounded w-24" />
       </div>
 
       {/* Rating Skeleton */}
       <div className="flex items-center gap-1 mb-3">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="w-4 h-4 bg-tertiary rounded" />
+          <div key={i} className="w-4 h-4 bg-muted rounded" />
         ))}
       </div>
 
       {/* Content Preview Skeleton */}
       <div className="space-y-2">
-        <div className="h-3 bg-tertiary rounded w-full" />
-        <div className="h-3 bg-tertiary rounded w-5/6" />
+        <div className="h-3 bg-muted rounded w-full" />
+        <div className="h-3 bg-muted rounded w-5/6" />
       </div>
     </div>
   );
