@@ -1,12 +1,15 @@
 // Imports from other modules
-import type { ReviewUser, ReviewStats } from "../reviews";
+import type { ReviewUser, ReviewStats } from '../reviews';
 
 // Game Status Types
 export type GameStatus =
-  | "RELEASED"
-  | "UNRELEASED"
-  | "EARLY_ACCESS"
-  | "CANCELLED";
+  | 'ANNOUNCED'
+  | 'IN_DEVELOPMENT'
+  | 'ALPHA'
+  | 'BETA'
+  | 'EARLY_ACCESS'
+  | 'RELEASED'
+  | 'CANCELLED';
 
 // Basic Game Entities
 export interface DeveloperResponse {
@@ -98,9 +101,9 @@ export interface GameSummary {
   status: GameStatus;
   averageRating?: number;
   reviewCount: number;
-  developer?: Pick<DeveloperResponse, "id" | "name" | "slug">;
-  genres: Pick<GenreResponse, "id" | "name" | "slug">[];
-  platforms: Pick<PlatformResponse, "id" | "name" | "slug" | "abbreviation">[];
+  developer?: Pick<DeveloperResponse, 'id' | 'name' | 'slug'>;
+  genres: Pick<GenreResponse, 'id' | 'name' | 'slug'>[];
+  platforms: Pick<PlatformResponse, 'id' | 'name' | 'slug' | 'abbreviation'>[];
 }
 
 // Review types for game detail view (imported from reviews module)
@@ -255,12 +258,12 @@ export interface GamesQuery {
   minRating?: number;
   maxRating?: number;
   sortBy?:
-    | "title"
-    | "releaseDate"
-    | "averageRating"
-    | "reviewCount"
-    | "createdAt";
-  sortOrder?: "asc" | "desc";
+    | 'title'
+    | 'releaseDate'
+    | 'averageRating'
+    | 'reviewCount'
+    | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface DevelopersQuery {

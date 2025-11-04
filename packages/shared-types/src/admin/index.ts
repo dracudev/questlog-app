@@ -1,8 +1,11 @@
 // Admin-specific types that extend the base shared types
-export * from "../users";
-export * from "../games";
-export * from "../auth";
-export * from "../api";
+export * from '../users';
+export * from '../games';
+export * from '../auth';
+export * from '../api';
+
+// Import GameStatus for internal use
+import type { GameStatus } from '../games';
 
 /**
  * Admin dashboard statistics
@@ -22,7 +25,7 @@ export interface AdminDashboardStats {
     gameCount: number;
   }>;
   recentActivity: Array<{
-    type: "user_registered" | "game_added" | "review_posted";
+    type: 'user_registered' | 'game_added' | 'review_posted';
     count: number;
     date: string;
   }>;
@@ -38,7 +41,7 @@ export interface AdminActivityLogEntry {
   resourceId: string;
   userId: string;
   username: string;
-  userRole: "ADMIN" | "MODERATOR";
+  userRole: 'ADMIN' | 'MODERATOR';
   timestamp: Date;
   ipAddress?: string;
   userAgent?: string;
@@ -49,45 +52,45 @@ export interface AdminActivityLogEntry {
  * Admin actions for activity logging
  */
 export type AdminAction =
-  | "CREATE_USER"
-  | "UPDATE_USER"
-  | "UPDATE_USER_ROLE"
-  | "DELETE_USER"
-  | "BULK_DELETE_USERS"
-  | "CREATE_GAME"
-  | "UPDATE_GAME"
-  | "DELETE_GAME"
-  | "CREATE_DEVELOPER"
-  | "UPDATE_DEVELOPER"
-  | "DELETE_DEVELOPER"
-  | "CREATE_PUBLISHER"
-  | "UPDATE_PUBLISHER"
-  | "DELETE_PUBLISHER"
-  | "CREATE_GENRE"
-  | "UPDATE_GENRE"
-  | "DELETE_GENRE"
-  | "CREATE_PLATFORM"
-  | "UPDATE_PLATFORM"
-  | "DELETE_PLATFORM"
-  | "MODERATE_REVIEW"
-  | "MODERATE_COMMENT"
-  | "BAN_USER"
-  | "UNBAN_USER"
-  | "EXPORT_DATA";
+  | 'CREATE_USER'
+  | 'UPDATE_USER'
+  | 'UPDATE_USER_ROLE'
+  | 'DELETE_USER'
+  | 'BULK_DELETE_USERS'
+  | 'CREATE_GAME'
+  | 'UPDATE_GAME'
+  | 'DELETE_GAME'
+  | 'CREATE_DEVELOPER'
+  | 'UPDATE_DEVELOPER'
+  | 'DELETE_DEVELOPER'
+  | 'CREATE_PUBLISHER'
+  | 'UPDATE_PUBLISHER'
+  | 'DELETE_PUBLISHER'
+  | 'CREATE_GENRE'
+  | 'UPDATE_GENRE'
+  | 'DELETE_GENRE'
+  | 'CREATE_PLATFORM'
+  | 'UPDATE_PLATFORM'
+  | 'DELETE_PLATFORM'
+  | 'MODERATE_REVIEW'
+  | 'MODERATE_COMMENT'
+  | 'BAN_USER'
+  | 'UNBAN_USER'
+  | 'EXPORT_DATA';
 
 /**
  * Admin resources for activity logging
  */
 export type AdminResource =
-  | "user"
-  | "game"
-  | "developer"
-  | "publisher"
-  | "genre"
-  | "platform"
-  | "review"
-  | "comment"
-  | "report";
+  | 'user'
+  | 'game'
+  | 'developer'
+  | 'publisher'
+  | 'genre'
+  | 'platform'
+  | 'review'
+  | 'comment'
+  | 'report';
 
 /**
  * Bulk operations request types
@@ -100,7 +103,7 @@ export interface BulkDeleteUsersRequest {
 export interface BulkUpdateUsersRequest {
   userIds: string[];
   updates: {
-    role?: "USER" | "ADMIN" | "MODERATOR";
+    role?: 'USER' | 'ADMIN' | 'MODERATOR';
     isPrivate?: boolean;
     emailNotifications?: boolean;
   };
@@ -113,14 +116,14 @@ export interface AdminUsersQuery {
   page?: number;
   limit?: number;
   search?: string;
-  role?: "USER" | "ADMIN" | "MODERATOR";
+  role?: 'USER' | 'ADMIN' | 'MODERATOR';
   isPrivate?: boolean;
   createdAfter?: Date;
   createdBefore?: Date;
   lastActiveAfter?: Date;
   lastActiveBefore?: Date;
-  sortBy?: "username" | "email" | "createdAt" | "lastActiveAt" | "role";
-  sortOrder?: "asc" | "desc";
+  sortBy?: 'username' | 'email' | 'createdAt' | 'lastActiveAt' | 'role';
+  sortOrder?: 'asc' | 'desc';
 }
 
 /**
@@ -130,19 +133,19 @@ export interface AdminGamesQuery {
   page?: number;
   limit?: number;
   search?: string;
-  status?: "RELEASED" | "UNRELEASED" | "EARLY_ACCESS" | "CANCELLED";
+  status?: GameStatus;
   createdAfter?: Date;
   createdBefore?: Date;
   hasReviews?: boolean;
   minRating?: number;
   maxRating?: number;
   sortBy?:
-    | "title"
-    | "createdAt"
-    | "releaseDate"
-    | "averageRating"
-    | "reviewCount";
-  sortOrder?: "asc" | "desc";
+    | 'title'
+    | 'createdAt'
+    | 'releaseDate'
+    | 'averageRating'
+    | 'reviewCount';
+  sortOrder?: 'asc' | 'desc';
 }
 
 /**
@@ -150,14 +153,14 @@ export interface AdminGamesQuery {
  */
 export interface AdminExportRequest {
   type:
-    | "users"
-    | "games"
-    | "reviews"
-    | "developers"
-    | "publishers"
-    | "genres"
-    | "platforms";
-  format: "json" | "csv" | "xlsx";
+    | 'users'
+    | 'games'
+    | 'reviews'
+    | 'developers'
+    | 'publishers'
+    | 'genres'
+    | 'platforms';
+  format: 'json' | 'csv' | 'xlsx';
   filters?: {
     dateFrom?: Date;
     dateTo?: Date;
@@ -220,14 +223,14 @@ export interface AdminPermissionCheck {
  * Admin content moderation types
  */
 export interface AdminModerationAction {
-  action: "approve" | "reject" | "flag" | "unflag";
+  action: 'approve' | 'reject' | 'flag' | 'unflag';
   reason?: string;
   moderatorNote?: string;
 }
 
 export interface AdminReportedContent {
   id: string;
-  type: "review" | "comment" | "user_profile";
+  type: 'review' | 'comment' | 'user_profile';
   resourceId: string;
   reportedBy: {
     id: string;
@@ -235,13 +238,13 @@ export interface AdminReportedContent {
   };
   reason: string;
   description?: string;
-  status: "pending" | "reviewed" | "resolved" | "dismissed";
+  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
   createdAt: Date;
   reviewedAt?: Date;
   reviewedBy?: {
     id: string;
     username: string;
-    role: "ADMIN" | "MODERATOR";
+    role: 'ADMIN' | 'MODERATOR';
   };
   content: {
     title?: string;

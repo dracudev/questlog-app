@@ -128,9 +128,12 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
                   <Select.Content className="rounded-lg border border-border bg-popover shadow-lg">
                     <Select.Viewport className="p-1">
                       <SelectItem value="all">All Games</SelectItem>
-                      <SelectItem value="RELEASED">Released</SelectItem>
+                      <SelectItem value="ANNOUNCED">Announced</SelectItem>
+                      <SelectItem value="IN_DEVELOPMENT">In Development</SelectItem>
+                      <SelectItem value="ALPHA">Alpha</SelectItem>
+                      <SelectItem value="BETA">Beta</SelectItem>
                       <SelectItem value="EARLY_ACCESS">Early Access</SelectItem>
-                      <SelectItem value="UNRELEASED">Upcoming</SelectItem>
+                      <SelectItem value="RELEASED">Released</SelectItem>
                       <SelectItem value="CANCELLED">Cancelled</SelectItem>
                     </Select.Viewport>
                   </Select.Content>

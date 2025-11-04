@@ -50,10 +50,12 @@ class GamesService {
 
     // Add query parameters
     Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
+      if (value !== undefined && value !== null && value !== '') {
         if (Array.isArray(value)) {
           // Handle array parameters (genreIds, platformIds)
-          value.forEach((item) => searchParams.append(key, item.toString()));
+          if (value.length > 0) {
+            value.forEach((item) => searchParams.append(key, item.toString()));
+          }
         } else {
           searchParams.append(key, value.toString());
         }
