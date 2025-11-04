@@ -6,8 +6,12 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9+-blue.svg)](https://www.typescriptlang.org/)
 [![PNPM](https://img.shields.io/badge/PNPM-10+-orange.svg)](https://pnpm.io/)
+[![Astro](https://img.shields.io/badge/Astro-5.x-ff5d01.svg)](https://astro.build/)
+[![NestJS](https://img.shields.io/badge/NestJS-11.x-e0234e.svg)](https://nestjs.com/)
 
-Questlog is a comprehensive social platform where gamers can discover games, write reviews, connect with fellow players, and build personalized gaming profiles. Built with modern web technologies and designed for scalability, it features a hybrid architecture that combines static generation for optimal performance with interactive components for dynamic user experiences.
+Questlog is a comprehensive social platform where gamers can discover games, write reviews, connect with fellow players, and build personalized gaming profiles. Built with modern web technologies and designed for scalability, it features a static-first architecture that combines optimal performance with selective interactivity for dynamic user experiences.
+
+**Last Updated:** November 4, 2025
 
 ## Features
 
@@ -55,28 +59,30 @@ Questlog is a comprehensive social platform where gamers can discover games, wri
 
 ## Architecture
 
-Questlog uses a modern monorepo architecture designed for scalability and developer productivity:
+Questlog uses a modern PNPM monorepo architecture designed for scalability and developer productivity:
 
-### Frontend (Astro + React Islands)
+### Frontend (Astro 5.x + React 19.x)
 
-- **Astro 5.x** for static site generation with excellent SEO and performance
+- **Astro 5.x** with static output by default for excellent SEO and performance
 - **React 19.x Islands** for selective interactivity and optimal JavaScript delivery
-- **Tailwind CSS v4** with custom design system and responsive components
+- **Tailwind CSS v4** with @tailwindcss/vite plugin and custom design system
+- **Radix UI** primitives for accessible, unstyled component foundations
 - **Nanostores** for lightweight, efficient state management
 
-### Backend (NestJS + Prisma)
+### Backend (NestJS 11.x + Prisma 6.x)
 
-- **NestJS** framework with modular, domain-driven architecture
-- **Prisma ORM** with PostgreSQL for type-safe database operations
-- **JWT Authentication** with global guards and role-based access control
-- **Comprehensive API** with REST endpoints and future GraphQL support
+- **NestJS 11.x** framework with modular, domain-driven architecture
+- **Prisma ORM v6.14.0** with PostgreSQL for type-safe database operations
+- **JWT Authentication** with HTTP-only cookies and role-based access control
+- **Comprehensive REST API** with Swagger/OpenAPI documentation
 
 ### Infrastructure
 
 - **Docker Compose** for development environment consistency
-- **Redis** for caching and session management
-- **MinIO** for S3-compatible file storage
-- **Monitoring** with Prometheus and centralized logging
+- **PostgreSQL 13+** as primary database
+- **Redis** for caching and session management (planned)
+- **MinIO** for S3-compatible file storage (planned)
+- **Prometheus** monitoring and centralized logging (planned)
 
 ```tree
 questlog-app/
@@ -145,21 +151,19 @@ questlog-app/
 ### Development URLs
 
 - **Frontend**: [http://localhost:4321](http://localhost:4321)
-- **Backend API**: [http://localhost:3001](http://localhost:3001)
-- **API Documentation**: [http://localhost:3001/api](http://localhost:3001/api)
-- **Database Admin**: [http://localhost:8080](http://localhost:8080) (Adminer)
-- **Prisma Studio**: [http://localhost:5555](http://localhost:5555) (via `pnpm db:studio`)
-- **MinIO Console**: [http://localhost:9001](http://localhost:9001)
+- **Backend API**: [http://localhost:3000](http://localhost:3000)
+- **API Documentation**: [http://localhost:3000/api](http://localhost:3000/api)
+- **Prisma Studio**: Run `pnpm db:studio` to open database admin interface
 
 ## 📚 Documentation
 
 Comprehensive documentation is available in the `/docs` directory:
 
-- **[System Design](./docs/architecture/system-design.md)** - Overall architecture and design decisions
-- **[Development Guide](./docs/architecture/dev-guide.md)** - Detailed development workflow
-- **[Frontend TCD](./docs/architecture/frontend-tcd.md)** - Frontend technical context
-- **[Backend TCD](./docs/architecture/backend-tcd.md)** - Backend technical context
-- **[Project Structure](./docs/architecture/project-structure.md)** - Codebase organization
+- **[System Design](./docs/architecture/system-design.md)** - Design system, components, and patterns
+- **[Development Guide](./docs/architecture/dev-guide.md)** - Detailed development workflow and requirements
+- **[Frontend TCD](./docs/architecture/frontend-tcd.md)** - Frontend technical context and architecture
+- **[Backend TCD](./docs/architecture/backend-tcd.md)** - Backend technical context and API design
+- **[Project Structure](./docs/architecture/project-structure.md)** - Codebase organization and monorepo structure
 
 ## Development Scripts
 
@@ -251,17 +255,18 @@ pnpm test:e2e              # End-to-end tests
 - [x] Radix UI integration for accessibility
 - [x] Design system with CSS custom properties
 
-### Phase 2: UI Development
+### Phase 2: UI Development (Current Phase - Q4 2025)
 
 - [x] Core layout refactoring with Radix UI (Navbar, Footer, ThemeToggle)
 - [x] User profile feature implementation (complete 3-layer architecture)
 - [x] Authentication pages (login, register)
 - [x] Mobile-first responsive design patterns
 - [x] Optimistic UI updates with automatic rollback
-- [x] Games catalog and detail pages
+- [x] Games catalog and filtering interface
 - [ ] Review creation and editing UI
-- [x] Search and filtering interfaces
-- [x] Activity feed implementation
+- [ ] Advanced search interface
+- [x] Activity feed implementation with real-time updates
+- [ ] Enhanced mobile responsive improvements
 
 ### Phase 3: Social Features Enhancement (Q1 2026)
 
@@ -336,4 +341,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Built with care for the gaming community
 
-[Website](https://questlog.app) • [Documentation](./docs/) • [API](http://localhost:3001/api) • [Contributing](./CONTRIBUTING.md)
+[Website](https://questlog.app) • [Documentation](./docs/) • [API Docs](http://localhost:3000/api) • [Contributing](./CONTRIBUTING.md)

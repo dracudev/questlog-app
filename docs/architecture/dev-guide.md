@@ -1,4 +1,7 @@
-# 📘 Questlog - Dev Guide
+# 📘 Questlog - Development Guide
+
+**Last Updated:** November 4, 2025  
+**Status:** Production Ready
 
 ## 1. Requirements Analysis (ERS)
 
@@ -60,17 +63,17 @@ In the future, it will integrate with the Steam API for login and game library d
 
 ### 2.1 Architecture
 
-- **Frontend:** Astro + React Islands + TailwindCSS.
-  - Static pages for video game profiles and user profiles (SSG).
-  - Interactive components (feed, login, reviews) in React Islands.
-- **Backend:** NestJS (Node.js) + TypeScript + REST/GraphQL API.
-- **Database:** PostgreSQL.
-- **ORM:** Prisma.
-- **Authentication:** JWT, with future Steam OAuth support.
+- **Frontend:** Astro 5.x + React 19.x Islands + Tailwind CSS v4.
+  - Static pages for optimal performance and SEO (SSG by default).
+  - Interactive components in React Islands with selective hydration.
+  - Radix UI primitives for accessible component foundations.
+- **Backend:** NestJS 11.x (Node.js) + TypeScript + REST API.
+- **Database:** PostgreSQL 13+ with Prisma ORM v6.14.0.
+- **Authentication:** JWT with HTTP-only cookies for session management.
 - **Deployment:**
-  - Frontend → Vercel.
-  - Backend → Render/Railway.
-  - DB → Supabase/Neon.
+  - Frontend → Vercel (static hosting with edge functions).
+  - Backend → Railway/Render (containerized deployment).
+  - Database → Neon/Supabase (managed PostgreSQL).
 
 ---
 
@@ -157,35 +160,50 @@ GraphQL will be used for dynamic queries and relationships between entities (fee
 
 ### 3.2 Frontend (Astro + React Islands)
 
-The frontend will be built with **Astro** for static rendering (fast and SEO-friendly) and **React Islands** for interactive components. This allows for an optimal balance between performance and interactivity.
+The frontend is built with **Astro 5.x** for static rendering (fast and SEO-friendly) and **React 19.x Islands** for interactive components. This allows for an optimal balance between performance and interactivity.
 
-#### 🔹 Static Pages (SSG / Hybrid)
+#### 🔹 Static Pages (SSG by Default)
 
-Astro is used with a hybrid rendering model. The implemented route-level decisions are:
+Astro uses static output by default (`output: 'static'` in `astro.config.mjs`). Most pages are pre-rendered at build time:
 
-- `/` (Home): SSG (static). Home includes a tiny client-side script (`scripts/client-redirect.ts`) that performs auth redirect logic previously implemented in a React fallback component.
-- `/feed`: SSG Shell (static). The page shell is static; the client (ActivityFeedPage) performs auth checks and fetches feed data.
-- `/games` (Explore): SSR (dynamic, `prerender = false`) to support query-based filtering and dynamic results.
-- `/games/[slug]`: SSG using `getStaticPaths` to prerender game pages for SEO and caching.
-- `/reviews`: SSG for the first page (built at compile time); further pages are client-fetched.
-- `/reviews/[id]`: SSR (dynamic) to ensure up-to-date interactions and social data.
+- `/` (Home): Static home page with client-side auth redirect logic
+- `/auth/login` & `/auth/register`: Static forms with client-side validation
+- `/feed`: Static shell with client-side data fetching for activity feed
+- `/reviews`: Static listing with pagination
+
+#### 🔹 Dynamic Pages (SSR - Opt-in with `prerender: false`)
+
+Specific routes require server-side rendering for dynamic content:
+
+- `/games` (Explore): SSR for dynamic filters and query-based pagination
+- `/games/[slug]`: SSR for individual game pages with real-time data
+- `/profile/[username]`: SSR for user profiles with up-to-date information
+- `/reviews/[id]`: SSR for review details with social interactions
 
 #### 🔹 React Islands (Dynamic Components)
 
-React will be used selectively for components that need interactivity:
+React is used selectively for components that need interactivity:
 
-- **Social feed** → dynamically loaded reviews from followed users (GraphQL query).
-- **Login / Register / Profile forms** → controlled React forms with validation.
-- **Review editor** → create/edit review with Markdown editor + rating stars.
-- **Follow / unfollow buttons** → reactive, updated without page reload.
-- **Search bar (games, users)** → autocomplete with GraphQL queries.
-- **Notifications (future roadmap)** → real-time updates (via WebSockets).
+- **Social feed** → Dynamically loaded reviews from followed users
+- **Login / Register / Profile forms** → Controlled React forms with validation
+- **Review editor** → Create/edit review with rich text editor
+- **Follow / unfollow buttons** → Reactive, updated without page reload
+- **Search bar** → Autocomplete with API queries
+- **Game filters** → Interactive filtering interface
 
 #### 🔹 Styles & UI
 
-- **TailwindCSS** → utility-first, responsive, mobile-first design.
-- **Component library** → Radix UI primitives for unstyled, accessible component primitives (Dialog, Tabs, Avatar). Styling is applied via Tailwind and design tokens.
-- **Dark mode** → toggle support via Tailwind.
+- **Tailwind CSS v4** → Utility-first, responsive, mobile-first design with `@tailwindcss/vite` plugin
+- **Radix UI** → Headless, accessible component primitives (Dialog, Tabs, Avatar, etc.)
+- **Custom Design System** → CSS custom properties for consistent theming
+- **Lucide React** → Consistent icon library
+- **Dark mode** → System preference support with toggle
+
+#### 🔹 State Management
+
+- **Nanostores** → Lightweight state management for global state
+- **React State** → Component-level state with hooks
+- **Persistent Auth** → Token management with localStorage
 
 ---
 
@@ -246,5 +264,5 @@ React will be used selectively for components that need interactivity:
    - Social feed with friends' activity related to indie games.
 
 5. **Advanced interactivity**
-   - Embedded web games (JS/TS, Phaser, Unity WebGL).
-   - Real-time notifications (WebSockets).
+   - Embedded web games (JS/TS, Phaser, Unity WebGL) (future)
+   - Real-time notifications via WebSockets (future)

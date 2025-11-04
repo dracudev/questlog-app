@@ -1,5 +1,8 @@
 # Questlog Frontend - Technical Context Document
 
+**Last Updated:** November 4, 2025  
+**Status:** Production Ready
+
 ## 1. High-Level Overview
 
 **Questlog Frontend** is the user-facing application for the gaming social network, built with a modern hybrid architecture that combines static generation for optimal performance with interactive components for dynamic user experiences. The frontend serves as a progressive web application that allows gamers to discover games, write reviews, connect with other users, and build personalized gaming profiles.
@@ -43,114 +46,167 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 
 ### Core Technologies
 
-- **Framework**: Astro 5.x (Static Site Generator with hybrid rendering)
+- **Framework**: Astro 5.x (Static Site Generator)
 - **UI Library**: React 19.x for interactive components (Islands Architecture)
 - **UI Components**: Radix UI primitives for accessible, unstyled components
+- **Styling**: Tailwind CSS v4 with @tailwindcss/vite plugin
+- **State Management**: Nanostores for efficient client-side state
+- **Type Safety**: TypeScript 5.9+ with strict mode
+- **Icons**: Lucide React for consistent iconography
+- **Routing**: File-based routing with Astro pages
+
+### Key Dependencies
+
+- **@astrojs/react**: React integration for Astro (v4.3.1)
+- **@astrojs/node**: Node.js adapter for SSR capabilities (v9.5.0)
+- **@astrojs/vercel**: Vercel deployment adapter (v8.2.6)
+- **@nanostores/react**: React bindings for Nanostores (v1.0.0)
+- **@radix-ui/react-\***: Accessible component primitives
+- **@questlog/shared-types**: Shared TypeScript types with backend
+- **class-variance-authority**: For component variant management
+- **tailwindcss**: v4.1.12 with Vite plugin
+
+## 3. Architecture & Directory Structure
+
+The frontend follows a component-based architecture with clear separation of concerns:
+
+```text
+src/
+├── components/              # React components
+│   ├── ui/                 # Base UI components (Button, Input, etc.)
+│   ├── auth/               # Authentication components (LoginForm, RegisterForm)
+│   ├── games/              # Game components (GameCard, GameDetail, GameFilters)
+│   ├── reviews/            # Review components (ReviewCard, ReviewForm)
+│   ├── social/             # Social components (ActivityFeed, FollowButton)
+│   ├── profile/            # Profile components (ProfileHeader, ProfileTabs)
+│   └── layout/             # Layout components (Navbar, Footer)
+├── pages/                  # Astro pages (file-based routing)
+│   ├── index.astro        # Home page
+│   ├── feed/              # Activity feed pages
+│   ├── games/             # Games catalog and details
+│   ├── profile/           # User profiles
+│   ├── reviews/           # Review pages
+│   └── auth/              # Authentication pages
+├── layouts/               # Page layouts
+│   └── MainLayout.astro   # Main layout with header/footer
+├── stores/                # Nanostores state management
+├── services/              # API client services
+├── hooks/                 # React hooks
+├── utils/                 # Utility functions
+├── types/                 # TypeScript type definitions
+├── scripts/               # Client-side scripts
+└── styles/                # Global styles
+    └── global.css         # Tailwind imports and custom styles
+```
 
 ## 4. Page Types & Rendering Strategy
 
-The project settled on a hybrid rendering strategy with explicit decisions per route to balance performance, SEO, and interactive needs. Astro is configured for server output but critical pages were chosen to be pre-rendered (SSG) or served via SSR depending on UX requirements.
+The application uses **static output by default** configured in `astro.config.mjs` with `output: 'static'`. Specific routes can opt into server-side rendering using `export const prerender = false`.
 
-### Rendering configuration (as-built)
+### Rendering Configuration
 
-- Astro is configured for server output (SSR-capable) but many routes opt into SSG using `export const prerender = true` on a per-page basis.
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  output: 'static', // Static generation by default
+  adapter: vercel(), // Vercel adapter for deployment
+  // ...
+});
+```
 
-### Route-level decisions (final)
+### Current Route Implementations
 
-- `/` (Home)
-  - Strategy: SSG (Static)
-  - Notes: Home is static at build-time and includes a small client-side script (`scripts/client-redirect.ts`) that performs the auth redirect logic that previously lived in `ClientAuthRedirect.tsx` (that component was removed).
+**Static Pages (Default - SSG)**:
 
-- `/feed`
-  - Strategy: SSG Shell (Static)
-  - Notes: The route renders a static shell at build time. All auth checks and runtime data fetching for the feed are handled entirely client-side by `components/social/ActivityFeedPage.tsx` (client-only data fetching/hydration).
+- `/` - Home page with static content
+- `/auth/login` - Login form (static with client-side validation)
+- `/auth/register` - Registration form (static with client-side validation)
+- `/feed` - Activity feed shell (static shell, client-side data fetching)
+- `/reviews` - Reviews listing (static first page)
 
-- `/games` (Explore)
-  - Strategy: SSR (dynamic) — `export const prerender = false`
-  - Notes: Explore uses server rendering to support dynamic filtering, server-side pagination, and query parameters.
+**Dynamic Pages (SSR - `prerender: false`)**:
 
-- `/games/[slug]`
-  - Strategy: SSG (getStaticPaths)
-  - Notes: Individual game pages are pre-generated with `getStaticPaths` to maximize SEO and CDN caching for stable game slugs.
+- `/games` - Games catalog with dynamic filtering and pagination
+- `/games/[slug]` - Game detail pages (SSR for dynamic content)
+- `/profile/[username]` - User profiles (SSR for real-time data)
+- `/reviews/[id]` - Review detail pages (SSR for interactions)
 
-- `/reviews`
-  - Strategy: SSG (first page fetched at build time)
-  - Notes: The first page is built at compile time for SEO; subsequent pages are client-fetched or paginated.
+### Rendering Patterns
 
-- `/reviews/[id]`
-  - Strategy: SSR (dynamic) — `export const prerender = false`
-  - Notes: Review detail pages are served via SSR to ensure up-to-date interactions and social data.
-
-### Practical patterns used
-
-- SSG Shells: used for routes like `/feed` where the HTML shell is static but the client populates user-specific data after load.
-- Client-only data fetching: Interactive, auth-protected data is fetched from the browser (e.g., Activity feed, follow lists) to keep SSG pages cacheable while preserving per-user privacy.
-- Explicit prerender control: Routes that must be dynamic set `export const prerender = false`.
-
-### Example: static shell pattern
+**1. Static Shell Pattern** (used in `/feed`):
 
 ```astro
 ---
-export const prerender = true; // build-time shell
+// Static shell at build time
 import ActivityFeedPage from '@/components/social/ActivityFeedPage';
 ---
 
 <MainLayout>
-  <div id="feed-root">
-    <!-- Client component fetches and renders the feed -->
-    <ActivityFeedPage client:load />
-  </div>
+  <!-- Client component fetches and renders the feed -->
+  <ActivityFeedPage client:load />
 </MainLayout>
 ```
 
-│   ├── auth.ts              # Authentication state with persistence
-│   ├── games.ts             # Games catalog and detail state
-│   ├── reviews.ts           # Reviews management state
-│   ├── social.ts            # Social features state
-│   ├── users.ts             # User profiles and management
-│   ├── admin.ts             # Admin panel state
-│   ├── developers.ts        # Game developers state
-│   ├── publishers.ts        # Game publishers state
-│   ├── genres.ts            # Game genres state
-│   └── platforms.ts         # Gaming platforms state
-├── services/                # API client services
-│   ├── api.ts               # Base API client with error handling
-│   ├── auth.ts              # Authentication API calls with token management
-│   ├── games.ts             # Game-related API calls with caching
-│   ├── reviews.ts           # Review API calls with CRUD operations
-│   ├── social.ts            # Social features API calls
-│   ├── users.ts             # User management API calls
-│   ├── admin.ts             # Admin-only API operations
-│   ├── developers.ts        # Game developers API service
-│   ├── publishers.ts        # Game publishers API service
-│   ├── genres.ts            # Game genres API service
-│   └── platforms.ts         # Gaming platforms API service
-├── utils/                   # Utility functions
-│   ├── constants.ts         # Application constants
-│   ├── validation.ts        # Form validation schemas
-│   ├── formatting.ts        # Date/text formatting utilities
-│   ├── storage.ts           # Local storage utilities
-│   └── auth.ts              # Authentication utilities
-├── hooks/                   # React hooks
-│   ├── useAuth.ts           # Authentication hook with role-based access
-│   ├── useGames.ts          # Games management hooks
-│   ├── useReviews.ts        # Reviews management hooks
-│   ├── useSocial.ts         # Social features hooks
-│   ├── useUsers.ts          # User management hooks
-│   ├── useAdmin.ts          # Admin operations hooks
-│   ├── useDevelopers.ts     # Game developers hooks
-│   ├── usePublishers.ts     # Game publishers hooks
-│   ├── useGenres.ts         # Game genres hooks
-│   └── usePlatforms.ts      # Gaming platforms hooks
-├── types/                   # Frontend-specific types
-│   ├── components.ts        # Component prop types
-│   ├── pages.ts             # Page-specific types
-│   └── stores.ts            # Store state types
-└── styles/                  # Global styles and Tailwind
-    ├── global.css           # Global CSS with Tailwind imports
-    └── components.css       # Component-specific styles (if needed)
+**2. Server-Side Rendering Pattern** (used in `/profile/[username]`):
 
+```astro
+---
+export const prerender = false; // Enable SSR for this route
+
+import ProfilePage from '@/components/profile/ProfilePage';
+import { fetchUserProfile } from '@/services/users';
+
+const { username } = Astro.params;
+const profile = await fetchUserProfile(username);
+---
+
+<MainLayout>
+  <ProfilePage profile={profile} username={username} client:load />
+</MainLayout>
 ```
+
+**3. Client-Only Data Fetching**:
+
+- Used for auth-protected, user-specific data
+- Keeps static pages cacheable while preserving privacy
+- Examples: Activity feed, follow lists, user statistics
+
+## 5. Component Architecture
+
+### Islands Architecture
+
+React components are hydrated selectively using Astro's Islands:
+
+- `client:load` - Hydrate immediately (interactive components)
+- `client:idle` - Hydrate when browser is idle
+- `client:visible` - Hydrate when component is visible
+- `client:only` - Skip server rendering, client-only
+
+### Component Categories
+
+**1. UI Components** (`components/ui/`):
+
+- Base design system components
+- Button, Input, Dialog, Tabs, Avatar
+- Built with Radix UI primitives + Tailwind CSS
+- Fully accessible and type-safe
+
+**2. Feature Components**:
+
+- Game-related: GameCard, GameDetail, GameFilters
+- Reviews: ReviewCard, ReviewForm, ReviewList
+- Social: ActivityFeed, FollowButton, FollowList
+- Profile: ProfileHeader, ProfileTabs, EditProfileDialog
+
+**3. Layout Components**:
+
+- Navbar with responsive mobile menu
+- Footer with site links
+- ThemeToggle for dark/light mode
+
+### State Management Architecture
+
+**Global State (Nanostores)**:
 
 ### Key Design Patterns
 

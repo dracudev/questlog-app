@@ -1,5 +1,8 @@
 # Questlog Backend - Technical Context Document
 
+**Last Updated:** November 4, 2025  
+**Status:** Production Ready
+
 ## 1. High-Level Overview
 
 **Questlog** is a social network for gamers, similar to Letterboxd but focused on video games. The platform allows users to discover games, write reviews, follow other gamers, and build a personalized gaming profile. The backend serves as the core API that powers user authentication, game catalog management, social features, and review systems.
@@ -36,7 +39,7 @@ The platform is designed to eventually become a showcase for indie games, integr
 
 - **Framework**: NestJS 11.x (Node.js TypeScript framework)
 - **Database**: PostgreSQL with Prisma ORM (v6.14.0)
-- **Authentication**: JWT tokens with passport strategies
+- **Authentication**: JWT tokens with cookie-based session management
 - **Validation**: class-validator and class-transformer for DTOs
 - **API Documentation**: Swagger/OpenAPI integration
 - **Security**: Helmet, CORS, bcryptjs for password hashing
