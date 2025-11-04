@@ -28,35 +28,35 @@ export default function ProfileTabs({ profile }: ProfileTabsProps) {
     <Tabs.Root defaultValue="reviews" className="w-full">
       {/* Tab List */}
       <Tabs.List
-        className="flex gap-1 border-b border-tertiary mb-6 overflow-x-auto scrollbar-hide"
+        className="flex gap-1 border-b border-border mb-6 overflow-x-auto scrollbar-hide"
         aria-label="Profile sections"
       >
         <Tabs.Trigger
           value="reviews"
-          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+          className="p-4 text-sm font-semibold text-muted-foreground hover:text-foreground transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background data-[state=active]:text-foreground data-[state=active]:border-b-2 data-[state=active]:border-primary"
         >
           Reviews
-          <span className="ml-2 text-xs bg-tertiary px-2 py-0.5 rounded-full">
+          <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full">
             {profile.stats.reviewsCount}
           </span>
         </Tabs.Trigger>
 
         <Tabs.Trigger
           value="followers"
-          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+          className="p-4 text-sm font-semibold text-muted-foreground hover:text-foreground transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background data-[state=active]:text-foreground data-[state=active]:border-b-2 data-[state=active]:border-primary"
         >
           Followers
-          <span className="ml-2 text-xs bg-tertiary px-2 py-0.5 rounded-full">
+          <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full">
             {profile.stats.followersCount}
           </span>
         </Tabs.Trigger>
 
         <Tabs.Trigger
           value="following"
-          className="p-4 text-sm font-semibold text-muted hover:text-primary transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-secondary data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary"
+          className="p-4 text-sm font-semibold text-muted-foreground hover:text-foreground transition-all whitespace-nowrap cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background data-[state=active]:text-foreground data-[state=active]:border-b-2 data-[state=active]:border-primary"
         >
           Following
-          <span className="ml-2 text-xs bg-tertiary px-2 py-0.5 rounded-full">
+          <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full">
             {profile.stats.followingCount}
           </span>
         </Tabs.Trigger>

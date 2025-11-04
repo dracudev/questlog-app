@@ -49,7 +49,7 @@ export default function FollowList({ type, username }: FollowListProps) {
     return (
       <div className="text-center py-12">
         <svg
-          className="w-16 h-16 mx-auto text-muted mb-4"
+          className="w-16 h-16 mx-auto text-muted-foreground mb-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -61,10 +61,10 @@ export default function FollowList({ type, username }: FollowListProps) {
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
           />
         </svg>
-        <p className="text-primary font-semibold mb-1">
+        <p className="text-foreground font-semibold mb-1">
           No {type === 'followers' ? 'followers' : 'following'} yet
         </p>
-        <p className="text-muted text-sm">
+        <p className="text-muted-foreground text-sm">
           {type === 'followers'
             ? `${username} doesn't have any followers yet`
             : `${username} isn't following anyone yet`}
@@ -84,7 +84,7 @@ export default function FollowList({ type, username }: FollowListProps) {
 
       {/* Pagination info */}
       {data.meta && data.meta.totalPages > 1 && (
-        <div className="text-center text-sm text-muted pt-4">
+        <div className="text-center text-sm text-muted-foreground pt-4">
           Page {data.meta.page} of {data.meta.totalPages}
         </div>
       )}
@@ -109,13 +109,13 @@ function UserCard({ user }: UserCardProps) {
   return (
     <a
       href={`/profile/${user.username}`}
-      className="flex items-center gap-4 bg-secondary rounded-lg border border-tertiary p-4 hover:border-primary transition-colors"
+      className="flex items-center gap-4 bg-card rounded-lg border border-border p-4 hover:border-accent transition-colors"
     >
       {/* Avatar with Radix UI */}
       <Avatar.Root className="inline-flex h-12 w-12 select-none items-center justify-center overflow-hidden rounded-full align-middle">
         <Avatar.Image className="h-full w-full object-cover" src={avatarUrl} alt={user.username} />
         <Avatar.Fallback
-          className="flex h-full w-full items-center justify-center bg-tertiary text-primary text-sm font-semibold"
+          className="flex h-full w-full items-center justify-center bg-muted text-foreground text-sm font-semibold"
           delayMs={600}
         >
           {user.username.slice(0, 2).toUpperCase()}
@@ -124,13 +124,15 @@ function UserCard({ user }: UserCardProps) {
 
       {/* User Info */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-primary truncate">{user.displayName || user.username}</h3>
-        <p className="text-sm text-muted truncate">@{user.username}</p>
+        <h3 className="font-semibold text-foreground truncate">
+          {user.displayName || user.username}
+        </h3>
+        <p className="text-sm text-muted-foreground truncate">@{user.username}</p>
       </div>
 
       {/* Arrow icon */}
       <svg
-        className="w-5 h-5 text-muted flex-shrink-0"
+        className="w-5 h-5 text-muted-foreground flex-shrink-0"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
@@ -147,18 +149,18 @@ function UserCard({ user }: UserCardProps) {
 
 function UserSkeleton() {
   return (
-    <div className="flex items-center gap-4 bg-secondary rounded-lg border border-tertiary p-4 animate-pulse">
+    <div className="flex items-center gap-4 bg-card rounded-lg border border-border p-4 animate-pulse">
       {/* Avatar skeleton */}
-      <div className="w-12 h-12 bg-tertiary rounded-full" />
+      <div className="w-12 h-12 bg-muted rounded-full" />
 
       {/* Content skeleton */}
       <div className="flex-1 space-y-2">
-        <div className="h-5 bg-tertiary rounded w-32" />
-        <div className="h-4 bg-tertiary rounded w-24" />
+        <div className="h-5 bg-muted rounded w-32" />
+        <div className="h-4 bg-muted rounded w-24" />
       </div>
 
       {/* Arrow skeleton */}
-      <div className="w-5 h-5 bg-tertiary rounded" />
+      <div className="w-5 h-5 bg-muted rounded" />
     </div>
   );
 }

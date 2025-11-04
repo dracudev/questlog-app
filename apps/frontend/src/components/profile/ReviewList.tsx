@@ -93,7 +93,7 @@ export default function ReviewList({ userId }: ReviewListProps) {
     return (
       <div className="text-center py-12">
         <p className="text-error mb-2">Failed to load reviews</p>
-        <p className="text-muted text-sm">{error}</p>
+        <p className="text-muted-foreground text-sm">{error}</p>
       </div>
     );
   }
@@ -103,7 +103,7 @@ export default function ReviewList({ userId }: ReviewListProps) {
     return (
       <div className="text-center py-12">
         <svg
-          className="w-16 h-16 mx-auto text-muted mb-4"
+          className="w-16 h-16 mx-auto text-muted-foreground mb-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -115,8 +115,8 @@ export default function ReviewList({ userId }: ReviewListProps) {
             d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
           />
         </svg>
-        <p className="text-primary font-semibold mb-1">No reviews yet</p>
-        <p className="text-muted text-sm">This user hasn't reviewed any games</p>
+        <p className="text-foreground font-semibold mb-1">No reviews yet</p>
+        <p className="text-muted-foreground text-sm">This user hasn't reviewed any games</p>
       </div>
     );
   }
@@ -137,7 +137,7 @@ export default function ReviewList({ userId }: ReviewListProps) {
       {isLoading && reviewItems.length > 0 && (
         <div className="flex justify-center py-4">
           <svg
-            className="animate-spin h-6 w-6 text-primary"
+            className="animate-spin h-6 w-6 text-foreground"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -183,7 +183,7 @@ function ReviewCard({ review }: ReviewCardProps) {
   return (
     <a
       href={`/reviews/${review.id}`}
-      className="block bg-secondary rounded-lg border border-tertiary p-4 hover:border-primary transition-colors"
+      className="block bg-card rounded-lg border border-border p-4 hover:border-accent transition-colors"
     >
       <div className="flex gap-4">
         {/* Game Cover */}
@@ -195,7 +195,7 @@ function ReviewCard({ review }: ReviewCardProps) {
 
         {/* Review Content */}
         <div className="flex-1">
-          <h3 className="font-semibold text-primary mb-1">{review.game.title}</h3>
+          <h3 className="font-semibold text-foreground mb-1">{review.game.title}</h3>
 
           {/* Rating */}
           <div className="flex items-center gap-2 mb-2">
@@ -203,9 +203,7 @@ function ReviewCard({ review }: ReviewCardProps) {
               {[1, 2, 3, 4, 5].map((star) => (
                 <svg
                   key={star}
-                  className={`w-4 h-4 ${
-                    star <= review.rating ? 'text-primary' : 'text-tertiary'
-                  }`}
+                  className={`w-4 h-4 ${star <= review.rating ? 'text-accent' : 'text-muted-foreground'}`}
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -213,16 +211,16 @@ function ReviewCard({ review }: ReviewCardProps) {
                 </svg>
               ))}
             </div>
-            <span className="text-sm text-muted">
+            <span className="text-sm text-muted-foreground">
               {new Date(review.createdAt).toLocaleDateString()}
             </span>
           </div>
 
           {/* Review Text */}
-          <p className="text-secondary text-sm whitespace-pre-wrap">{truncatedContent}</p>
+          <p className="text-foreground text-sm whitespace-pre-wrap">{truncatedContent}</p>
 
           {/* Stats */}
-          <div className="flex gap-4 mt-2 text-xs text-muted">
+          <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
             <span className="flex items-center gap-1">
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
@@ -252,23 +250,23 @@ function ReviewCard({ review }: ReviewCardProps) {
 
 function ReviewSkeleton() {
   return (
-    <div className="bg-secondary rounded-lg border border-tertiary p-4 animate-pulse">
+    <div className="bg-card rounded-lg border border-border p-4 animate-pulse">
       <div className="flex gap-4">
         {/* Cover skeleton */}
-        <div className="w-20 h-28 bg-tertiary rounded" />
+        <div className="w-20 h-28 bg-muted rounded" />
 
         {/* Content skeleton */}
         <div className="flex-1 space-y-2">
-          <div className="h-5 bg-tertiary rounded w-2/3" />
-          <div className="h-4 bg-tertiary rounded w-1/3" />
+          <div className="h-5 bg-muted rounded w-2/3" />
+          <div className="h-4 bg-muted rounded w-1/3" />
           <div className="space-y-1 pt-1">
-            <div className="h-3 bg-tertiary rounded w-full" />
-            <div className="h-3 bg-tertiary rounded w-full" />
-            <div className="h-3 bg-tertiary rounded w-3/4" />
+            <div className="h-3 bg-muted rounded w-full" />
+            <div className="h-3 bg-muted rounded w-full" />
+            <div className="h-3 bg-muted rounded w-3/4" />
           </div>
           <div className="flex gap-4 pt-1">
-            <div className="h-3 bg-tertiary rounded w-12" />
-            <div className="h-3 bg-tertiary rounded w-12" />
+            <div className="h-3 bg-muted rounded w-12" />
+            <div className="h-3 bg-muted rounded w-12" />
           </div>
         </div>
       </div>

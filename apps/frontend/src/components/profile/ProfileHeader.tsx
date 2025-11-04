@@ -46,19 +46,19 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
 
   return (
     <>
-      <div className="bg-secondary rounded-lg shadow-lg border border-tertiary p-6">
+      <div className="bg-card rounded-lg shadow-lg border border-border p-6">
         <div className="lg:grid lg:grid-cols-3 lg:gap-8">
           {/* Column 1: Avatar*/}
           <div className="flex flex-col items-center lg:items-start">
             <div className="relative">
-              <Avatar.Root className="inline-flex h-24 w-24 lg:h-32 lg:w-32 select-none items-center justify-center overflow-hidden rounded-full border-4 border-tertiary align-middle">
+              <Avatar.Root className="inline-flex h-24 w-24 lg:h-32 lg:w-32 select-none items-center justify-center overflow-hidden rounded-full border-4 border-border align-middle">
                 <Avatar.Image
                   className="h-full w-full object-cover"
                   src={avatarUrl}
                   alt={displayProfile.username}
                 />
                 <Avatar.Fallback
-                  className="flex h-full w-full items-center justify-center bg-tertiary text-primary text-2xl lg:text-3xl font-semibold"
+                  className="flex h-full w-full items-center justify-center bg-muted text-foreground text-2xl lg:text-3xl font-semibold"
                   delayMs={600}
                 >
                   {displayProfile.username.slice(0, 2).toUpperCase()}
@@ -66,11 +66,11 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
               </Avatar.Root>
               {displayProfile.isPrivate && (
                 <div
-                  className="absolute bottom-0 right-0 bg-tertiary rounded-full p-2 border-2 border-secondary"
+                  className="absolute bottom-0 right-0 bg-card rounded-full p-2 border-2 border-border"
                   title="Private Profile"
                 >
                   <svg
-                    className="w-5 h-5 text-primary"
+                    className="w-5 h-5 text-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -90,18 +90,18 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
           {/* Column 2: Profile Info  */}
           <div className="mt-6 lg:mt-0 lg:col-span-1 text-center lg:text-left">
             {/* Username */}
-            <h1 className="text-2xl lg:text-3xl font-bold text-primary">
+            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
               {displayProfile.displayName || displayProfile.username}
             </h1>
-            <p className="text-base lg:text-lg text-muted">@{displayProfile.username}</p>
+            <p className="text-base lg:text-lg text-muted-foreground">@{displayProfile.username}</p>
 
             {/* Bio */}
             {displayProfile.bio && (
-              <p className="mt-4 text-secondary whitespace-pre-wrap">{displayProfile.bio}</p>
+              <p className="mt-4 text-foreground whitespace-pre-wrap">{displayProfile.bio}</p>
             )}
 
             {/* Additional Info */}
-            <div className="mt-4 flex flex-wrap justify-center lg:justify-start gap-4 text-sm text-muted">
+            <div className="mt-4 flex flex-wrap justify-center lg:justify-start gap-4 text-sm text-muted-foreground">
               {displayProfile.location && (
                 <span className="flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +126,7 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
                   href={displayProfile.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                  className="flex items-center gap-1 hover:text-accent transition-colors"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -160,22 +160,22 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
             {/* Stats */}
             <div className="mt-6 flex justify-center lg:justify-start gap-8">
               <div className="text-center lg:text-left">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-2xl font-bold text-foreground">
                   {displayProfile.stats.reviewsCount}
                 </div>
-                <div className="text-sm text-muted">Reviews</div>
+                <div className="text-sm text-muted-foreground">Reviews</div>
               </div>
               <div className="text-center lg:text-left">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-2xl font-bold text-foreground">
                   {displayProfile.stats.followersCount}
                 </div>
-                <div className="text-sm text-muted">Followers</div>
+                <div className="text-sm text-muted-foreground">Followers</div>
               </div>
               <div className="text-center lg:text-left">
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-2xl font-bold text-foreground">
                   {displayProfile.stats.followingCount}
                 </div>
-                <div className="text-sm text-muted">Following</div>
+                <div className="text-sm text-muted-foreground">Following</div>
               </div>
             </div>
           </div>
