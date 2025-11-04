@@ -94,22 +94,22 @@ const currentYear = new Date().getFullYear();
     </script>
   </head>
   
-  <body class="h-full antialiased bg-primary text-secondary">
+  <body class="h-full antialiased bg-[var(--bg-primary)] text-[var(--text-secondary)]">
     <!-- Minimal Auth Layout -->
     <div class="min-h-screen flex flex-col">
       <!-- Simplified Navbar -->
-      <nav class="sticky top-0 z-50 w-full border-b bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-primary/60 border-tertiary">
+      <nav class="sticky top-0 z-50 w-full border-b bg-[var(--bg-primary)] backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-primary)]/95 border-[var(--bg-tertiary)]">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
           <div class="flex justify-between items-center h-16">
             <!-- Logo -->
             <a
               href="/"
-              class="flex items-center space-x-2 text-primary hover:text-primary transition-colors"
+              class="flex items-center space-x-2 text-[var(--text-primary)] hover:text-[var(--brand-accent)] transition-colors"
             >
-              <div class="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-                <span class="text-primary font-bold text-sm">Q</span>
+              <div class="w-8 h-8 bg-[var(--brand-primary)] rounded-md flex items-center justify-center">
+                <span class="text-[var(--text-inverse)] font-bold text-sm">Q</span>
               </div>
-              <span class="font-bold text-xl">Questlog</span>
+              <span class="font-bold text-[var(--text-primary)] text-xl">Questlog</span>
             </a>
 
             <!-- Theme Toggle -->
@@ -124,33 +124,33 @@ const currentYear = new Date().getFullYear();
       </main>
 
       <!-- Simplified Footer -->
-      <footer class="border-t border-tertiary bg-primary">
+      <footer class="border-t border-[var(--bg-tertiary)] bg-[var(--bg-primary)]">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <!-- Copyright -->
-            <div class="text-sm text-muted">
+            <div class="text-sm text-[var(--text-muted)]">
               © {currentYear} Questlog. All rights reserved.
             </div>
 
             <!-- Footer Links -->
-            <div class="flex items-center space-x-4 text-sm text-muted">
+            <div class="flex items-center space-x-4 text-sm text-[var(--text-muted)]">
               <a 
                 href="/privacy" 
-                class="hover:text-secondary transition-colors"
+                class="hover:text-[var(--text-secondary)] transition-colors"
               >
                 Privacy
               </a>
               <span>•</span>
               <a 
                 href="/terms" 
-                class="hover:text-secondary transition-colors"
+                class="hover:text-[var(--text-secondary)] transition-colors"
               >
                 Terms
               </a>
               <span>•</span>
               <a 
                 href="/support" 
-                class="hover:text-secondary transition-colors"
+                class="hover:text-[var(--text-secondary)] transition-colors"
               >
                 Support
               </a>

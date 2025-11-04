@@ -82,19 +82,19 @@ export default function Navbar({ currentPath }: NavbarProps) {
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-primary/95 backdrop-blur supports-[backdrop-filter]:bg-primary/60 border-tertiary">
+    <nav className="sticky top-0 z-50 w-full border-b bg-[var(--bg-primary)] backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-primary)]/95 border-[var(--bg-tertiary)]">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
             <a
               href="/"
-              className="flex items-center space-x-2 text-primary hover:text-primary transition-colors"
+              className="flex items-center space-x-2 text-[var(--text-primary)] hover:text-[var(--brand-accent)] transition-colors"
             >
-              <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-sm">Q</span>
+              <div className="w-8 h-8 bg-[var(--brand-primary)] rounded-md flex items-center justify-center">
+                <span className="text-[var(--text-inverse)] font-bold text-sm">Q</span>
               </div>
-              <span className="font-bold text-accent-foreground text-xl hidden sm:block">
+              <span className="font-bold text-[var(--text-primary)] text-xl hidden sm:block">
                 Questlog
               </span>
             </a>
@@ -112,8 +112,8 @@ export default function Navbar({ currentPath }: NavbarProps) {
                         href={item.href}
                         className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                           isActive
-                            ? 'bg-primary/10 text-primary'
-                            : 'text-secondary hover:text-primary hover:bg-tertiary'
+                            ? 'bg-[var(--bg-secondary)] text-[var(--brand-primary)]'
+                            : 'text-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--bg-secondary)]'
                         }`}
                         aria-current={isActive ? 'page' : undefined}
                       >
@@ -152,12 +152,12 @@ export default function Navbar({ currentPath }: NavbarProps) {
 
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content
-                      className="min-w-[200px] bg-secondary border border-tertiary rounded-md shadow-lg p-1 z-[100] text-[var(--brand-accent)]"
+                      className="min-w-[200px] bg-[var(--bg-secondary)] border border-[var(--bg-tertiary)] rounded-md shadow-lg p-1 z-[100] text-[var(--text-primary)]"
                       sideOffset={8}
                       align="end"
                     >
                       <DropdownMenu.Item
-                        className="px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-tertiary rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
+                        className="px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
                         asChild
                       >
                         <a href={`/profile/${user.username}`}>
@@ -167,7 +167,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
                       </DropdownMenu.Item>
 
                       <DropdownMenu.Item
-                        className="px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-tertiary rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
+                        className="px-3 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
                         asChild
                       >
                         <a href="/settings">
@@ -176,10 +176,10 @@ export default function Navbar({ currentPath }: NavbarProps) {
                         </a>
                       </DropdownMenu.Item>
 
-                      <DropdownMenu.Separator className="h-px bg-tertiary my-1" />
+                      <DropdownMenu.Separator className="h-px bg-[var(--bg-tertiary)] my-1" />
 
                       <DropdownMenu.Item
-                        className="px-3 py-2 text-sm text-state-error hover:bg-state-error/10 rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
+                        className="px-3 py-2 text-sm text-[var(--state-error)] hover:bg-[var(--state-error)]/10 rounded-md outline-none cursor-pointer transition-colors flex items-center space-x-2"
                         onSelect={handleLogout}
                       >
                         <LogOut size={16} />
@@ -192,13 +192,13 @@ export default function Navbar({ currentPath }: NavbarProps) {
                 <div className="flex items-center space-x-2">
                   <a
                     href="/auth/login"
-                    className="px-3 py-2 text-sm font-medium text-secondary hover:text-primary transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                   >
                     Login
                   </a>
                   <a
                     href="/auth/register"
-                    className="px-4 py-2 text-sm font-medium bg-primary text-primary rounded-md hover:bg-primary/90 transition-colors"
+                    className="px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--text-inverse)] rounded-md hover:opacity-90 transition-opacity"
                   >
                     Register
                   </a>
@@ -216,7 +216,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
               <Dialog.Trigger asChild>
                 <button
                   type="button"
-                  className="p-1 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+                  className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-primary)]"
                   aria-label="Toggle navigation menu"
                 >
                   {isMobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
@@ -224,18 +224,20 @@ export default function Navbar({ currentPath }: NavbarProps) {
               </Dialog.Trigger>
 
               <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 bg-primary/80 backdrop-blur-sm z-[60]" />
+                <Dialog.Overlay className="fixed inset-0 bg-[var(--bg-primary)]/80 backdrop-blur-sm z-[60]" />
                 <Dialog.Content
-                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-secondary border-l border-tertiary shadow-lg z-[60] focus:outline-none"
+                  className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-[var(--bg-secondary)] border-l border-[var(--bg-tertiary)] shadow-lg z-[60] focus:outline-none"
                   aria-describedby={undefined}
                 >
                   {/* Mobile Menu Header */}
-                  <div className="flex items-center justify-between p-4 border-b border-tertiary">
-                    <Dialog.Title className="text-lg font-semibold text-primary">Menu</Dialog.Title>
+                  <div className="flex items-center justify-between p-4 border-b border-[var(--bg-tertiary)]">
+                    <Dialog.Title className="text-lg font-semibold text-[var(--text-primary)]">
+                      Menu
+                    </Dialog.Title>
                     <Dialog.Close asChild>
                       <button
                         type="button"
-                        className="p-1 rounded-md text-secondary hover:text-primary hover:bg-tertiary transition-colors"
+                        className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors"
                         aria-label="Close menu"
                       >
                         <X size={16} />
@@ -255,8 +257,8 @@ export default function Navbar({ currentPath }: NavbarProps) {
                             href={item.href}
                             className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                               isActive
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-secondary hover:text-primary hover:bg-tertiary'
+                                ? 'bg-[var(--bg-tertiary)] text-[var(--brand-primary)]'
+                                : 'text-[var(--brand-primary)] hover:text-[var(--brand-primary)] hover:bg-[var(--bg-tertiary)]'
                             }`}
                             aria-current={isActive ? 'page' : undefined}
                             onClick={() => setIsMobileMenuOpen(false)}
@@ -268,7 +270,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
                     </nav>
 
                     {/* Mobile Authentication Section */}
-                    <div className="border-t border-tertiary p-4">
+                    <div className="border-t border-[var(--bg-tertiary)] p-4">
                       {authInitialized ? (
                         isAuthenticated && user ? (
                           <div className="space-y-3">
@@ -282,11 +284,13 @@ export default function Navbar({ currentPath }: NavbarProps) {
                                 />
                               </Avatar.Root>
                               <div>
-                                <div className="text-base font-medium text-primary">
+                                <div className="text-base font-medium text-[var(--text-primary)]">
                                   {user.username}
                                 </div>
                                 <a href={`/profile/${user.username}`}>
-                                  <div className="text-sm text-muted">View profile</div>
+                                  <div className="text-sm text-[var(--text-muted)]">
+                                    View profile
+                                  </div>
                                 </a>
                               </div>
                             </div>
@@ -295,7 +299,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
 
                             <a
                               href="/settings"
-                              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-secondary hover:text-primary hover:bg-tertiary rounded-md transition-colors"
+                              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] rounded-md transition-colors"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
                               <Settings size={16} />
@@ -304,7 +308,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
 
                             <button
                               type="button"
-                              className="w-full flex items-center space-x-2 px-3 py-2 text-sm font-medium text-state-error hover:bg-state-error/10 rounded-md transition-colors"
+                              className="w-full flex items-center space-x-2 px-3 py-2 text-sm font-medium text-[var(--state-error)] hover:bg-[var(--state-error)]/10 rounded-md transition-colors"
                               onClick={() => {
                                 setIsMobileMenuOpen(false);
                                 handleLogout();
@@ -318,14 +322,14 @@ export default function Navbar({ currentPath }: NavbarProps) {
                           <div className="space-y-2">
                             <a
                               href="/auth/login"
-                              className="block w-full text-center px-4 py-2 text-sm font-medium text-secondary hover:text-primary border border-tertiary rounded-md hover:bg-tertiary transition-colors"
+                              className="block w-full text-center px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--bg-tertiary)] rounded-md hover:bg-[var(--bg-tertiary)] transition-colors"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
                               Login
                             </a>
                             <a
                               href="/auth/register"
-                              className="block w-full text-center px-4 py-2 text-sm font-medium bg-primary text-primary rounded-md hover:bg-primary/90 transition-colors"
+                              className="block w-full text-center px-4 py-2 text-sm font-medium bg-[var(--brand-primary)] text-[var(--text-inverse)] rounded-md hover:opacity-90 transition-opacity"
                               onClick={() => setIsMobileMenuOpen(false)}
                             >
                               Register
