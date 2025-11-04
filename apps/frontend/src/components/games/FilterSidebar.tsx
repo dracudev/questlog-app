@@ -148,7 +148,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
           {/* Genres */}
           {filterOptions?.genres && filterOptions.genres.length > 0 && (
             <CollapsibleSection title="Genres" count={selectedFilters.genreIds?.length}>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-hidden pr-1">
                 {filterOptions.genres.map((genre) => (
                   <CheckboxItem
                     key={genre.id}
@@ -165,7 +165,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
           {/* Platforms */}
           {filterOptions?.platforms && filterOptions.platforms.length > 0 && (
             <CollapsibleSection title="Platforms" count={selectedFilters.platformIds?.length}>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-hidden pr-1">
                 {filterOptions.platforms.map((platform) => (
                   <CheckboxItem
                     key={platform.id}
@@ -182,7 +182,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
           {/* Developers */}
           {filterOptions?.developers && filterOptions.developers.length > 0 && (
             <CollapsibleSection title="Developers" count={selectedFilters.developerId ? 1 : 0}>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-hidden pr-1">
                 {filterOptions.developers.map((developer) => (
                   <CheckboxItem
                     key={developer.id}
@@ -204,7 +204,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
           {/* Publishers */}
           {filterOptions?.publishers && filterOptions.publishers.length > 0 && (
             <CollapsibleSection title="Publishers" count={selectedFilters.publisherId ? 1 : 0}>
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-hidden pr-1">
                 {filterOptions.publishers.map((publisher) => (
                   <CheckboxItem
                     key={publisher.id}
@@ -302,18 +302,21 @@ function CheckboxItem({
   onCheckedChange: () => void;
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 min-w-0 pr-1">
       <Checkbox.Root
         id={id}
         checked={checked}
         onCheckedChange={onCheckedChange}
-        className="h-5 w-5 rounded border border-border bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+        className="h-5 w-5 shrink-0 rounded border border-border bg-background hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
       >
         <Checkbox.Indicator>
           <Check className="h-4 w-4 text-primary-foreground" />
         </Checkbox.Indicator>
       </Checkbox.Root>
-      <label htmlFor={id} className="text-sm cursor-pointer hover:opacity-80">
+      <label
+        htmlFor={id}
+        className="text-sm cursor-pointer hover:opacity-80 break-words min-w-0 flex-1"
+      >
         {label}
       </label>
     </div>
