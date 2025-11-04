@@ -94,7 +94,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
                 </Select.Trigger>
 
                 <Select.Portal>
-                  <Select.Content className="rounded-lg border border-border bg-popover shadow-lg">
+                  <Select.Content className="z-[60] rounded-lg border border-border bg-card shadow-lg">
                     <Select.Viewport className="p-1">
                       <SelectItem value="averageRating-desc">Highest Rated</SelectItem>
                       <SelectItem value="averageRating-asc">Lowest Rated</SelectItem>
@@ -125,7 +125,7 @@ export default function FilterSidebar({ isMobile = false, onClose }: FilterSideb
                 </Select.Trigger>
 
                 <Select.Portal>
-                  <Select.Content className="rounded-lg border border-border bg-popover shadow-lg">
+                  <Select.Content className="z-[60] rounded-lg border border-border bg-card shadow-lg">
                     <Select.Viewport className="p-1">
                       <SelectItem value="all">All Games</SelectItem>
                       <SelectItem value="ANNOUNCED">Announced</SelectItem>
