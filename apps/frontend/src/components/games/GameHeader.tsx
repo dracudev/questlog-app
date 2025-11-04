@@ -150,19 +150,19 @@ function ActionButtons({ onWriteReview }: { onWriteReview: () => void }) {
 
         <DropdownMenu.Portal>
           <DropdownMenu.Content
-            className="min-w-[220px] bg-zinc-800 text-[var(--brand-accent)] rounded-md p-2 shadow-lg"
+            className="min-w-[220px] bg-card border border-border text-foreground rounded-lg p-1 shadow-lg z-50"
             sideOffset={5}
           >
-            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
+            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
               Favorites
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
+            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
               Playing
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
+            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
               Completed
             </DropdownMenu.Item>
-            <DropdownMenu.Item className="px-3 py-2 text-foreground rounded hover:bg-muted cursor-pointer outline-none">
+            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
               Want to Play
             </DropdownMenu.Item>
           </DropdownMenu.Content>

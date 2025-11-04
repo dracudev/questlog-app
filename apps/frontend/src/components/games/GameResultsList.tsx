@@ -128,7 +128,7 @@ export default function GameResultsList() {
 
       {/* End of results message */}
       {!data.hasNextPage && data.data.length > 0 && (
-        <div className="mt-8 text-center text-sm text-muted-foreground">
+        <div className="mt-8 text-center text-sm text-muted">
           You've reached the end of the results
         </div>
       )}
