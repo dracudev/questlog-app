@@ -60,7 +60,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
       stars.push(
         <svg
           key={`full-${i}`}
-          className="w-5 h-5 md:w-6 md:h-6 text-brand-accent"
+          className="w-5 h-5 md:w-6 md:h-6 text-accent"
           fill="currentColor"
           viewBox="0 0 20 20"
           aria-hidden="true"
@@ -75,7 +75,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
       stars.push(
         <svg
           key="half"
-          className="w-5 h-5 md:w-6 md:h-6 text-brand-accent"
+          className="w-5 h-5 md:w-6 md:h-6 text-accent"
           fill="currentColor"
           viewBox="0 0 20 20"
           aria-hidden="true"
@@ -83,7 +83,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
           <defs>
             <linearGradient id="halfGradient">
               <stop offset="50%" stopColor="currentColor" />
-              <stop offset="50%" stopColor="var(--bg-tertiary)" />
+              <stop offset="50%" stopColor="var(--color-muted)" />
             </linearGradient>
           </defs>
           <path
@@ -100,7 +100,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
       stars.push(
         <svg
           key={`empty-${i}`}
-          className="w-5 h-5 md:w-6 md:h-6 text-tertiary"
+          className="w-5 h-5 md:w-6 md:h-6 text-muted"
           fill="currentColor"
           viewBox="0 0 20 20"
           aria-hidden="true"
@@ -118,7 +118,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
   // ============================================================================
 
   return (
-    <header className="bg-secondary rounded-lg border border-tertiary overflow-hidden">
+    <header className="bg-card rounded-lg border border-border overflow-hidden">
       {/* Mobile-First Layout: Stacked on mobile, Grid on larger screens */}
       <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6 p-4 md:p-6">
         {/* Game Cover Image */}
@@ -127,7 +127,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
           className="shrink-0 self-start group"
           aria-label={`View ${review.game.title}`}
         >
-          <div className="relative w-32 md:w-40 lg:w-48 aspect-[3/4] rounded-md overflow-hidden bg-tertiary border border-tertiary">
+          <div className="relative w-32 md:w-40 lg:w-48 aspect-[3/4] rounded-md overflow-hidden bg-muted border border-border">
             <img
               src={coverUrl}
               alt={review.game.title}
@@ -135,7 +135,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
             />
             {/* Spoiler Badge */}
             {review.isSpoiler && (
-              <div className="absolute top-2 right-2 bg-state-warning text-primary px-2 py-1 rounded text-xs font-semibold shadow-md">
+              <div className="absolute top-2 right-2 bg-destructive text-destructive-foreground px-2 py-1 rounded text-xs font-semibold shadow-md">
                 SPOILER
               </div>
             )}
@@ -150,7 +150,7 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
             className="block group mb-4"
             aria-label={`View ${review.game.title}`}
           >
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary group-hover:text-primary transition-colors">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground group-hover:text-primary transition-colors">
               {review.game.title}
             </h1>
           </a>
@@ -164,13 +164,13 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
             <img
               src={avatarUrl}
               alt={review.user.displayName}
-              className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-tertiary group-hover:border-primary transition-colors"
+              className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-border group-hover:border-primary transition-colors"
             />
             <div className="flex flex-col min-w-0">
-              <span className="text-base md:text-lg font-semibold text-primary truncate">
+              <span className="text-base md:text-lg font-semibold text-foreground truncate">
                 {review.user.displayName}
               </span>
-              <span className="text-sm text-muted">@{review.user.username}</span>
+              <span className="text-sm text-muted-foreground">@{review.user.username}</span>
             </div>
           </a>
 
@@ -183,17 +183,17 @@ export default function ReviewHeader({ review }: ReviewHeaderProps) {
             >
               {renderStars()}
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted">
-              <span className="text-xl md:text-2xl font-bold text-brand-accent">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="text-xl md:text-2xl font-bold text-accent">
                 {review.rating.toFixed(1)}
               </span>
-              <span className="text-muted">/</span>
-              <span className="text-muted">10</span>
+              <span className="text-muted-foreground">/</span>
+              <span className="text-muted-foreground">10</span>
             </div>
           </div>
 
           {/* Publication Date */}
-          <div className="mt-4 text-sm text-muted">
+          <div className="mt-4 text-sm text-muted-foreground">
             <time dateTime={new Date(review.createdAt).toISOString()}>
               {formatDate(review.createdAt)}
             </time>

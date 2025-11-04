@@ -51,8 +51,10 @@ export default function ReviewsPage({ initialData }: ReviewsPageProps) {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       {/* Page Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-primary mb-2">Recent Reviews</h1>
-        <p className="text-muted">Discover the latest game reviews from the Questlog community</p>
+        <h1 className="text-4xl font-bold text-foreground mb-2">Recent Reviews</h1>
+        <p className="text-muted-foreground">
+          Discover the latest game reviews from the Questlog community
+        </p>
       </div>
 
       {/* Filters Section */}

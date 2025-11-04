@@ -57,11 +57,11 @@ export default function ReviewCard({ review }: ReviewCardProps) {
   // ============================================================================
 
   return (
-    <article className="bg-secondary rounded-lg border border-tertiary overflow-hidden hover:border-primary transition-all duration-200 hover:shadow-lg group flex flex-col md:flex-row">
+    <article className="bg-card rounded-lg border border-border overflow-hidden hover:border-primary transition-all duration-200 hover:shadow-lg group flex flex-col md:flex-row">
       {/* Game Cover Image */}
       <a
         href={`/games/${review.game.slug}`}
-        className="block w-full md:w-36 flex-shrink-0 md:aspect-[3/4] h-48 md:h-auto relative overflow-hidden bg-tertiary"
+        className="block w-full md:w-36 flex-shrink-0 md:aspect-[3/4] h-48 md:h-auto relative overflow-hidden bg-muted"
       >
         <img
           src={coverUrl}
@@ -78,7 +78,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         />
         {/* Spoiler Badge */}
         {review.isSpoiler && (
-          <div className="absolute top-2 right-2 bg-state-warning text-primary px-2 py-1 rounded text-xs font-semibold">
+          <div className="absolute top-2 right-2 bg-destructive text-destructive-foreground px-2 py-1 rounded text-xs font-semibold">
             SPOILER
           </div>
         )}
@@ -91,7 +91,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
           href={`/games/${review.game.slug}`}
           className="block mb-3 hover:text-primary transition-colors"
         >
-          <h3 className="font-semibold text-primary line-clamp-2">{review.game.title}</h3>
+          <h3 className="font-semibold text-foreground line-clamp-2">{review.game.title}</h3>
         </a>
 
         {/* User Info - Link to Profile */}
@@ -102,14 +102,14 @@ export default function ReviewCard({ review }: ReviewCardProps) {
           <img
             src={avatarUrl}
             alt={review.user.displayName}
-            className="w-8 h-8 rounded-full border border-tertiary"
+            className="w-8 h-8 rounded-full border border-border"
             loading="lazy"
           />
           <div className="flex flex-col min-w-0">
-            <span className="text-sm text-secondary font-medium truncate">
+            <span className="text-sm text-foreground font-medium truncate">
               {review.user.displayName}
             </span>
-            <span className="text-xs text-muted">@{review.user.username}</span>
+            <span className="text-xs text-muted-foreground">@{review.user.username}</span>
           </div>
         </a>
 
@@ -120,7 +120,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
             return (
               <svg
                 key={star}
-                className={`w-4 h-4 ${isFilled ? 'text-brand-accent' : 'text-tertiary'}`}
+                className={`w-4 h-4 ${isFilled ? 'text-accent' : 'text-muted'}`}
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -128,9 +128,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
               </svg>
             );
           })}
-          <span className="ml-1 text-sm font-semibold text-brand-accent">
-            {review.rating.toFixed(1)}
-          </span>
+          <span className="ml-1 text-sm font-semibold text-accent">{review.rating.toFixed(1)}</span>
         </div>
 
         {/* Review Title (if exists) */}
@@ -139,7 +137,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
             href={`/reviews/${review.id}`}
             className="block mb-2 hover:text-primary transition-colors"
           >
-            <h4 className="font-medium text-secondary line-clamp-1">{review.title}</h4>
+            <h4 className="font-medium text-foreground line-clamp-1">{review.title}</h4>
           </a>
         )}
 
@@ -148,11 +146,13 @@ export default function ReviewCard({ review }: ReviewCardProps) {
           href={`/reviews/${review.id}`}
           className="block mb-3 hover:text-primary transition-colors"
         >
-          <p className="text-sm text-muted line-clamp-3">{truncateContent(review.content)}</p>
+          <p className="text-sm text-muted-foreground line-clamp-3">
+            {truncateContent(review.content)}
+          </p>
         </a>
 
         {/* Footer: Stats and Date */}
-        <div className="flex items-center justify-between text-xs text-muted pt-3 border-t border-tertiary">
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-3 border-t border-border">
           {/* Stats */}
           <div className="flex items-center gap-3">
             {/* Likes */}

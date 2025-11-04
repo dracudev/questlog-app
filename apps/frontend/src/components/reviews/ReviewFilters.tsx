@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import * as Select from '@radix-ui/react-select';
+import { Check, ChevronDown } from 'lucide-react';
 import { useReviews } from '@/hooks/useReviews';
 
 // ============================================================================
@@ -82,11 +84,11 @@ export default function ReviewFilters() {
   // ============================================================================
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-secondary rounded-lg border border-tertiary p-4">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card rounded-lg border border-border p-4">
       {/* Filter Label */}
       <div className="flex items-center gap-2">
         <svg
-          className="w-5 h-5 text-muted"
+          className="w-5 h-5 text-muted-foreground"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -99,23 +101,38 @@ export default function ReviewFilters() {
             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
           />
         </svg>
-        <span className="text-sm font-medium text-secondary">Sort By</span>
+        <span className="text-sm font-medium text-foreground">Sort By</span>
       </div>
 
       {/* Sort Dropdown */}
       <div className="w-full sm:w-auto">
-        <select
-          value={selectedSort}
-          onChange={(e) => handleSortChange(e.target.value)}
-          disabled={isLoading}
-          className="w-full sm:w-auto px-4 py-2 bg-primary border border-tertiary rounded-md text-sm text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {SORT_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <Select.Root value={selectedSort} onValueChange={handleSortChange} disabled={isLoading}>
+          <Select.Trigger className="w-full sm:w-auto flex items-center justify-between rounded-lg border border-border bg-background px-4 py-2 text-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <Select.Value />
+            <Select.Icon>
+              <ChevronDown className="h-4 w-4 opacity-50" />
+            </Select.Icon>
+          </Select.Trigger>
+
+          <Select.Portal>
+            <Select.Content className="z-[60] rounded-lg border border-border bg-card shadow-lg">
+              <Select.Viewport className="p-1">
+                {SORT_OPTIONS.map((option) => (
+                  <Select.Item
+                    key={option.value}
+                    value={option.value}
+                    className="relative flex items-center rounded px-8 py-2 text-sm hover:bg-accent focus:bg-accent outline-none cursor-pointer"
+                  >
+                    <Select.ItemText>{option.label}</Select.ItemText>
+                    <Select.ItemIndicator className="absolute left-2">
+                      <Check className="h-4 w-4" />
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                ))}
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
       </div>
     </div>
   );
