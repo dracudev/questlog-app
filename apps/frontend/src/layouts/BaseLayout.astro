@@ -12,7 +12,7 @@ export interface Props {
 const {
   title,
   description = "Questlog - The social network for gamers. Discover games, write reviews, and connect with fellow gamers.",
-  image = "/og-image.jpg",
+  image = "/og-image.webp",
   noIndex = false,
   canonicalURL
 } = Astro.props;
@@ -48,6 +48,9 @@ const canonical = canonicalURL || new URL(Astro.url.pathname, siteURL).toString(
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={imageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/webp" />
     <meta property="og:site_name" content={siteName} />
     
     <!-- Twitter Card -->
