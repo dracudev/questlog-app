@@ -340,5 +340,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 Built with care for the gaming community
-
-[Website](https://questlog.app) • [Documentation](./docs/) • [API Docs](http://localhost:3000/api) • [Contributing](./CONTRIBUTING.md)
