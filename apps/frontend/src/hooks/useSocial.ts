@@ -11,6 +11,7 @@ import type {
 } from '@glitch/shared-types';
 
 import { socialService } from '@/services/social';
+import { $currentUser } from '@/stores/auth';
 import {
   $currentUserSocialStats,
   $socialStatsLoading,
@@ -392,6 +393,17 @@ export function useFollowActions(): UseFollowActionsReturn {
   const loadingActions = useStore($followActionsLoading);
 
   const followUser = useCallback(async (userId: string): Promise<void> => {
+    // Optimistic: update viewed profile counts immediately
+    const { $viewedProfile, updateViewedProfile } = await import('@/stores/users');
+    const viewedProfile = $viewedProfile.get();
+
+    if (viewedProfile && viewedProfile.id === userId) {
+      updateViewedProfile({
+        isFollowing: true,
+        stats: { ...viewedProfile.stats, followersCount: viewedProfile.stats.followersCount + 1 },
+      });
+    }
+
     try {
       setFollowActionLoading(userId, true);
       await socialService.followUser(userId);
@@ -399,7 +411,23 @@ export function useFollowActions(): UseFollowActionsReturn {
       updateCurrentUserStatsAfterFollow(true);
       updateUserStatsAfterBeingFollowed(userId, true);
       removeSuggestionAfterFollow(userId);
+
+      // Refetch follow lists to show the new follower card
+      if (viewedProfile) {
+        const { loadUserFollowers, loadUserFollowing } = await import('@/stores/users');
+        loadUserFollowers(viewedProfile.username);
+        if (viewedProfile.id === $currentUser.get()?.id) {
+          loadUserFollowing(viewedProfile.username);
+        }
+      }
     } catch (err) {
+      // Rollback counts
+      if (viewedProfile && viewedProfile.id === userId) {
+        updateViewedProfile({
+          isFollowing: false,
+          stats: { ...viewedProfile.stats, followersCount: Math.max(0, viewedProfile.stats.followersCount - 1) },
+        });
+      }
       throw err;
     } finally {
       setFollowActionLoading(userId, false);
@@ -407,13 +435,40 @@ export function useFollowActions(): UseFollowActionsReturn {
   }, []);
 
   const unfollowUser = useCallback(async (userId: string): Promise<void> => {
+    // Optimistic: update viewed profile counts immediately
+    const { $viewedProfile, updateViewedProfile } = await import('@/stores/users');
+    const viewedProfile = $viewedProfile.get();
+
+    if (viewedProfile && viewedProfile.id === userId) {
+      updateViewedProfile({
+        isFollowing: false,
+        stats: { ...viewedProfile.stats, followersCount: Math.max(0, viewedProfile.stats.followersCount - 1) },
+      });
+    }
+
     try {
       setFollowActionLoading(userId, true);
       await socialService.unfollowUser(userId);
       setFollowingStatus(userId, false);
       updateCurrentUserStatsAfterFollow(false);
       updateUserStatsAfterBeingFollowed(userId, false);
+
+      // Refetch follow lists to remove the follower card
+      if (viewedProfile) {
+        const { loadUserFollowers, loadUserFollowing } = await import('@/stores/users');
+        loadUserFollowers(viewedProfile.username);
+        if (viewedProfile.id === $currentUser.get()?.id) {
+          loadUserFollowing(viewedProfile.username);
+        }
+      }
     } catch (err) {
+      // Rollback counts
+      if (viewedProfile && viewedProfile.id === userId) {
+        updateViewedProfile({
+          isFollowing: true,
+          stats: { ...viewedProfile.stats, followersCount: viewedProfile.stats.followersCount + 1 },
+        });
+      }
       throw err;
     } finally {
       setFollowActionLoading(userId, false);

@@ -1,5 +1,7 @@
 import * as Tabs from '@radix-ui/react-tabs';
+import { useStore } from '@nanostores/react';
 import type { UserProfile } from '@glitch/shared-types';
+import { $viewedProfile } from '@/stores/users';
 import ReviewList from './ReviewList';
 import FollowList from './FollowList';
 
@@ -24,6 +26,8 @@ interface ProfileTabsProps {
  * ```
  */
 export default function ProfileTabs({ profile }: ProfileTabsProps) {
+  const viewedProfile = useStore($viewedProfile);
+  const displayProfile = viewedProfile || profile;
   return (
     <Tabs.Root defaultValue="reviews" className="w-full">
       {/* Tab List */}
@@ -37,7 +41,7 @@ export default function ProfileTabs({ profile }: ProfileTabsProps) {
         >
           Reviews
           <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full">
-            {profile.stats.reviewsCount}
+            {displayProfile.stats.reviewsCount}
           </span>
         </Tabs.Trigger>
 
@@ -47,7 +51,7 @@ export default function ProfileTabs({ profile }: ProfileTabsProps) {
         >
           Followers
           <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full">
-            {profile.stats.followersCount}
+            {displayProfile.stats.followersCount}
           </span>
         </Tabs.Trigger>
 
@@ -57,22 +61,22 @@ export default function ProfileTabs({ profile }: ProfileTabsProps) {
         >
           Following
           <span className="ml-2 text-xs bg-muted px-2 py-0.5 rounded-full">
-            {profile.stats.followingCount}
+            {displayProfile.stats.followingCount}
           </span>
         </Tabs.Trigger>
       </Tabs.List>
 
       {/* Tab Content */}
       <Tabs.Content value="reviews" className="focus:outline-none">
-        <ReviewList userId={profile.id} />
+        <ReviewList userId={displayProfile.id} />
       </Tabs.Content>
 
       <Tabs.Content value="followers" className="focus:outline-none">
-        <FollowList type="followers" username={profile.username} />
+        <FollowList type="followers" username={displayProfile.username} />
       </Tabs.Content>
 
       <Tabs.Content value="following" className="focus:outline-none">
-        <FollowList type="following" username={profile.username} />
+        <FollowList type="following" username={displayProfile.username} />
       </Tabs.Content>
     </Tabs.Root>
   );
