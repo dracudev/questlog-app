@@ -4,7 +4,6 @@ import {
   IsNumber,
   IsString,
   IsEnum,
-  IsUUID,
   IsBoolean,
   Min,
   Max,
@@ -49,7 +48,7 @@ export class ReviewsQueryDto {
     description: 'Filter by game ID',
   })
   @IsOptional()
-  @IsUUID()
+  @IsString()
   gameId?: string;
 
   @ApiPropertyOptional({
@@ -57,7 +56,7 @@ export class ReviewsQueryDto {
     description: 'Filter by user ID',
   })
   @IsOptional()
-  @IsUUID()
+  @IsString()
   userId?: string;
 
   @ApiPropertyOptional({

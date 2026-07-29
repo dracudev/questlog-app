@@ -3,7 +3,6 @@ import {
   IsOptional,
   IsNumber,
   IsBoolean,
-  IsUUID,
   Min,
   Max,
   MinLength,
@@ -11,6 +10,7 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { REVIEWS_CONSTANTS } from '../constants/reviews.constants';
+import { IsHalfStep } from '../decorators/is-half-step.decorator';
 
 export class CreateReviewDto {
   @ApiPropertyOptional({
@@ -41,13 +41,14 @@ export class CreateReviewDto {
   @IsNumber({ maxDecimalPlaces: 1 })
   @Min(REVIEWS_CONSTANTS.VALIDATION.MIN_RATING)
   @Max(REVIEWS_CONSTANTS.VALIDATION.MAX_RATING)
+  @IsHalfStep({ message: 'Rating must be a multiple of 0.5 (e.g., 0, 0.5, 1, 1.5, ... 10)' })
   rating: number;
 
   @ApiProperty({
     example: 'cm2a3b4c5d6e7f8g9h0i',
     description: 'Game ID being reviewed',
   })
-  @IsUUID()
+  @IsString()
   gameId: string;
 
   @ApiPropertyOptional({
