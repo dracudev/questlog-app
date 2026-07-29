@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import type { ReviewResponse } from '@glitch/shared-types';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { Heart } from 'lucide-react';
+import { Heart, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 // Hooks
 import { useReviewActions } from '@/hooks/useReviews';
 import { useStore } from '@nanostores/react';
 import { $reviewDetail } from '@/stores/reviews';
+import { $currentUser } from '@/stores/auth';
 
 // ============================================================================
 // Props Interface
@@ -15,6 +16,10 @@ import { $reviewDetail } from '@/stores/reviews';
 
 interface ReviewActionsProps {
   review: ReviewResponse;
+  /** Called when edit button is clicked (for owner to open edit dialog) */
+  onEdit?: () => void;
+  /** Called after successful deletion */
+  onDeleted?: () => void;
 }
 
 // ============================================================================
@@ -32,19 +37,29 @@ interface ReviewActionsProps {
  * <ReviewActions review={reviewData} />
  * ```
  */
-export default function ReviewActions({ review: initialReview }: ReviewActionsProps) {
+export default function ReviewActions({
+  review: initialReview,
+  onEdit,
+  onDeleted,
+}: ReviewActionsProps) {
   // ============================================================================
   // State & Hooks
   // ============================================================================
+
+  // Get current user for ownership check
+  const currentUser = useStore($currentUser);
+  const isOwner = currentUser?.id === initialReview.user.id;
 
   // Get current review from store (for optimistic updates)
   const currentReview = useStore($reviewDetail) || initialReview;
 
   // Review actions hook
-  const { likeReview, unlikeReview, isLoading, error } = useReviewActions();
+  const { likeReview, unlikeReview, deleteReview, isLoading, error } = useReviewActions();
 
-  // Local loading state for the like button
+  // Local loading states
   const [isLiking, setIsLiking] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // ============================================================================
   // Handlers
@@ -68,6 +83,24 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
       console.error('Failed to toggle like:', err);
     } finally {
       setIsLiking(false);
+    }
+  };
+
+  /**
+   * Handle review deletion with confirmation
+   */
+  const handleDelete = async () => {
+    if (isDeleting) return;
+    setIsDeleting(true);
+
+    try {
+      await deleteReview(currentReview.id);
+      setShowDeleteConfirm(false);
+      onDeleted?.();
+    } catch (err) {
+      console.error('Failed to delete review:', err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -107,6 +140,61 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
+          {/* Owner Actions: Edit + Delete */}
+          {isOwner && (
+            <>
+              {/* Edit Button */}
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    onClick={onEdit}
+                    disabled={isLoading}
+                    variant="outline"
+                    leftIcon={<Edit className="w-5 h-5" aria-hidden="true" />}
+                    aria-label="Edit this review"
+                  >
+                    <span className="hidden sm:inline">Edit</span>
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    className="bg-popover text-popover-foreground px-3 py-2 rounded-md text-sm font-medium shadow-lg z-tooltip"
+                    sideOffset={5}
+                  >
+                    Edit this review
+                    <Tooltip.Arrow className="fill-popover" />
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+
+              {/* Delete Button */}
+              <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    disabled={isDeleting || isLoading}
+                    variant="outline"
+                    leftIcon={
+                      <Trash2 className="w-5 h-5 text-destructive" aria-hidden="true" />
+                    }
+                    aria-label="Delete this review"
+                  >
+                    <span className="hidden sm:inline">Delete</span>
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content
+                    className="bg-popover text-popover-foreground px-3 py-2 rounded-md text-sm font-medium shadow-lg z-tooltip"
+                    sideOffset={5}
+                  >
+                    Delete this review
+                    <Tooltip.Arrow className="fill-popover" />
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </>
+          )}
+
           {/* Like Button with Tooltip */}
           <Tooltip.Root>
             <Tooltip.Trigger asChild>
@@ -214,6 +302,30 @@ export default function ReviewActions({ review: initialReview }: ReviewActionsPr
               />
             </svg>
             <p className="text-sm text-state-error">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center">
+          <div className="bg-card rounded-lg border border-border p-6 w-[90vw] max-w-md shadow-xl">
+            <h3 className="text-lg font-semibold text-foreground mb-2">Delete Review</h3>
+            <p className="text-muted-foreground text-sm mb-6">
+              Are you sure you want to delete this review? This action cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="secondary"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleDelete} disabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </Button>
+            </div>
           </div>
         </div>
       )}

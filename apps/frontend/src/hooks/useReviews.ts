@@ -41,6 +41,9 @@ import {
   clearUserReviewsState,
   clearGameReviewsState,
   optimisticLikeUpdate,
+  addReviewToList,
+  updateReviewInLists,
+  removeReviewFromList,
 } from '@/stores/reviews';
 
 // ============================================================================
@@ -775,6 +778,7 @@ export function useReviewActions(): UseReviewActionsReturn {
 
       try {
         const response = await reviewsService.createReview(reviewData);
+        addReviewToList(response);
         return response;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to create review';
@@ -794,6 +798,7 @@ export function useReviewActions(): UseReviewActionsReturn {
 
       try {
         const response = await reviewsService.updateReview(reviewId, updateData);
+        updateReviewInLists(response);
         return response;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to update review';
@@ -812,6 +817,7 @@ export function useReviewActions(): UseReviewActionsReturn {
 
     try {
       await reviewsService.deleteReview(reviewId);
+      removeReviewFromList(reviewId);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete review';
       setReviewActionError(errorMessage);

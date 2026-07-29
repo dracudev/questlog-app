@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReviewResponse } from '@glitch/shared-types';
 
 // Components
 import ReviewHeader from './ReviewHeader';
 import ReviewContent from './ReviewContent';
 import ReviewActions from './ReviewActions';
+import ReviewFormDialog from '@/components/games/ReviewFormDialog';
 
 // Stores
 import { setReviewDetail } from '@/stores/reviews';
@@ -26,6 +27,7 @@ interface ReviewDetailPageProps {
  *
  * Main container for displaying full review details.
  * Hydrated by Astro with server-rendered review data.
+ * Supports edit/delete for review owners.
  *
  * @example
  * ```tsx
@@ -33,6 +35,13 @@ interface ReviewDetailPageProps {
  * ```
  */
 export default function ReviewDetailPage({ review }: ReviewDetailPageProps) {
+  // ============================================================================
+  // State
+  // ============================================================================
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+
   // ============================================================================
   // Initialization Effect
   // ============================================================================
@@ -43,8 +52,29 @@ export default function ReviewDetailPage({ review }: ReviewDetailPageProps) {
   }, [review]);
 
   // ============================================================================
+  // Handlers
+  // ============================================================================
+
+  const handleDeleted = () => {
+    setIsDeleted(true);
+    // Navigate back to reviews list
+    window.location.href = '/reviews';
+  };
+
+  // ============================================================================
   // Render
   // ============================================================================
+
+  if (isDeleted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-foreground text-lg font-semibold">Review deleted</p>
+          <p className="text-muted-foreground text-sm mt-2">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,11 +88,23 @@ export default function ReviewDetailPage({ review }: ReviewDetailPageProps) {
           <ReviewContent review={review} />
         </div>
 
-        {/* Review Actions - Like, Comment, Share */}
+        {/* Review Actions - Like, Comment, Share, Edit/Delete */}
         <div className="mt-6 md:mt-8 pt-6 border-t border-border">
-          <ReviewActions review={review} />
+          <ReviewActions
+            review={review}
+            onEdit={() => setIsEditDialogOpen(true)}
+            onDeleted={handleDeleted}
+          />
         </div>
       </div>
+
+      {/* Edit Review Dialog */}
+      <ReviewFormDialog
+        gameId={review.game.id}
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        existingReview={review}
+      />
     </div>
   );
 }

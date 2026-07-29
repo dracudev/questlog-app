@@ -29,20 +29,34 @@ export default function FeedItem({ activity }: FeedItemProps) {
     return past.toLocaleDateString();
   };
 
-  // Render stars for ratings
+  // Render stars for ratings (0-10 scale)
   const renderRating = (rating: number) => {
-    const stars = Math.round(rating / 2); // Convert 0-10 to 0-5 stars
     return (
       <div className="flex items-center gap-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            size={16}
-            fill={i < stars ? 'var(--brand-accent)' : 'none'}
-            stroke={i < stars ? 'var(--brand-accent)' : 'var(--text-muted)'}
-            strokeWidth={1.5}
-          />
-        ))}
+        {Array.from({ length: 10 }).map((_, i) => {
+          const fillPercent = Math.min(100, Math.max(0, (rating - i) * 100));
+          return (
+            <span key={i} className="relative inline-block" style={{ width: 16, height: 16 }}>
+              <Star
+                size={16}
+                className="absolute inset-0 text-[var(--text-muted)]"
+                fill="none"
+                strokeWidth={1.5}
+              />
+              <span
+                className="absolute inset-0 overflow-hidden"
+                style={{ width: `${fillPercent}%` }}
+              >
+                <Star
+                  size={16}
+                  fill="var(--brand-accent)"
+                  stroke="var(--brand-accent)"
+                  strokeWidth={1.5}
+                />
+              </span>
+            </span>
+          );
+        })}
       </div>
     );
   };

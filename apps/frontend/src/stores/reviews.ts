@@ -481,6 +481,78 @@ export function optimisticLikeUpdate(reviewId: string, isLiked: boolean) {
 }
 
 // ============================================================================
+// Optimistic Updates for Create/Update/Delete
+// ============================================================================
+
+/** Prepend a newly created review to game reviews and main reviews list */
+export function addReviewToList(review: ReviewResponse) {
+  const gameReviews = $gameReviews.get();
+  if (gameReviews && review.game.id === $currentGameReviewsId.get()) {
+    $gameReviews.set({
+      ...gameReviews,
+      items: [review, ...gameReviews.items],
+      meta: { ...gameReviews.meta, total: gameReviews.meta.total + 1 },
+    });
+  }
+  const reviewsData = $reviewsData.get();
+  if (reviewsData) {
+    $reviewsData.set({
+      ...reviewsData,
+      items: [review, ...reviewsData.items],
+      meta: { ...reviewsData.meta, total: reviewsData.meta.total + 1 },
+    });
+  }
+}
+
+/** Replace a review in all lists after update */
+export function updateReviewInLists(updated: ReviewResponse) {
+  _replaceInList($reviewsData, updated);
+  _replaceInList($gameReviews, updated);
+  _replaceInList($userReviews, updated);
+  if ($currentReviewId.get() === updated.id) {
+    $reviewDetail.set(updated);
+  }
+}
+
+/** Remove a review from all lists after delete */
+export function removeReviewFromList(reviewId: string) {
+  _removeFromList($reviewsData, reviewId);
+  _removeFromList($gameReviews, reviewId);
+  _removeFromList($userReviews, reviewId);
+  if ($currentReviewId.get() === reviewId) {
+    $reviewDetail.set(null);
+    $currentReviewId.set(null);
+  }
+}
+
+function _replaceInList(
+  atom: ReturnType<typeof import('nanostores').atom>,
+  updated: ReviewResponse,
+) {
+  const data = atom.get() as PaginatedReviewsResponse | null;
+  if (!data) return;
+  atom.set({
+    ...data,
+    items: data.items.map((r) => (r.id === updated.id ? updated : r)),
+  });
+}
+
+function _removeFromList(
+  atom: ReturnType<typeof import('nanostores').atom>,
+  reviewId: string,
+) {
+  const data = atom.get() as PaginatedReviewsResponse | null;
+  if (!data) return;
+  const filtered = data.items.filter((r) => r.id !== reviewId);
+  if (filtered.length === data.items.length) return;
+  atom.set({
+    ...data,
+    items: filtered,
+    meta: { ...data.meta, total: data.meta.total - 1 },
+  });
+}
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 
