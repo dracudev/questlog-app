@@ -23,7 +23,7 @@ import { UsersService } from './users.service';
 import { UpdateProfileDto, UserResponseDto, UserProfileDto } from './dto';
 import { PaginationQueryDto, PaginatedResponseDto } from '../common/dto';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
-import { GetUser, Roles, Public } from '../auth/decorators';
+import { GetUser, Roles, Public, OptionalAuth } from '../auth/decorators';
 import { UserRole } from '@prisma/client';
 
 @ApiTags('Users')
@@ -45,7 +45,7 @@ export class UsersController {
   }
 
   @Get('profile/:username')
-  @Public()
+  @OptionalAuth()
   @ApiOperation({ summary: 'Get user profile by username' })
   @ApiParam({ name: 'username', description: 'Username of the user' })
   @ApiResponse({ status: 200, description: 'User profile retrieved successfully' })
