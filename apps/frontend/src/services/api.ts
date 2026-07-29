@@ -5,8 +5,21 @@ import { $authToken, $refreshToken, clearAuthState, updateAuthTokens } from '@/s
 // Configuration
 // ============================================================================
 
+// Server-side (SSR/build): always need absolute URL — Node.js can't resolve relative paths.
+// Client-side dev: use Vite proxy (same-origin, no CORS, cookies work natively).
+// Client-side prod: use absolute URL (no Vite proxy available, CORS handles cross-origin).
+const API_BASE_URL = (() => {
+  if (typeof window === 'undefined') {
+    return import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+  }
+  if (import.meta.env.DEV) {
+    return '/api/v1';
+  }
+  return import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+})();
+
 const API_CONFIG = {
-  baseURL: import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api/v1',
+  baseURL: API_BASE_URL,
   timeout: 30000, // 30 seconds
   retryAttempts: 3,
   retryDelay: 1000, // 1 second
@@ -142,7 +155,13 @@ class ApiClient {
     config: RequestConfig,
     ssrHeaders?: HeadersInit,
   ): Promise<RequestInit> {
-    const headers = new Headers(ssrHeaders || this.defaultHeaders); // Use ssrHeaders if provided
+    const headers = new Headers(this.defaultHeaders);
+
+    // Merge SSR headers (cookies, etc.) on top, preserving defaults
+    if (ssrHeaders) {
+      const extra = new Headers(ssrHeaders);
+      extra.forEach((value, key) => headers.set(key, value));
+    }
 
     // Add custom headers from config
     if (config.headers) {

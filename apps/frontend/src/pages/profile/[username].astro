@@ -3,7 +3,7 @@ export const prerender = false;
 
 import MainLayout from '@/layouts/MainLayout.astro';
 import ProfilePage from '@/components/profile/ProfilePage';
-import { fetchUserProfile } from '@/services/users';
+import { apiClient } from '@/services/api';
 import type { UserProfile } from '@glitch/shared-types';
 
 // ============================================================================
@@ -20,8 +20,14 @@ if (!username) {
 let profile: UserProfile | null = null;
 
 try {
-  // Fetch user profile from API
-  profile = await fetchUserProfile(username);
+  // Fetch user profile from API, forwarding browser cookies so
+  // the backend can determine if the current user is following this profile
+  const cookieHeader = Astro.request.headers.get('cookie') || undefined;
+  profile = await apiClient.get<UserProfile>(
+    `users/profile/${username}`,
+    {},
+    cookieHeader ? { cookie: cookieHeader } : undefined,
+  );
 } catch (err: any) {
   // Handle 404 - User not found
   if (err.status === 404) {
