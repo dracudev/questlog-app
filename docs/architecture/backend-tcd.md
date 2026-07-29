@@ -1,11 +1,11 @@
-# Questlog Backend - Technical Context Document
+# Glitch Backend - Technical Context Document
 
 **Last Updated:** November 4, 2025  
 **Status:** Production Ready
 
 ## 1. High-Level Overview
 
-**Questlog** is a social network for gamers, similar to Letterboxd but focused on video games. The platform allows users to discover games, write reviews, follow other gamers, and build a personalized gaming profile. The backend serves as the core API that powers user authentication, game catalog management, social features, and review systems.
+**Glitch** is a social network for gamers, similar to Letterboxd but focused on video games. The platform allows users to discover games, write reviews, follow other gamers, and build a personalized gaming profile. The backend serves as the core API that powers user authentication, game catalog management, social features, and review systems.
 
 ### Core Functionality
 
@@ -31,7 +31,7 @@
 
 ### Future Vision
 
-The platform is designed to eventually become a showcase for indie games, integrate with Steam APIs for automatic game library sync, and provide gamification features like achievements and personalized gaming questlogs.
+The platform is designed to eventually become a showcase for indie games, integrate with Steam APIs for automatic game library sync, and provide gamification features like achievements and personalized gaming glitchs.
 
 ## 2. Technology Stack
 
@@ -449,8 +449,8 @@ The backend uses a cookie-first session model backed by JWTs. Authentication coo
 1. **Clone and Install:**
 
 ```bash
-git clone https://github.com/dracudev/questlog-app.git
-cd questlog-app
+git clone https://github.com/dracudev/glitch-app.git
+cd glitch-app
 pnpm install
 ```
 
@@ -459,10 +459,10 @@ pnpm install
 
 ```bash
 # Database
-DATABASE_URL="postgresql://questlog:questlog@localhost:5432/questlog_dev"
-POSTGRES_DB="questlog_dev"
-POSTGRES_USER="questlog"
-POSTGRES_PASSWORD="questlog"
+DATABASE_URL="postgresql://glitch:glitch@localhost:5432/glitch_dev"
+POSTGRES_DB="glitch_dev"
+POSTGRES_USER="glitch"
+POSTGRES_PASSWORD="glitch"
 
 # JWT Configuration
 JWT_SECRET="your-super-secret-jwt-key-here-make-it-long-and-secure"
@@ -518,7 +518,7 @@ pnpm db:seed
 
 ```bash
 # Install PostgreSQL and create database
-createdb questlog_dev
+createdb glitch_dev
 
 # Run migrations and seed
 cd apps/backend
@@ -659,7 +659,7 @@ The application is designed for deployment on platforms like Railway, Render, or
 
 - User achievements and badges
 - Gaming statistics and analytics
-- Personal gaming journals/questlogs
+- Personal gaming journals/glitchs
 - Progress tracking for games
 
 🔄 **External Integrations**
@@ -675,4 +675,4 @@ The application is designed for deployment on platforms like Railway, Render, or
 - Advanced search with AI/ML capabilities
 - Real-time features (live notifications, chat)
 
-This backend provides a solid foundation for the Questlog gaming social network, with a comprehensive feature set already implemented and clear pathways for future expansion into indie game showcases, external platform integrations, and advanced social gaming features.
+This backend provides a solid foundation for the Glitch gaming social network, with a comprehensive feature set already implemented and clear pathways for future expansion into indie game showcases, external platform integrations, and advanced social gaming features.

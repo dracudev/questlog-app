@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import type { ReviewResponse, PaginatedReviewsResponse } from '@questlog/shared-types';
+import type { ReviewResponse, PaginatedReviewsResponse } from '@glitch/shared-types';
 
 // ============================================================================
 // Reviews List State
@@ -568,7 +568,7 @@ export function getReviewsErrorState() {
  */
 export async function loadUserReviews(
   userId: string,
-  query: import('@questlog/shared-types').ReviewsQuery = {},
+  query: import('@glitch/shared-types').ReviewsQuery = {},
 ): Promise<void> {
   setUserReviewsLoading(true);
 

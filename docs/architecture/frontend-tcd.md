@@ -1,11 +1,11 @@
-# Questlog Frontend - Technical Context Document
+# Glitch Frontend - Technical Context Document
 
 **Last Updated:** November 4, 2025  
 **Status:** Production Ready
 
 ## 1. High-Level Overview
 
-**Questlog Frontend** is the user-facing application for the gaming social network, built with a modern hybrid architecture that combines static generation for optimal performance with interactive components for dynamic user experiences. The frontend serves as a progressive web application that allows gamers to discover games, write reviews, connect with other users, and build personalized gaming profiles.
+**Glitch Frontend** is the user-facing application for the gaming social network, built with a modern hybrid architecture that combines static generation for optimal performance with interactive components for dynamic user experiences. The frontend serves as a progressive web application that allows gamers to discover games, write reviews, connect with other users, and build personalized gaming profiles.
 
 ### Core Functionality
 
@@ -23,7 +23,7 @@
 
 - **Server-Side Rendering Architecture**: Astro 5.x with SSR by default and opt-in static generation using `export const prerender = true`
 - **React 19.x Islands**: Selective client-side hydration for interactive components with Radix UI primitives
-- **Type-Safe API Client**: Complete integration with backend APIs using `@questlog/shared-types`
+- **Type-Safe API Client**: Complete integration with backend APIs using `@glitch/shared-types`
 - **Accessible Component Library**: Radix UI primitives (Avatar, Dialog, Tabs) with Tailwind CSS styling
 - **Responsive UI System**: Mobile-first Tailwind CSS v4 design with responsive grids and Lucide React icons
 - **Authentication System**: Complete login/register flow with JWT token management, role-based access control, and persistent authentication
@@ -62,7 +62,7 @@ The frontend is designed to scale into a comprehensive gaming social platform wi
 - **@astrojs/vercel**: Vercel deployment adapter (v8.2.6)
 - **@nanostores/react**: React bindings for Nanostores (v1.0.0)
 - **@radix-ui/react-\***: Accessible component primitives
-- **@questlog/shared-types**: Shared TypeScript types with backend
+- **@glitch/shared-types**: Shared TypeScript types with backend
 - **class-variance-authority**: For component variant management
 - **tailwindcss**: v4.1.12 with Vite plugin
 
@@ -220,7 +220,7 @@ React components are hydrated selectively using Astro's Islands:
 
 ### Cross-Cutting Concerns
 
-- **Type Safety**: Complete type safety from API responses to component props using `@questlog/shared-types`
+- **Type Safety**: Complete type safety from API responses to component props using `@glitch/shared-types`
 - **Error Handling**: Centralized error handling with user-friendly error messages and fallbacks
 - **Loading States**: Consistent loading indicators and skeleton screens across the application
 - **Authentication**: JWT token management with automatic refresh and route protection
@@ -349,7 +349,7 @@ if (!profile) {
 // In Astro pages (.astro files)
 ---
 import { getGameBySlug } from '../services/games';
-import type { GameResponse } from '@questlog/shared-types';
+import type { GameResponse } from '@glitch/shared-types';
 
 const { slug } = Astro.params;
 const game: GameResponse = await getGameBySlug(slug);
@@ -366,7 +366,7 @@ import type {
   ReviewsQuery,
   PaginatedResponse,
   ReviewResponse,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 
 const ReviewList = ({ gameId }: { gameId: string }) => {
   const query: ReviewsQuery = { gameId, page: 1, limit: 10 };
@@ -393,7 +393,7 @@ export const $exploreLoading = atom<boolean>(false);
 
 ```typescript
 import { atom, computed } from "nanostores";
-import type { AuthUser, UserRole } from "@questlog/shared-types";
+import type { AuthUser, UserRole } from "@glitch/shared-types";
 
 // Core authentication state
 export const $currentUser = atom<AuthUser | null>(null);
@@ -427,7 +427,7 @@ import type {
   GameResponse,
   GameDetail,
   PaginatedGamesResponse,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 
 // Games list state
 export const $gamesData = atom<PaginatedGamesResponse | null>(null);
@@ -452,7 +452,7 @@ import { atom } from "nanostores";
 import type {
   ReviewResponse,
   PaginatedReviewsResponse,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 
 // Reviews list state
 export const $reviewsData = atom<PaginatedReviewsResponse | null>(null);
@@ -522,7 +522,7 @@ export const $reviewActionError = atom<string | null>(null);
 **Base API Configuration** (`services/api.ts`):
 
 ```typescript
-import type { ApiResponse, ApiError } from "@questlog/shared-types";
+import type { ApiResponse, ApiError } from "@glitch/shared-types";
 
 class ApiClient {
   private baseURL =
@@ -561,7 +561,7 @@ import type {
   GameResponse,
   GamesQuery,
   PaginatedResponse,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 
 export const getGames = async (
   query?: GamesQuery,
@@ -586,7 +586,7 @@ import type {
   LoginRequest,
   RegisterRequest,
   AuthResponse,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 import { login, register, logout } from "@/services/auth";
 import {
   $currentUser,
@@ -638,7 +638,7 @@ import type {
   ReviewsQuery,
   CreateReviewRequest,
   UpdateReviewRequest,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 import { reviewsService } from "@/services/reviews";
 import { $reviewsData, $reviewsLoading, $reviewsError } from "@/stores/reviews";
 
@@ -796,7 +796,7 @@ pnpm preview                # Preview production build locally
 
 - Strict mode enabled for maximum type safety
 - Path mapping for clean imports
-- Integration with `@questlog/shared-types`
+- Integration with `@glitch/shared-types`
 
 **Linting & Formatting**:
 
@@ -1009,7 +1009,7 @@ Note: a previous refactor that replaced `LoginForm.tsx` and `RegisterForm.tsx` w
 
 ### Development Guidelines
 
-1. **Type Safety First**: Always use types from `@questlog/shared-types` for API interactions - fully implemented across all services and hooks
+1. **Type Safety First**: Always use types from `@glitch/shared-types` for API interactions - fully implemented across all services and hooks
 2. **Performance Conscious**: Default to static generation, use client-side rendering only when necessary - architecture supports hybrid rendering
 3. **Progressive Enhancement**: Ensure core functionality works without JavaScript - NoScript fallbacks implemented
 4. **Component Reusability**: Build composable components that work across different contexts - component architecture established

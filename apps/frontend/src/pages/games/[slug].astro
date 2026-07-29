@@ -4,7 +4,7 @@ import MainLayout from '@/layouts/MainLayout.astro';
 import GameDetailPage from '@/components/games/GameDetailPage';
 import { gamesService } from '@/services/games';
 import { reviewsService } from '@/services/reviews';
-import type { GameDetail, PaginatedReviewsResponse, GameResponse } from '@questlog/shared-types';
+import type { GameDetail, PaginatedReviewsResponse, GameResponse } from '@glitch/shared-types';
 
 // ============================================================================
 // STATIC PATH GENERATION
@@ -96,10 +96,10 @@ if (similarGamesResult.status === 'rejected') {
 // SEO META TAGS
 // ============================================================================
 
-const pageTitle = `${game.game.title} - Game Reviews & Details | Questlog`;
+const pageTitle = `${game.game.title} - Game Reviews & Details | Glitch`;
 const pageDescription = game.summary
   ? `${game.summary.substring(0, 160)}...`
-  : `Discover reviews, ratings, and details for ${game.game.title}. Join the Questlog community to share your gaming experiences.`;
+  : `Discover reviews, ratings, and details for ${game.game.title}. Join the Glitch community to share your gaming experiences.`;
 
 const coverImageUrl = (() => {
   const img = game.game.coverImage;

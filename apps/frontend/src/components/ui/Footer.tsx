@@ -30,17 +30,7 @@ export default function Footer({ className = '' }: FooterProps) {
             {/* Brand Section */}
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center space-x-2 mb-4">
-                <div
-                  className="w-8 h-8 rounded-md flex items-center justify-center"
-                  style={{ backgroundColor: 'var(--brand-primary)' }}
-                >
-                  <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
-                    Q
-                  </span>
-                </div>
-                <span className="font-bold text-xl" style={{ color: 'var(--text-primary)' }}>
-                  Questlog
-                </span>
+                <img src="/images/glitch-logotype.png" alt="Glitch" className="h-10" />
               </div>
               <p className="text-sm max-w-md" style={{ color: 'var(--text-muted)' }}>
                 The social network for gamers. Discover games, write reviews, and connect with
@@ -160,13 +150,13 @@ export default function Footer({ className = '' }: FooterProps) {
             <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
               {/* Copyright */}
               <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                © {currentYear} Questlog. All rights reserved.
+                © {currentYear} Glitch. All rights reserved.
               </div>
 
               {/* Social Links */}
               <div className="flex items-center space-x-4">
                 <a
-                  href="https://twitter.com/questlog"
+                  href="https://twitter.com/glitch"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition-colors"
@@ -185,7 +175,7 @@ export default function Footer({ className = '' }: FooterProps) {
                   </svg>
                 </a>
                 <a
-                  href="https://discord.gg/questlog"
+                  href="https://discord.gg/glitch"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition-colors"
@@ -204,7 +194,7 @@ export default function Footer({ className = '' }: FooterProps) {
                   </svg>
                 </a>
                 <a
-                  href="https://github.com/questlog"
+                  href="https://github.com/glitch"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition-colors"

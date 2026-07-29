@@ -3,7 +3,7 @@ import type {
   GenresQuery,
   CreateGenreRequest,
   UpdateGenreRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 import { apiClient } from './api';
 
 // ============================================================================

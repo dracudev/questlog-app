@@ -5,7 +5,7 @@ import type {
   PlatformsQuery,
   CreatePlatformRequest,
   UpdatePlatformRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { platformsService, type PaginatedPlatformsResponse } from '@/services/platforms';
 import {

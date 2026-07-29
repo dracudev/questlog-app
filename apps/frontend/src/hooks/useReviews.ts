@@ -6,7 +6,7 @@ import type {
   ReviewsQuery,
   CreateReviewRequest,
   UpdateReviewRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { reviewsService } from '@/services/reviews';
 import {

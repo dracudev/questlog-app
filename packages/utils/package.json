@@ -1,7 +1,7 @@
 {
-  "name": "@questlog/utils",
+  "name": "@glitch/utils",
   "version": "1.0.0",
-  "description": "Shared utility functions for Questlog",
+  "description": "Shared utility functions for Glitch",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

@@ -1,6 +1,6 @@
 import { useUserReviews } from '@/hooks/useReviews';
 import { useEffect, useRef, useCallback } from 'react';
-import type { ReviewResponse } from '@questlog/shared-types';
+import type { ReviewResponse } from '@glitch/shared-types';
 
 // ============================================================================
 // Props Interface

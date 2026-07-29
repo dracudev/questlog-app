@@ -4,7 +4,7 @@ import type {
   ReviewsQuery,
   CreateReviewRequest,
   UpdateReviewRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 import { apiClient } from './api';
 
 // ============================================================================

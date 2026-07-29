@@ -1,4 +1,4 @@
-# Questlog
+# Glitch
 
 **A social network for gamers** - Think Letterboxd, but for video games.
 
@@ -9,7 +9,7 @@
 [![Astro](https://img.shields.io/badge/Astro-5.x-ff5d01.svg)](https://astro.build/)
 [![NestJS](https://img.shields.io/badge/NestJS-11.x-e0234e.svg)](https://nestjs.com/)
 
-Questlog is a comprehensive social platform where gamers can discover games, write reviews, connect with fellow players, and build personalized gaming profiles. Built with modern web technologies and designed for scalability, it features a static-first architecture that combines optimal performance with selective interactivity for dynamic user experiences.
+Glitch is a comprehensive social platform where gamers can discover games, write reviews, connect with fellow players, and build personalized gaming profiles. Built with modern web technologies and designed for scalability, it features a static-first architecture that combines optimal performance with selective interactivity for dynamic user experiences.
 
 **Last Updated:** November 4, 2025
 
@@ -59,7 +59,7 @@ Questlog is a comprehensive social platform where gamers can discover games, wri
 
 ## Architecture
 
-Questlog uses a modern PNPM monorepo architecture designed for scalability and developer productivity:
+Glitch uses a modern PNPM monorepo architecture designed for scalability and developer productivity:
 
 ### Frontend (Astro 5.x + React 19.x)
 
@@ -85,7 +85,7 @@ Questlog uses a modern PNPM monorepo architecture designed for scalability and d
 - **Prometheus** monitoring and centralized logging (planned)
 
 ```tree
-questlog-app/
+glitch-app/
 ├── apps/
 │   ├── backend/          # NestJS API server
 │   ├── frontend/         # Astro + React frontend
@@ -112,8 +112,8 @@ questlog-app/
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/dracudev/questlog-app.git
-   cd questlog-app
+   git clone https://github.com/dracudev/glitch-app.git
+   cd glitch-app
    ```
 
 2. **Install dependencies**
@@ -213,7 +213,7 @@ pnpm docker:dev:build      # Rebuild and start containers
 
 ## Testing
 
-Questlog includes comprehensive testing across all layers:
+Glitch includes comprehensive testing across all layers:
 
 - **Unit Tests**: Jest with React Testing Library
 - **Integration Tests**: Supertest for API testing
@@ -334,8 +334,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - **Documentation**: Check the [docs folder](./docs/) for detailed guides
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/dracudev/questlog-app/issues)
-- **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/dracudev/questlog-app/discussions)
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/dracudev/glitch-app/issues)
+- **Discussions**: Join community discussions in [GitHub Discussions](https://github.com/dracudev/glitch-app/discussions)
 
 ---
 

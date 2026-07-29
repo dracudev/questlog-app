@@ -1,6 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { useCurrentUserProfile } from '@/hooks/useUsers';
-import type { UserProfile } from '@questlog/shared-types';
+import type { UserProfile } from '@glitch/shared-types';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 

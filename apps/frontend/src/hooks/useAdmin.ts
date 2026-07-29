@@ -28,7 +28,7 @@ import type {
   PlatformsQuery,
   PaginatedResponse,
   AdminDashboardStats,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { AdminService } from '@/services/admin';
 import {

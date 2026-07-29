@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { GameDetail, PaginatedReviewsResponse, GameResponse } from '@questlog/shared-types';
+import type { GameDetail, PaginatedReviewsResponse, GameResponse } from '@glitch/shared-types';
 import { setGameDetailWithCache, setSimilarGames } from '@/stores/games';
 import { setGameReviews } from '@/stores/reviews';
 import GameHeader from './GameHeader';

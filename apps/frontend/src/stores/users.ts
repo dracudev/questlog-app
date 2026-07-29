@@ -4,7 +4,7 @@ import type {
   UserProfile,
   PaginatedResponse,
   UpdateProfileRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 // ============================================================================
 // Users State

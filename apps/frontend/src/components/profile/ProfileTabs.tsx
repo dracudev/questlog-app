@@ -1,5 +1,5 @@
 import * as Tabs from '@radix-ui/react-tabs';
-import type { UserProfile } from '@questlog/shared-types';
+import type { UserProfile } from '@glitch/shared-types';
 import ReviewList from './ReviewList';
 import FollowList from './FollowList';
 

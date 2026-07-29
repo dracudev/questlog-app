@@ -11,7 +11,7 @@ import type {
   PaginatedResponse,
   UserRole,
   AdminDashboardStats,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 // ============================================================================
 // Admin Permission Checks

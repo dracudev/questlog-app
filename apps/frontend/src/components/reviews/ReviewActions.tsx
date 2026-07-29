@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { ReviewResponse } from '@questlog/shared-types';
+import type { ReviewResponse } from '@glitch/shared-types';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/Button';

@@ -3,7 +3,7 @@ import type {
   PlatformsQuery,
   CreatePlatformRequest,
   UpdatePlatformRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 import { apiClient } from './api';
 
 // ============================================================================

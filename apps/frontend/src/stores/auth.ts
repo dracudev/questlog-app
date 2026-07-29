@@ -1,5 +1,5 @@
 import { atom, computed } from 'nanostores';
-import type { AuthUser, UserRole } from '@questlog/shared-types';
+import type { AuthUser, UserRole } from '@glitch/shared-types';
 
 // ============================================================================
 // Core Authentication State
@@ -151,7 +151,7 @@ export function setAuthError(error: string | null) {
 // Persistence Layer
 // ============================================================================
 
-const AUTH_STORAGE_KEY = 'questlog_auth';
+const AUTH_STORAGE_KEY = 'glitch_auth';
 
 interface PersistedAuthState {
   user: AuthUser;

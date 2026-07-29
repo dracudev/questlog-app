@@ -5,7 +5,7 @@ import type {
   GenresQuery,
   CreateGenreRequest,
   UpdateGenreRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { genresService, type PaginatedGenresResponse } from '@/services/genres';
 import {

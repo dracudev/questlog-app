@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import type { GenreResponse } from '@questlog/shared-types';
+import type { GenreResponse } from '@glitch/shared-types';
 import type { PaginatedGenresResponse } from '@/services/genres';
 
 // ============================================================================

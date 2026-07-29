@@ -259,7 +259,7 @@ async function main() {
   const users = await Promise.all([
     prisma.user.create({
       data: {
-        email: 'admin@questlog.com',
+        email: 'admin@glitch.com',
         username: 'admin',
         displayName: 'Administrator',
         password: hashedPassword,
@@ -778,7 +778,7 @@ async function main() {
   console.log(`- Game Lists: ${gameLists.length}`);
 
   console.log('\n🔐 Test Credentials:');
-  console.log('Admin: admin@questlog.com / password123');
+  console.log('Admin: admin@glitch.com / password123');
   console.log('User: john@example.com / password123');
   console.log('User: sarah@example.com / password123');
   console.log('User: mike@example.com / password123');

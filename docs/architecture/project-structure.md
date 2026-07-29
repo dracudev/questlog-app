@@ -1,15 +1,15 @@
-# Questlog - Project Structure
+# Glitch - Project Structure
 
 **Last Updated:** November 4, 2025
 
-This document provides a comprehensive overview of the Questlog monorepo structure, explaining the organization of applications, packages, and supporting files.
+This document provides a comprehensive overview of the Glitch monorepo structure, explaining the organization of applications, packages, and supporting files.
 
 ## Repository Overview
 
-Questlog uses a **PNPM monorepo** architecture with the following top-level structure:
+Glitch uses a **PNPM monorepo** architecture with the following top-level structure:
 
 ```
-questlog-app/
+glitch-app/
 ├── apps/          # Main applications (frontend, backend, e2e)
 ├── packages/      # Shared packages and libraries
 ├── docs/          # Project documentation
@@ -273,8 +273,8 @@ Packages reference each other using the workspace protocol:
 ```json
 {
   "dependencies": {
-    "@questlog/shared-types": "workspace:*",
-    "@questlog/utils": "workspace:*"
+    "@glitch/shared-types": "workspace:*",
+    "@glitch/utils": "workspace:*"
   }
 }
 ```

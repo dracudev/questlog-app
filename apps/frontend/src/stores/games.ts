@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import type { GameResponse, GameDetail, PaginatedGamesResponse } from '@questlog/shared-types';
+import type { GameResponse, GameDetail, PaginatedGamesResponse } from '@glitch/shared-types';
 
 // ============================================================================
 // Games List State

@@ -5,7 +5,7 @@ import type {
   PublishersQuery,
   CreatePublisherRequest,
   UpdatePublisherRequest,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { publishersService, type PaginatedPublishersResponse } from '@/services/publishers';
 import {

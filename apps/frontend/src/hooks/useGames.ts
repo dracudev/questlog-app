@@ -5,7 +5,7 @@ import type {
   GameDetail,
   PaginatedGamesResponse,
   GamesQuery,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { gamesService } from '@/services/games';
 import {

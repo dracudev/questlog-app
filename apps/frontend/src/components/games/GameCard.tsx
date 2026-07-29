@@ -1,5 +1,5 @@
 import { Star, Calendar } from 'lucide-react';
-import type { GameResponse } from '@questlog/shared-types';
+import type { GameResponse } from '@glitch/shared-types';
 
 interface GameCardProps {
   game: GameResponse;

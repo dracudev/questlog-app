@@ -5,7 +5,7 @@ import { $selectedFilters, clearFilters } from '@/stores/explore';
 import GameCard from './GameCard.tsx';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import type { GameResponse } from '@questlog/shared-types';
+import type { GameResponse } from '@glitch/shared-types';
 
 export default function GameResultsList() {
   const selectedFilters = useStore($selectedFilters);

@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import type { PublisherResponse } from '@questlog/shared-types';
+import type { PublisherResponse } from '@glitch/shared-types';
 import type { PaginatedPublishersResponse } from '@/services/publishers';
 
 // ============================================================================

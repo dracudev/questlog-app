@@ -8,7 +8,7 @@ import type {
   FollowSuggestionsQuery,
   MutualFollowsResponse,
   ActivityType,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { socialService } from '@/services/social';
 import {

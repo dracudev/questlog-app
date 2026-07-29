@@ -1,5 +1,5 @@
 import { atom } from 'nanostores';
-import type { DeveloperResponse, PaginatedResponse } from '@questlog/shared-types';
+import type { DeveloperResponse, PaginatedResponse } from '@glitch/shared-types';
 
 // ============================================================================
 // Developers State

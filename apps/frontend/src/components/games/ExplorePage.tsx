@@ -17,7 +17,7 @@ import type {
   DeveloperResponse,
   PublisherResponse,
   GamesQuery,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 interface ExplorePageProps {
   initialGames: PaginatedGamesResponse | null;

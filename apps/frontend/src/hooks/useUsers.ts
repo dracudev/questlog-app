@@ -6,7 +6,7 @@ import type {
   UpdateProfileRequest,
   UsersQuery,
   PaginatedResponse,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { usersService } from '@/services/users';
 import {

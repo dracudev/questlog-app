@@ -1,4 +1,4 @@
-# 📘 Questlog - Development Guide
+# 📘 Glitch - Development Guide
 
 **Last Updated:** November 4, 2025  
 **Status:** Production Ready
@@ -7,7 +7,7 @@
 
 ### 1.1 System Objective
 
-Questlog is a social network focused on **video games**, similar to Letterboxd but for gamers.  
+Glitch is a social network focused on **video games**, similar to Letterboxd but for gamers.  
 It will allow users to:
 
 - Create a personal profile.
@@ -257,7 +257,7 @@ React is used selectively for components that need interactivity:
 3. **Personal video game management and tracking**
    - Add video games to favorite, played, and pending lists.
    - Achievement tracker synced via Steam (automatic import of achievements).
-   - Create a personalized "questlog" with tasks or pending challenges within each video game.
+   - Create a personalized "glitch" with tasks or pending challenges within each video game.
 
 4. **Gamification**
    - Achievements for reviews, lists, or games played.

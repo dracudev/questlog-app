@@ -1,19 +1,19 @@
-# @questlog/shared-types
+# @glitch/shared-types
 
-Shared TypeScript types for the Questlog application, providing type safety between the backend API and frontend applications.
+Shared TypeScript types for the Glitch application, providing type safety between the backend API and frontend applications.
 
 ## Overview
 
-This package contains all the shared TypeScript interfaces and types that define the data contracts between the Questlog backend and frontend applications. These types are derived from the backend DTOs (Data Transfer Objects) and provide complete type safety for API interactions.
+This package contains all the shared TypeScript interfaces and types that define the data contracts between the Glitch backend and frontend applications. These types are derived from the backend DTOs (Data Transfer Objects) and provide complete type safety for API interactions.
 
 ## Installation
 
 ```bash
 # In your frontend project
-pnpm add @questlog/shared-types
+pnpm add @glitch/shared-types
 
 # For development
-pnpm add -D @questlog/shared-types
+pnpm add -D @glitch/shared-types
 ```
 
 ## Usage
@@ -24,11 +24,11 @@ import {
   UserResponse,
   GameResponse,
   ReviewResponse,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 
 // Import entire modules
-import * as AuthTypes from "@questlog/shared-types/auth";
-import * as GameTypes from "@questlog/shared-types/games";
+import * as AuthTypes from "@glitch/shared-types/auth";
+import * as GameTypes from "@glitch/shared-types/games";
 
 // Use in your components/services
 const user: UserResponse = {
@@ -148,7 +148,7 @@ const reviewFilters: ReviewFilters = {
 ### React with TypeScript
 
 ```typescript
-import { UserResponse, UpdateProfileRequest } from "@questlog/shared-types";
+import { UserResponse, UpdateProfileRequest } from "@glitch/shared-types";
 
 interface UserProfileProps {
   user: UserResponse;
@@ -168,7 +168,7 @@ import {
   LoginRequest,
   PaginatedResponse,
   GameResponse,
-} from "@questlog/shared-types";
+} from "@glitch/shared-types";
 
 class ApiClient {
   async login(credentials: LoginRequest): Promise<AuthResponse> {
@@ -184,7 +184,7 @@ class ApiClient {
 ### State Management (Zustand/Redux)
 
 ```typescript
-import { UserResponse, GameResponse } from "@questlog/shared-types";
+import { UserResponse, GameResponse } from "@glitch/shared-types";
 
 interface AppState {
   user: UserResponse | null;
@@ -240,7 +240,7 @@ These types are directly derived from the backend DTOs and should be kept in syn
 
 ## Support
 
-This package is part of the Questlog monorepo. For issues, feature requests, or questions:
+This package is part of the Glitch monorepo. For issues, feature requests, or questions:
 
 - Check the main project documentation
 - Open issues in the main repository

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { UserProfile } from '@questlog/shared-types';
+import type { UserProfile } from '@glitch/shared-types';
 
 // Components
 import ProfileHeader from './ProfileHeader';

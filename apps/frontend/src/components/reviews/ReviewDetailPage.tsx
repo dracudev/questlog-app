@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { ReviewResponse } from '@questlog/shared-types';
+import type { ReviewResponse } from '@glitch/shared-types';
 
 // Components
 import ReviewHeader from './ReviewHeader';

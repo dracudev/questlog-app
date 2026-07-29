@@ -1,7 +1,7 @@
 {
-  "name": "@questlog/config",
+  "name": "@glitch/config",
   "version": "1.0.0",
-  "description": "Shared configuration for Questlog monorepo (eslint, prettier, typescript, tailwind)",
+  "description": "Shared configuration for Glitch monorepo (eslint, prettier, typescript, tailwind)",
   "main": "src/index.js",
   "license": "MIT",
   "type": "module"

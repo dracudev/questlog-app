@@ -6,7 +6,7 @@ import type {
   UpdateDeveloperRequest,
   DevelopersQuery,
   PaginatedResponse,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { developersService } from '@/services/developers';
 import {

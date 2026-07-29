@@ -1,4 +1,4 @@
-import type { ApiResponse, ApiError } from '@questlog/shared-types';
+import type { ApiResponse, ApiError } from '@glitch/shared-types';
 import { $authToken, $refreshToken, clearAuthState, updateAuthTokens } from '@/stores/auth';
 
 // ============================================================================

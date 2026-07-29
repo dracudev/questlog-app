@@ -71,7 +71,7 @@ async function bootstrap() {
   // Swagger documentation
   if (configService.get('NODE_ENV') !== 'production') {
     const config = new DocumentBuilder()
-      .setTitle('Questlog API')
+      .setTitle('Glitch API')
       .setDescription('A social network for gamers - API Documentation')
       .setVersion('1.0')
       .addBearerAuth()

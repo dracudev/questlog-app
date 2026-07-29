@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react';
 import * as Avatar from '@radix-ui/react-avatar';
 import { $viewedFollowers, $viewedFollowing } from '@/stores/users';
-import type { UserResponse } from '@questlog/shared-types';
+import type { UserResponse } from '@glitch/shared-types';
 
 // ============================================================================
 // Props Interface

@@ -10,7 +10,7 @@ import type {
   PlatformResponse,
   DeveloperResponse,
   PublisherResponse,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { getAllGames } from '@/services/games';
 import { getAllGenres } from '@/services/genres';
@@ -76,12 +76,12 @@ try {
 
 // SEO metadata
 const title = initialQuery.search
-  ? `Search: "${initialQuery.search}" | Questlog`
-  : 'Explore | Questlog';
+  ? `Search: "${initialQuery.search}" | Glitch`
+  : 'Explore | Glitch';
 
 const description = initialQuery.search
   ? `Search results for "${initialQuery.search}" - Discover and review video games`
-  : 'Discover thousands of video games, read reviews, and share your gaming experiences with the Questlog community.';
+  : 'Discover thousands of video games, read reviews, and share your gaming experiences with the Glitch community.';
 
 const canonicalUrl = new URL('/games', Astro.site ?? Astro.request.url);
 ---

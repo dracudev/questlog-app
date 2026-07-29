@@ -5,7 +5,7 @@ import type {
   RegisterRequest,
   ChangePasswordRequest,
   AuthResponse,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { login, register, logout, changePassword, verifyAuthentication } from '@/services/auth';
 import { $currentUser, $authToken, $authLoading, $authError, setAuthError } from '@/stores/auth';

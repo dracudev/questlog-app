@@ -1,4 +1,4 @@
-# Questlog Design System
+# Glitch Design System
 
 **Last Updated:** November 4, 2025  
 **Status:** Production Ready

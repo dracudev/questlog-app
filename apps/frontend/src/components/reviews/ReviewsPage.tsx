@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { PaginatedReviewsResponse } from '@questlog/shared-types';
+import type { PaginatedReviewsResponse } from '@glitch/shared-types';
 
 // Components
 import ReviewFilters from './ReviewFilters';
@@ -53,7 +53,7 @@ export default function ReviewsPage({ initialData }: ReviewsPageProps) {
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-foreground mb-2">Recent Reviews</h1>
         <p className="text-muted-foreground">
-          Discover the latest game reviews from the Questlog community
+          Discover the latest game reviews from the Glitch community
         </p>
       </div>
 

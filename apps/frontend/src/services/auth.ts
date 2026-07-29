@@ -6,7 +6,7 @@ import type {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   TokenResponse,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 import { apiClient } from './api';
 import {

@@ -4,7 +4,7 @@ import type {
   ActivityFeedResponse,
   FollowSuggestion,
   MutualFollowsResponse,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 
 // ============================================================================
 // Social Stats State

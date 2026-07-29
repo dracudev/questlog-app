@@ -6,7 +6,7 @@ import type {
   DeveloperResponse,
   PublisherResponse,
   GamesQuery,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 import { getAllGenres } from '../services/genres';
 import { getAllPlatforms } from '../services/platforms';
 import { getDevelopers } from '../services/developers';

@@ -4,7 +4,7 @@ export const prerender = false;
 import MainLayout from '@/layouts/MainLayout.astro';
 import ProfilePage from '@/components/profile/ProfilePage';
 import { fetchUserProfile } from '@/services/users';
-import type { UserProfile } from '@questlog/shared-types';
+import type { UserProfile } from '@glitch/shared-types';
 
 // ============================================================================
 // Server-Side Data Fetching
@@ -48,10 +48,10 @@ if (!profile) {
 // ============================================================================
 
 const displayName = profile.displayName || profile.username;
-const pageTitle = `${displayName} (@${profile.username}) - Questlog`;
+const pageTitle = `${displayName} (@${profile.username}) - Glitch`;
 const pageDescription = profile.bio 
-  ? `${profile.bio} - View ${displayName}'s gaming profile, reviews, and activity on Questlog.`
-  : `View ${displayName}'s gaming profile, reviews, and activity on Questlog. Follow to see their latest game reviews and recommendations.`;
+  ? `${profile.bio} - View ${displayName}'s gaming profile, reviews, and activity on Glitch.`
+  : `View ${displayName}'s gaming profile, reviews, and activity on Glitch. Follow to see their latest game reviews and recommendations.`;
 
 // Profile image for Open Graph
 const profileImage = profile.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(profile.username)}`;

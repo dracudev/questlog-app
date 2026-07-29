@@ -11,14 +11,14 @@ export interface Props {
 
 const {
   title,
-  description = "Questlog - The social network for gamers. Discover games, write reviews, and connect with fellow gamers.",
+  description = "Glitch - The social network for gamers. Discover games, write reviews, and connect with fellow gamers.",
   image = "/og-image.png",
   noIndex = false,
   canonicalURL
 } = Astro.props;
 
-const siteName = "Questlog";
-const siteURL = Astro.site || "https://questlog.app";
+const siteName = "Glitch";
+const siteURL = Astro.site || "https://glitch.app";
 const fullTitle = title.includes(siteName) ? title : `${title} | ${siteName}`;
 const imageURL = new URL(image, siteURL).toString();
 const canonical = canonicalURL || new URL(Astro.url.pathname, siteURL).toString();
@@ -61,10 +61,11 @@ const canonical = canonicalURL || new URL(Astro.url.pathname, siteURL).toString(
     <meta property="twitter:image" content={imageURL} />
     
     <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
     
     <!-- Theme color for mobile browsers -->
     <meta name="theme-color" content="#16161a" media="(prefers-color-scheme: dark)" />
@@ -82,12 +83,12 @@ const canonical = canonicalURL || new URL(Astro.url.pathname, siteURL).toString(
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "name": "Questlog",
+        "name": "Glitch",
         "description": "The social network for gamers",
-        "url": "https://questlog.app",
+        "url": "https://glitch.app",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://questlog.app/search?q={search_term_string}",
+          "target": "https://glitch.app/search?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       }

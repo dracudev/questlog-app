@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
 import * as Avatar from '@radix-ui/react-avatar';
-import type { UserProfile } from '@questlog/shared-types';
+import type { UserProfile } from '@glitch/shared-types';
 import { $currentUser } from '@/stores/auth';
 import { $viewedProfile } from '@/stores/users';
 import FollowButton from './FollowButton';

@@ -88,7 +88,7 @@ case $COMMAND in
         docker compose -f $COMPOSE_FILE exec $SERVICE $SHELL
         ;;
     "help"|*)
-        echo -e "${BLUE}🎮 Questlog Docker Development Helper${NC}"
+        echo -e "${BLUE}🎮 Glitch Docker Development Helper${NC}"
         echo -e "${BLUE}====================================${NC}"
         echo ""
         echo -e "${YELLOW}Usage:${NC} ./scripts/docker-dev.sh [command] [options]"

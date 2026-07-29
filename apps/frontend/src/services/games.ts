@@ -3,7 +3,7 @@ import type {
   GameDetail,
   PaginatedGamesResponse,
   GamesQuery,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 import { apiClient } from './api';
 
 // ============================================================================

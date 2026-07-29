@@ -7,7 +7,7 @@ import type {
   FollowSuggestion,
   FollowSuggestionsQuery,
   ActivityType,
-} from '@questlog/shared-types';
+} from '@glitch/shared-types';
 import { apiClient } from './api';
 
 // ============================================================================

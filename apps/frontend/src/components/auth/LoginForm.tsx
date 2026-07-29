@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as Form from '@radix-ui/react-form';
-import type { LoginRequest } from '@questlog/shared-types';
+import type { LoginRequest } from '@glitch/shared-types';
 import { useAuth } from '@/hooks/useAuth';
 import Card from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';

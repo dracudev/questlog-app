@@ -2,7 +2,7 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: questlog-postgres-dev
+    container_name: glitch-postgres-dev
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -15,9 +15,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./apps/backend/prisma/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - questlog-network
+      - glitch-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U questlog -d questlog_dev"]
+      test: ["CMD-SHELL", "pg_isready -U glitch -d glitch_dev"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,14 +25,14 @@ services:
   # Redis for caching and sessions
   redis:
     image: redis:7-alpine
-    container_name: questlog-redis-dev
+    container_name: glitch-redis-dev
     restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
-      - questlog-network
+      - glitch-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -42,18 +42,18 @@ services:
   # MinIO for file storage (S3-compatible)
   minio:
     image: minio/minio:latest
-    container_name: questlog-minio-dev
+    container_name: glitch-minio-dev
     restart: unless-stopped
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: questlog
-      MINIO_ROOT_PASSWORD: questlog_minio_password
+      MINIO_ROOT_USER: glitch
+      MINIO_ROOT_PASSWORD: glitch_minio_password
     volumes:
       - minio_data:/data
     networks:
-      - questlog-network
+      - glitch-network
     command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -66,23 +66,23 @@ services:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile.dev
-    container_name: questlog-backend-dev
+    container_name: glitch-backend-dev
     restart: unless-stopped
     ports:
       - "3001:3001"
     environment:
       NODE_ENV: development
       PORT: 3001
-      DATABASE_URL: postgresql://questlog:questlog@postgres:5432/questlog_dev
+      DATABASE_URL: postgresql://glitch:glitch@postgres:5432/glitch_dev
       REDIS_URL: redis://redis:6379
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       JWT_EXPIRES_IN: 24h
       CORS_ORIGIN: http://localhost:4321
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
-      MINIO_ACCESS_KEY: questlog
-      MINIO_SECRET_KEY: questlog_minio_password
-      MINIO_BUCKET_NAME: questlog-uploads
+      MINIO_ACCESS_KEY: glitch
+      MINIO_SECRET_KEY: glitch_minio_password
+      MINIO_BUCKET_NAME: glitch-uploads
       # Steam API (for future implementation)
       STEAM_API_KEY: your-steam-api-key
       # External Game APIs
@@ -101,7 +101,7 @@ services:
       - /app/node_modules
       - /app/dist
     networks:
-      - questlog-network
+      - glitch-network
     depends_on:
       postgres:
         condition: service_healthy
@@ -120,7 +120,7 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile.dev
-    container_name: questlog-frontend-dev
+    container_name: glitch-frontend-dev
     restart: unless-stopped
     ports:
       - "4321:4321"
@@ -140,7 +140,7 @@ services:
       - /app/node_modules
       - /app/dist
     networks:
-      - questlog-network
+      - glitch-network
     depends_on:
       - backend
     healthcheck:
@@ -152,14 +152,14 @@ services:
   # Nginx reverse proxy (for production-like setup)
   nginx:
     image: nginx:alpine
-    container_name: questlog-nginx-dev
+    container_name: glitch-nginx-dev
     restart: unless-stopped
     ports:
       - "80:80"
     volumes:
       - ./docker/nginx/dev.conf:/etc/nginx/nginx.conf:ro
     networks:
-      - questlog-network
+      - glitch-network
     depends_on:
       - frontend
       - backend
@@ -167,23 +167,23 @@ services:
   # MailHog for email testing
   mailhog:
     image: mailhog/mailhog:latest
-    container_name: questlog-mailhog-dev
+    container_name: glitch-mailhog-dev
     restart: unless-stopped
     ports:
       - "1025:1025" # SMTP port
       - "8025:8025" # Web UI port
     networks:
-      - questlog-network
+      - glitch-network
 
   # Adminer for database management
   adminer:
     image: adminer:latest
-    container_name: questlog-adminer-dev
+    container_name: glitch-adminer-dev
     restart: unless-stopped
     ports:
       - "8080:8080"
     networks:
-      - questlog-network
+      - glitch-network
     depends_on:
       - postgres
 
@@ -196,5 +196,5 @@ volumes:
     driver: local
 
 networks:
-  questlog-network:
+  glitch-network:
     driver: bridge

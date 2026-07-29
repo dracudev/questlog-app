@@ -1,4 +1,4 @@
-import type { ActivityItem } from '@questlog/shared-types';
+import type { ActivityItem } from '@glitch/shared-types';
 import * as Avatar from '@radix-ui/react-avatar';
 import { Star } from 'lucide-react';
 

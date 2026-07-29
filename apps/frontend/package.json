@@ -1,8 +1,8 @@
 {
-  "name": "@questlog/frontend",
+  "name": "@glitch/frontend",
   "type": "module",
   "version": "0.0.1",
-  "description": "Questlog Frontend",
+  "description": "Glitch Frontend",
   "scripts": {
     "dev": "astro dev --host localhost",
     "start": "astro dev",
@@ -20,8 +20,8 @@
     "@astrojs/react": "^4.3.1",
     "@astrojs/vercel": "^8.2.6",
     "@nanostores/react": "^1.0.0",
-    "@questlog/shared-types": "workspace:*",
-    "@questlog/utils": "workspace:*",
+    "@glitch/shared-types": "workspace:*",
+    "@glitch/utils": "workspace:*",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-collapsible": "^1.1.12",

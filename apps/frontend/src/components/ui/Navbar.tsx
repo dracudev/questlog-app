@@ -91,12 +91,7 @@ export default function Navbar({ currentPath }: NavbarProps) {
               href="/"
               className="flex items-center space-x-2 text-[var(--text-primary)] hover:text-[var(--brand-accent)] transition-colors"
             >
-              <div className="w-8 h-8 bg-[var(--brand-primary)] rounded-md flex items-center justify-center">
-                <span className="text-[var(--text-inverse)] font-bold text-sm">Q</span>
-              </div>
-              <span className="font-bold text-[var(--text-primary)] text-xl hidden sm:block">
-                Questlog
-              </span>
+              <img src="/images/glitch-isotype.png" alt="Glitch" className="w-8 h-8" />
             </a>
           </div>
 
