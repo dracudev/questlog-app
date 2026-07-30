@@ -2,6 +2,15 @@ import type { ApiResponse, ApiError } from '@glitch/shared-types';
 import { $authToken, $refreshToken, clearAuthState, updateAuthTokens } from '@/stores/auth';
 
 // ============================================================================
+// Types
+// ============================================================================
+
+interface CacheEntry {
+  data: unknown;
+  expiry: number;
+}
+
+// ============================================================================
 // Configuration
 // ============================================================================
 
@@ -50,6 +59,8 @@ class ApiClient {
   private timeout: number;
   private defaultHeaders: Record<string, string>;
   private refreshPromise: Promise<void> | null = null;
+  private cache = new Map<string, CacheEntry>();
+  private readonly cacheTTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(options: ApiClientOptions = {}) {
     this.baseURL = options.baseURL || API_CONFIG.baseURL;
@@ -192,12 +203,25 @@ class ApiClient {
    */
   private async executeRequest<T>(url: string, config: RequestInit): Promise<T> {
     const maxRetries = (config as RequestConfig).retryAttempts || API_CONFIG.retryAttempts;
+    const isGet = !config.method || config.method === 'GET';
     let lastError: Error;
+
+    // ponytail: in-memory cache, add Redis if multi-instance or persistence matters
+    if (isGet) {
+      const cached = this.cache.get(url);
+      if (cached && cached.expiry > Date.now()) {
+        return cached.data as T;
+      }
+    }
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
         const response = await fetch(url, config);
-        return await this.handleResponse<T>(response);
+        const result = await this.handleResponse<T>(response);
+        if (isGet) {
+          this.cache.set(url, { data: result, expiry: Date.now() + this.cacheTTL });
+        }
+        return result;
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Unknown error');
 

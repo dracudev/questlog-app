@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
 import '../styles/global.css';
 
 export interface Props {
@@ -71,6 +72,9 @@ const canonical = canonicalURL || new URL(Astro.url.pathname, siteURL).toString(
     <meta name="theme-color" content="#16161a" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="msapplication-TileColor" content="#7f5af0" />
+    
+    <!-- Astro ViewTransitions for SPA-like navigation -->
+    <ViewTransitions />
     
     <!-- Progressive Web App meta tags -->
     <meta name="application-name" content={siteName} />
