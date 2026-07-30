@@ -6,6 +6,7 @@ import { useStore } from '@nanostores/react';
 import { $currentUser } from '@/stores/auth';
 import StarRating from '@/components/ui/StarRating';
 import { useReviewActions } from '@/hooks/useReviews';
+import { toast } from 'sonner';
 import type { ReviewResponse } from '@glitch/shared-types';
 
 // ============================================================================
@@ -74,7 +75,9 @@ export default function ReviewFormDialog({
     setLocalError(null);
 
     if (!user) {
-      setLocalError('You must be logged in to write a review');
+      toast('Log in to write a review', {
+        description: <a href="/auth/login" style={{ color: '#2cb67d', textDecoration: 'underline' }}>Go to login</a>,
+      });
       return;
     }
 
@@ -194,7 +197,7 @@ export default function ReviewFormDialog({
                   Cancel
                 </Button>
               </Dialog.Close>
-              <Button type="submit" disabled={isLoading || !user}>
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? 'Saving...' : isEditMode ? 'Update Review' : 'Submit Review'}
               </Button>
             </div>

@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useStore } from '@nanostores/react';
 import { Calendar, Users, Building2 } from 'lucide-react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useGameDetail } from '@/hooks/useGames';
+import { $currentUser } from '@/stores/auth';
 import ReviewFormDialog from './ReviewFormDialog';
 import { Button } from '@/components/ui/Button';
+import { toast } from 'sonner';
 
 export default function GameHeader() {
   const { game, isLoading } = useGameDetail();
@@ -135,39 +138,49 @@ export default function GameHeader() {
 }
 
 function ActionButtons({ onWriteReview }: { onWriteReview: () => void }) {
+  const user = useStore($currentUser);
+
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 items-center">
       <Button onClick={onWriteReview} className="flex-1 lg:flex-initial">
         Write Review
       </Button>
 
       <DropdownMenu.Root>
         <DropdownMenu.Trigger asChild>
-          <Button variant="secondary" className="flex-1 lg:flex-initial">
+          <Button
+            variant="secondary"
+            className="flex-1 lg:flex-initial"
+            onClick={() => {
+              if (!user) toast('Log in to manage your game lists', { description: <a href="/auth/login" style={{ color: '#2cb67d', textDecoration: 'underline' }}>Go to login</a> });
+            }}
+          >
             Add to List
           </Button>
         </DropdownMenu.Trigger>
 
-        <DropdownMenu.Portal>
-          <DropdownMenu.Content
-            className="min-w-[220px] bg-card border border-border text-foreground rounded-lg p-1 shadow-lg z-50"
-            sideOffset={5}
-          >
-            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
-              Favorites
-            </DropdownMenu.Item>
-            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
-              Playing
-            </DropdownMenu.Item>
-            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
-              Completed
-            </DropdownMenu.Item>
-            <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
-              Want to Play
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu.Portal>
-      </DropdownMenu.Root>
+        {user ? (
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content
+                className="min-w-[220px] bg-card border border-border text-foreground rounded-lg p-1 shadow-lg z-50"
+                sideOffset={5}
+              >
+                <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
+                  Favorites
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
+                  Playing
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
+                  Completed
+                </DropdownMenu.Item>
+                <DropdownMenu.Item className="flex items-center rounded px-3 py-2 text-sm hover:bg-accent focus:bg-accent cursor-pointer outline-none">
+                  Want to Play
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          ) : null}
+        </DropdownMenu.Root>
     </div>
   );
 }

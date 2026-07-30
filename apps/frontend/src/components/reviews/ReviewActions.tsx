@@ -3,6 +3,7 @@ import type { ReviewResponse } from '@glitch/shared-types';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Heart, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { toast } from 'sonner';
 
 // Hooks
 import { useReviewActions } from '@/hooks/useReviews';
@@ -70,6 +71,10 @@ export default function ReviewActions({
    */
   const handleLikeToggle = async () => {
     if (isLiking) return;
+    if (!currentUser) {
+      toast('Log in to like reviews', { description: <a href="/auth/login" style={{ color: '#2cb67d', textDecoration: 'underline' }}>Go to login</a> });
+      return;
+    }
 
     setIsLiking(true);
 

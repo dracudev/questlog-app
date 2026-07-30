@@ -1,7 +1,10 @@
 import { useFollowActions } from '@/hooks/useSocial';
 import { useEffect, useState } from 'react';
 import { setFollowingStatus } from '@/stores/social';
+import { $currentUser } from '@/stores/auth';
+import { useStore } from '@nanostores/react';
 import { Button } from '@/components/ui/Button';
+import { toast } from 'sonner';
 
 // ============================================================================
 // Props Interface
@@ -27,6 +30,7 @@ interface FollowButtonProps {
 export default function FollowButton({ userId, initialIsFollowing = false }: FollowButtonProps) {
   const { followUser, unfollowUser, followingStatus, loadingActions } =
     useFollowActions();
+  const currentUser = useStore($currentUser);
   const [error, setError] = useState<string | null>(null);
 
   // Seed the store with the SSR initial value on mount
@@ -39,6 +43,10 @@ export default function FollowButton({ userId, initialIsFollowing = false }: Fol
   const isLoading = loadingActions[userId] ?? false;
 
   const handleToggle = async () => {
+    if (!currentUser) {
+      toast('Log in to follow users', { description: <a href="/auth/login" style={{ color: '#2cb67d', textDecoration: 'underline' }}>Go to login</a> });
+      return;
+    }
     setError(null);
     try {
       if (isFollowing) {
