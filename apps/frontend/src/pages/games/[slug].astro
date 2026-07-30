@@ -1,35 +1,11 @@
 ---
-import type { GetStaticPaths } from 'astro';
+export const prerender = false;
+
 import MainLayout from '@/layouts/MainLayout.astro';
 import GameDetailPage from '@/components/games/GameDetailPage';
 import { gamesService } from '@/services/games';
 import { reviewsService } from '@/services/reviews';
 import type { GameDetail, PaginatedReviewsResponse, GameResponse } from '@glitch/shared-types';
-
-// ============================================================================
-// STATIC PATH GENERATION
-// ============================================================================
-
-export const getStaticPaths = (async () => {
-  try {  
-    // Fetch all games from API
-    const gamesResponse = await gamesService.getAllGames({ 
-      page: 1, 
-      limit: 100
-    });
-    
-    const paths = gamesResponse.data.map((game) => ({
-      params: { slug: game.game.slug },
-    }));
-    
-    console.log(`[GameDetail] Generated ${paths.length} static paths`);
-    
-    return paths;
-  } catch (error) {
-    console.error('[GameDetail] Failed to generate static paths:', error);
-    return [];
-  }
-}) satisfies GetStaticPaths;
 
 // ============================================================================
 // SERVER-SIDE DATA FETCHING

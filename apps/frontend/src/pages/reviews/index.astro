@@ -1,11 +1,10 @@
 ---
+export const prerender = false;
+
 import MainLayout from '@/layouts/MainLayout.astro';
 import ReviewsPage from '@/components/reviews/ReviewsPage';
 import { getAllReviews } from '@/services/reviews';
 import type { PaginatedReviewsResponse } from '@glitch/shared-types';
-
-// This page is statically generated at build time
-// On Vercel, you can enable ISR with revalidation
 
 // ============================================================================
 // Server-Side Data Fetching
