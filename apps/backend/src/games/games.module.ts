@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { GamesController } from './games.controller';
 import { GamesService } from './games.service';
+import { IgdbModule } from '@/igdb/igdb.module';
 
 import { DevelopersController } from './developers/developers.controller';
 import { DevelopersService } from './developers/developers.service';
@@ -12,6 +13,7 @@ import { GenresController } from './genres/genres.controller';
 import { GenresService } from './genres/genres.service';
 
 @Module({
+  imports: [IgdbModule],
   controllers: [
     DevelopersController,
     PublishersController,
